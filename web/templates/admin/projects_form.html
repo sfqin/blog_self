@@ -1,0 +1,43 @@
+{{template "admin_head" .}}
+{{$isNew := .Data.IsNew}}{{$it := .Data.Item}}
+<h1>{{if $isNew}}new project{{else}}edit project{{end}}</h1>
+<form method="post" action="{{if $isNew}}/admin/projects{{else}}/admin/projects/{{$it.ID}}{{end}}">
+  <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+  <div class="field">
+    <label>name 名称</label>
+    <input type="text" name="name" value="{{if not $isNew}}{{$it.Name}}{{end}}">
+  </div>
+  <div class="field">
+    <label>description 简介</label>
+    <textarea name="description" style="min-height:80px">{{if not $isNew}}{{$it.Description}}{{end}}</textarea>
+  </div>
+  <div class="row2">
+    <div class="field">
+      <label>language 语言</label>
+      <input type="text" name="language" value="{{if not $isNew}}{{$it.Language}}{{end}}">
+    </div>
+    <div class="field">
+      <label>stars star 数</label>
+      <input type="number" name="stars" value="{{if not $isNew}}{{$it.Stars}}{{else}}0{{end}}">
+    </div>
+  </div>
+  <div class="row2">
+    <div class="field">
+      <label>license</label>
+      <input type="text" name="license" value="{{if not $isNew}}{{$it.License}}{{end}}" placeholder="MIT">
+    </div>
+    <div class="field">
+      <label>sort_order 排序</label>
+      <input type="number" name="sort_order" value="{{if not $isNew}}{{$it.SortOrder}}{{else}}0{{end}}">
+    </div>
+  </div>
+  <div class="field">
+    <label>url 链接</label>
+    <input type="url" name="url" value="{{if not $isNew}}{{$it.URL}}{{end}}" placeholder="https://github.com/...">
+  </div>
+  <div class="actions-bar">
+    <button class="btn-primary" type="submit">save</button>
+    <a class="btn-ghost" style="text-decoration:none" href="/admin/projects">cancel</a>
+  </div>
+</form>
+{{template "admin_foot" .}}

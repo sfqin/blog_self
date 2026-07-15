@@ -1,0 +1,22 @@
+{
+  // Cloudflare Workers "static assets" deploy config.
+  //
+  // This project is a PURE STATIC site: `dist/` is rendered locally (from the
+  // SQLite admin) and committed. When Cloudflare's Git integration runs the
+  // default deploy command `npx wrangler deploy`, this file tells it to serve
+  // the pre-built `dist/` directory as static assets — with NO build step and
+  // NO server code.
+  //
+  // `dist/` is the ROOT-path build (assets referenced as /static/..., no /blog
+  // prefix), which is exactly what a domain-root host like *.workers.dev /
+  // *.pages.dev needs. (The /blog sub-path build lives on the gh-pages branch
+  // and Gitee, for those sub-path hosts.)
+  //
+  // "name" must match the Worker you created (its subdomain becomes
+  // <name>.workers.dev). Change it here if your Worker is named differently.
+  "name": "blog",
+  "compatibility_date": "2026-07-01",
+  "assets": {
+    "directory": "./dist"
+  }
+}

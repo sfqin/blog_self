@@ -1,0 +1,31 @@
+{{template "admin_head" .}}
+<div class="toolbar">
+  <h1>projects</h1>
+  <a class="btn-primary" style="text-decoration:none" href="/admin/projects/new">+ new</a>
+</div>
+{{if .Data}}
+<table>
+  <thead><tr><th>name</th><th>lang</th><th>★</th><th>license</th><th>order</th><th></th></tr></thead>
+  <tbody>
+  {{range .Data}}
+    <tr>
+      <td>{{.Name}}<div class="muted">{{.Description}}</div></td>
+      <td class="muted">{{.Language}}</td>
+      <td class="muted">{{.Stars}}</td>
+      <td class="muted">{{.License}}</td>
+      <td class="muted">{{.SortOrder}}</td>
+      <td style="white-space:nowrap;text-align:right">
+        <a class="btn-ghost" style="text-decoration:none;padding:6px 12px" href="/admin/projects/{{.ID}}/edit">edit</a>
+        <form method="post" action="/admin/projects/{{.ID}}/delete" style="display:inline" onsubmit="return confirm('删除这个项目？')">
+          <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+          <button class="btn-danger" type="submit">del</button>
+        </form>
+      </td>
+    </tr>
+  {{end}}
+  </tbody>
+</table>
+{{else}}
+<p class="empty" style="color:var(--muted)">暂无项目。</p>
+{{end}}
+{{template "admin_foot" .}}

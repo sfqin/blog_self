@@ -1,0 +1,70 @@
+{{template "admin_head" .}}
+{{$isNew := .Data.IsNew}}{{$it := .Data.Item}}
+<h1>{{if $isNew}}new footprint 新增足迹{{else}}edit footprint 编辑足迹{{end}}</h1>
+<form id="fp-form" method="post"
+      action="{{if $isNew}}/admin/footprints{{else}}/admin/footprints/{{$it.ID}}{{end}}"
+      data-cc="{{if not $isNew}}{{$it.CountryCode}}{{end}}"
+      data-prov="{{if not $isNew}}{{$it.Province}}{{end}}"
+      data-city="{{if not $isNew}}{{$it.City}}{{end}}">
+  <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+  <!-- country_name is derived from the selected country; kept as hidden field. -->
+  <input type="hidden" id="fp-country-name" name="country_name" value="{{if not $isNew}}{{$it.CountryName}}{{end}}">
+  <div class="row2">
+    <div class="field">
+      <label>country 国家</label>
+      <select id="fp-country" name="country_code">
+        <option value="">— 选择国家 select country —</option>
+        <option value="CN" data-name="中国">中国 · China (CN)</option>
+        <option value="MY" data-name="马来西亚">马来西亚 · Malaysia (MY)</option>
+        <option value="JP" data-name="日本">日本 · Japan (JP)</option>
+        <option value="TH" data-name="泰国">泰国 · Thailand (TH)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>province 省/州/都道府县</label>
+      <select id="fp-province" name="province" disabled>
+        <option value="">— 先选择国家 —</option>
+      </select>
+      <div class="hint" id="fp-province-hint"></div>
+    </div>
+  </div>
+  <div class="row2">
+    <div class="field">
+      <label>city 城市/区</label>
+      <select id="fp-city" name="city" disabled>
+        <option value="">— 先选择省/州 —</option>
+      </select>
+      <div class="hint" id="fp-city-hint"></div>
+    </div>
+    <div class="field">
+      <label>sort_order 排序</label>
+      <input type="number" name="sort_order" value="{{if not $isNew}}{{$it.SortOrder}}{{else}}0{{end}}">
+    </div>
+  </div>
+  <div class="field">
+    <label>note 备注（选填）</label>
+    <input type="text" name="note" value="{{if not $isNew}}{{$it.Note}}{{end}}" placeholder="可留空 optional">
+  </div>
+  <div class="field">
+    <label>linked moments 关联瞬间（选填，可多选，下钻到该城市时可跳转）</label>
+    {{if .Data.Moments}}
+    <div class="checkbox-list">
+      {{range .Data.Moments}}
+      <label class="checkbox-item">
+        <input type="checkbox" name="moment_ids" value="{{.ID}}" {{if and (not $isNew) ($it.LinksMoment .ID)}}checked{{end}}>
+        <span>{{.Date}} · {{if .Place}}{{.Place}} · {{end}}{{.Caption}}</span>
+      </label>
+      {{end}}
+    </div>
+    <div class="hint">在地球下钻到「城市」层级时，点击该城市可跳到所关联的瞬间（可关联多条）。</div>
+    {{else}}
+    <div class="hint">还没有瞬间可关联，先到 <a href="/admin/moments">/admin/moments</a> 添加。</div>
+    {{end}}
+  </div>
+  <div class="actions-bar">
+    <button class="btn-primary" type="submit">save</button>
+    <a class="btn-ghost" style="text-decoration:none" href="/admin/footprints">cancel</a>
+  </div>
+</form>
+<script src="/static/js/footprint-form.js"></script>
+{{template "admin_foot" .}}

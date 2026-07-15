@@ -1,0 +1,34 @@
+{{template "admin_head" .}}
+<div class="toolbar">
+  <h1>footprints — 去过的地方</h1>
+  <a class="btn-primary" style="text-decoration:none" href="/admin/footprints/new">+ new</a>
+</div>
+<p class="muted" style="color:var(--muted);margin-top:-10px">
+  每行一个「城市」。国家代码用 ISO 两位大写（CN / JP / MY / SG）。地球模块按 国家→省/州→城市 分组高亮。
+</p>
+{{if .Data}}
+<table>
+  <thead><tr><th>country</th><th>province/state</th><th>city</th><th>note</th><th>order</th><th></th></tr></thead>
+  <tbody>
+  {{range .Data}}
+    <tr>
+      <td>{{.CountryCode}} <span class="muted">{{.CountryName}}</span></td>
+      <td>{{.Province}}</td>
+      <td>{{.City}}</td>
+      <td class="muted">{{.Note}}</td>
+      <td class="muted">{{.SortOrder}}</td>
+      <td style="white-space:nowrap;text-align:right">
+        <a class="btn-ghost" style="text-decoration:none;padding:6px 12px" href="/admin/footprints/{{.ID}}/edit">edit</a>
+        <form method="post" action="/admin/footprints/{{.ID}}/delete" style="display:inline" onsubmit="return confirm('删除这个足迹？')">
+          <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+          <button class="btn-danger" type="submit">del</button>
+        </form>
+      </td>
+    </tr>
+  {{end}}
+  </tbody>
+</table>
+{{else}}
+<p class="empty" style="color:var(--muted)">暂无足迹。</p>
+{{end}}
+{{template "admin_foot" .}}

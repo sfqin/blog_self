@@ -1,0 +1,41 @@
+{{template "admin_head" .}}
+{{$isNew := .Data.IsNew}}{{$it := .Data.Item}}
+<h1>{{if $isNew}}new post{{else}}edit post{{end}}</h1>
+<form method="post" action="{{if $isNew}}/admin/posts{{else}}/admin/posts/{{$it.ID}}{{end}}">
+  <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+  <div class="field">
+    <label>title 标题</label>
+    <input type="text" name="title" id="post-title" value="{{if not $isNew}}{{$it.Title}}{{end}}" required>
+  </div>
+  <div class="row2">
+    <div class="field">
+      <label>slug（留空自动生成）</label>
+      <input type="text" name="slug" value="{{if not $isNew}}{{$it.Slug}}{{end}}" placeholder="my-first-post">
+      <div class="hint">URL 为 /posts/&lt;slug&gt;</div>
+    </div>
+    <div class="field">
+      <label>date 日期</label>
+      <input type="date" name="date" value="{{if not $isNew}}{{$it.Date}}{{end}}">
+    </div>
+  </div>
+  <div class="field">
+    <label>tags 标签（逗号分隔）</label>
+    <input type="text" name="tags" value="{{if not $isNew}}{{$it.Tags}}{{end}}" placeholder="go, sqlite, 后端">
+  </div>
+  <div class="field">
+    <label>body 正文（Markdown）</label>
+    <textarea name="body_md" id="post-body" class="tall">{{if not $isNew}}{{$it.BodyMD}}{{end}}</textarea>
+    <div class="hint">支持 GFM（标题 / 列表 / 代码块 / 引用 / 表格）。<a id="toggle-preview" style="cursor:pointer">预览</a></div>
+    <div id="preview" class="article" style="display:none;border:1px solid var(--line);border-radius:6px;padding:16px;margin-top:10px"></div>
+  </div>
+  <div class="field inline">
+    <input type="checkbox" name="published" id="published" {{if and (not $isNew) $it.Published}}checked{{end}}>
+    <label for="published">published 发布（勾选后立即出现在主页）</label>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-primary" type="submit">save</button>
+    <a class="btn-ghost" style="text-decoration:none" href="/admin/posts">cancel</a>
+  </div>
+</form>
+<script src="/static/js/admin.js" defer></script>
+{{template "admin_foot" .}}

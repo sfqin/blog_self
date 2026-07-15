@@ -1,0 +1,20 @@
+{{template "admin_head" .}}
+<h1>dashboard</h1>
+<p class="muted" style="color:var(--muted);margin-top:-10px">
+  在这里管理站点全部内容。任何修改保存后<strong style="color:var(--green)">立即生效</strong>，无需重新构建。
+</p>
+{{with .Data}}
+<div class="dash-grid" style="margin-top:22px">
+  <a class="dash-card" href="/admin/experiences"><div class="num">{{.Counts.experiences}}</div><div class="lbl">experiences</div></a>
+  <a class="dash-card" href="/admin/thoughts"><div class="num">{{.Counts.thoughts}}</div><div class="lbl">thoughts</div></a>
+  <a class="dash-card" href="/admin/projects"><div class="num">{{.Counts.projects}}</div><div class="lbl">projects</div></a>
+  <a class="dash-card" href="/admin/posts"><div class="num">{{.Counts.posts}}</div><div class="lbl">posts</div></a>
+  <a class="dash-card" href="/admin/footprints"><div class="num">{{.Counts.footprints}}</div><div class="lbl">footprints</div></a>
+  <a class="dash-card" href="/admin/moments"><div class="num">{{.Counts.moments}}</div><div class="lbl">moments</div></a>
+</div>
+<div style="margin-top:28px">
+  <a class="btn-primary" style="text-decoration:none" href="/admin/posts/new">+ 写新文章</a>
+  <a class="btn-ghost" style="text-decoration:none;margin-left:8px" href="/admin/profile">编辑 whoami</a>
+</div>
+{{end}}
+{{template "admin_foot" .}}

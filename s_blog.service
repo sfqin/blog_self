@@ -1,0 +1,45 @@
+# systemd unit for the dev@home blog Go service.
+#
+# Install to /etc/systemd/system/s_blog.service, then:
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now s_blog
+#
+# The binary listens on loopback only; Caddy (see Caddyfile) terminates TLS
+# and reverse-proxies public traffic to it.
+
+[Unit]
+Description=dev@home blog (Go + SQLite)
+After=network.target
+
+[Service]
+Type=simple
+User=blog
+Group=blog
+WorkingDirectory=/opt/s_blog
+
+# Runtime configuration. ADMIN_PASSWORD only needs to be set on the FIRST
+# start (it creates/updates the admin login); after that you may remove it
+# and restart. Change ADMIN_USERNAME if you like.
+Environment=ADDR=127.0.0.1:8080
+Environment=DB_PATH=/opt/s_blog/data/blog.db
+Environment=ADMIN_USERNAME=admin
+Environment=SECURE_COOKIES=1
+# Set this once, then restart. Use a strong value.
+Environment=ADMIN_PASSWORD=CHANGE_ME_ON_FIRST_BOOT
+
+ExecStart=/opt/s_blog/s_blog
+Restart=on-failure
+RestartSec=3
+
+# Hardening.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/s_blog/data
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target

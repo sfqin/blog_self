@@ -1,0 +1,35 @@
+{{template "admin_head" .}}
+{{$isNew := .Data.IsNew}}{{$it := .Data.Item}}
+<h1>{{if $isNew}}new experience{{else}}edit experience{{end}}</h1>
+<form method="post" action="{{if $isNew}}/admin/experiences{{else}}/admin/experiences/{{$it.ID}}{{end}}">
+  <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+  <div class="row2">
+    <div class="field">
+      <label>period 时间段</label>
+      <input type="text" name="period" value="{{if not $isNew}}{{$it.Period}}{{end}}" placeholder="2023.06 — 至今">
+    </div>
+    <div class="field">
+      <label>sort_order 排序（小在前）</label>
+      <input type="number" name="sort_order" value="{{if not $isNew}}{{$it.SortOrder}}{{else}}0{{end}}">
+    </div>
+  </div>
+  <div class="row2">
+    <div class="field">
+      <label>company 公司</label>
+      <input type="text" name="company" value="{{if not $isNew}}{{$it.Company}}{{end}}">
+    </div>
+    <div class="field">
+      <label>role 职位</label>
+      <input type="text" name="role" value="{{if not $isNew}}{{$it.Role}}{{end}}">
+    </div>
+  </div>
+  <div class="field">
+    <label>description 职责描述</label>
+    <textarea name="description">{{if not $isNew}}{{$it.Description}}{{end}}</textarea>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-primary" type="submit">save</button>
+    <a class="btn-ghost" style="text-decoration:none" href="/admin/experiences">cancel</a>
+  </div>
+</form>
+{{template "admin_foot" .}}

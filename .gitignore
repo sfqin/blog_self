@@ -1,0 +1,22 @@
+# Local build helpers
+/tmp/
+*.exe
+/blogbin
+
+# Local SQLite database — the admin source of truth. NEVER commit it:
+# it holds your hashed admin password and is edited only on your machine.
+*.db
+*.db-shm
+*.db-wal
+
+# Node (only needed to (re)generate geo data / run tests). package.json lives
+# under scripts/ (NOT the repo root) so Cloudflare/EdgeOne Pages treat this as a
+# pure static site and skip `npm install`.
+/node_modules/
+/scripts/node_modules/
+
+# OS / editor
+.DS_Store
+
+# NOTE: /dist is intentionally NOT ignored — the rendered static site is
+# committed and pushed so Cloudflare Pages / GitHub Pages can serve it.

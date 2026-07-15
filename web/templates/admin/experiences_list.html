@@ -1,0 +1,30 @@
+{{template "admin_head" .}}
+<div class="toolbar">
+  <h1>experiences</h1>
+  <a class="btn-primary" style="text-decoration:none" href="/admin/experiences/new">+ new</a>
+</div>
+{{if .Data}}
+<table>
+  <thead><tr><th>period</th><th>company</th><th>role</th><th>order</th><th></th></tr></thead>
+  <tbody>
+  {{range .Data}}
+    <tr>
+      <td>{{.Period}}</td>
+      <td>{{.Company}}</td>
+      <td class="muted">{{.Role}}</td>
+      <td class="muted">{{.SortOrder}}</td>
+      <td style="white-space:nowrap;text-align:right">
+        <a class="btn-ghost" style="text-decoration:none;padding:6px 12px" href="/admin/experiences/{{.ID}}/edit">edit</a>
+        <form method="post" action="/admin/experiences/{{.ID}}/delete" style="display:inline" onsubmit="return confirm('删除这条经历？')">
+          <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+          <button class="btn-danger" type="submit">del</button>
+        </form>
+      </td>
+    </tr>
+  {{end}}
+  </tbody>
+</table>
+{{else}}
+<p class="empty" style="color:var(--muted)">暂无经历。点击 + new 添加。</p>
+{{end}}
+{{template "admin_foot" .}}

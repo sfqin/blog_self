@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{if .Profile.Name}}{{.Profile.Name}}{{else}}dev@home{{end}} — dev@home</title>
+<meta name="description" content="{{.Profile.Tagline}}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{.Base}}/static/css/crt.css">
+</head>
+<body>
+<div class="crt-scanlines"></div>
+<div class="crt-vignette"></div>
+
+<nav class="nav">
+  <div class="container">
+    <span class="brand">dev@home</span>
+    <span class="spacer"></span>
+    <div class="search-box">
+      <input type="text" id="site-search" autocomplete="off" spellcheck="false" placeholder="搜索…  /  聚焦" aria-label="搜索站点内容">
+      <div class="search-results" id="search-results"></div>
+    </div>
+    <a class="link" href="#about">whoami</a>
+    <a class="link" href="#experience">经历</a>
+    <a class="link" href="#thoughts">思考</a>
+    <a class="link" href="#projects">项目</a>
+    <a class="link" href="#notes">笔记</a>
+    <a class="link" href="#footprint">足迹</a>
+    <a class="link" href="#moments">瞬间</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <div class="cmd">ssh dev@home --connect</div>
+    <h1 class="name">{{if .Profile.Name}}{{.Profile.Name}}{{else}}dev@home{{end}}</h1>
+    <div class="role">{{if .Profile.Title}}{{.Profile.Title}}{{else}}Backend Engineer{{end}}</div>
+    <p class="tagline">{{if .Profile.Tagline}}{{.Profile.Tagline}}{{else}}// 在这里写一句话简介（通过 /admin 编辑）{{end}}<span class="cursor"></span></p>
+    <div class="actions">
+      {{if .Profile.GitHubURL}}<a class="btn" href="{{.Profile.GitHubURL}}" target="_blank" rel="noopener">GitHub</a>{{end}}
+      {{if .Profile.Email}}<a class="btn amber" href="mailto:{{.Profile.Email}}">Email</a>{{end}}
+      <a class="btn" href="#footprint">./modules/footprint</a>
+    </div>
+  </div>
+</header>
+
+<!-- whoami -->
+<section id="about">
+  <div class="container">
+    <div class="cmd">cat about.md</div>
+    {{if .Profile.AboutMD}}
+      <div class="article">{{markdown .Profile.AboutMD}}</div>
+    {{else}}
+      <p class="empty">// 自我介绍待填写（/admin/profile）</p>
+    {{end}}
+    {{with .Profile.StackTags}}
+    <div class="tags">
+      {{range .}}<span class="tag green">{{.}}</span>{{end}}
+    </div>
+    {{end}}
+    {{if .Profile.Location}}<p class="note-row"><span class="date">location</span><span>{{.Profile.Location}}</span></p>{{end}}
+  </div>
+</section>
+
+<!-- experience -->
+<section id="experience">
+  <div class="container">
+    <div class="cmd">tail -f experience.log</div>
+    {{if .Experiences}}
+      {{range .Experiences}}
+      <div class="log-entry">
+        <div class="period">{{.Period}}</div>
+        <div><span class="company">{{.Company}}</span> <span class="role">— {{.Role}}</span></div>
+        <div>{{.Description}}</div>
+      </div>
+      {{end}}
+    {{else}}
+      <p class="empty">// 暂无经历（/admin/experiences）</p>
+    {{end}}
+  </div>
+</section>
+
+<!-- thoughts -->
+<section id="thoughts">
+  <div class="container">
+    <div class="cmd">less thoughts/</div>
+    {{if .Thoughts}}
+      {{range .Thoughts}}
+      <div class="thought">
+        <div class="thought-body">{{.Body}}</div>
+        <button class="thought-toggle" type="button" hidden>展开 ▾</button>
+        <div class="meta">{{if .Topic}}[{{.Topic}}] {{end}}{{.Date}}</div>
+      </div>
+      {{end}}
+    {{else}}
+      <p class="empty">// 暂无思考（/admin/thoughts）</p>
+    {{end}}
+  </div>
+</section>
+
+<!-- projects -->
+<section id="projects">
+  <div class="container">
+    <div class="cmd">ls projects/</div>
+    {{if .Projects}}
+      <div class="grid">
+        {{range .Projects}}
+        <div class="card">
+          <div class="name">{{if .URL}}<a href="{{.URL}}" target="_blank" rel="noopener">{{.Name}}</a>{{else}}{{.Name}}{{end}}</div>
+          <div class="desc">{{.Description}}</div>
+          <div class="meta">
+            {{if .Language}}<span>{{.Language}}</span>{{end}}
+            {{if .Stars}}<span class="star">{{.Stars}}</span>{{end}}
+            {{if .License}}<span>{{.License}}</span>{{end}}
+          </div>
+        </div>
+        {{end}}
+      </div>
+    {{else}}
+      <p class="empty">// 暂无项目（/admin/projects）</p>
+    {{end}}
+  </div>
+</section>
+
+<!-- notes / blog -->
+<section id="notes">
+  <div class="container">
+    <div class="cmd">ls -lt notes/</div>
+    {{if .Posts}}
+      {{range .Posts}}
+      <div class="note-row">
+        <span class="date">{{.Date}}</span>
+        <a class="title" href="{{$.Base}}/posts/{{.Slug}}">{{.Title}}</a>
+        <span class="tags-inline">{{range .TagList}}<span class="tag-chip">#{{.}}</span>{{end}}</span>
+      </div>
+      {{end}}
+    {{else}}
+      <p class="empty">// 暂无文章（/admin/posts）</p>
+    {{end}}
+  </div>
+</section>
+
+<!-- footprint globe -->
+<section id="footprint">
+  <div class="container">
+    <div class="cmd">./modules/footprint --render</div>
+    <div class="globe-breadcrumb" id="globe-breadcrumb">~/globe</div>
+    <div class="globe-stage">
+      <button id="globe-cd-up" class="globe-back-btn" style="display:none" aria-label="返回上一级">← 返回上一级</button>
+      <canvas id="globe-canvas" width="440" height="440"></canvas>
+    </div>
+    <div class="globe-stats" id="globe-stats"></div>
+    <div id="globe-moment-links" class="globe-moment-links" style="display:none"></div>
+  </div>
+</section>
+
+<!-- moments -->
+<section id="moments">
+  <div class="container">
+    <div class="cmd">feh moments/*</div>
+    {{if .Moments}}
+      <div class="moments">
+        {{range .Moments}}
+        <article class="moment" id="moment-{{.ID}}">
+          <div class="moment-meta">
+            {{if .Place}}<span class="moment-place">{{.Place}}</span>{{end}}
+            {{if .Date}}<span class="moment-date">{{.Date}}</span>{{end}}
+          </div>
+          {{if .Caption}}<div class="moment-caption">{{.Caption}}</div>{{end}}
+          {{with .MediaList}}
+          <div class="moment-media" data-count="{{len .}}">
+            {{range .}}
+            {{if .IsEmbed}}
+              <div class="moment-item moment-embed">
+                <div class="moment-embed-frame"><iframe src="{{.URL}}" loading="lazy" allow="fullscreen; encrypted-media; picture-in-picture" allowfullscreen scrolling="no" frameborder="0" referrerpolicy="no-referrer"></iframe></div>
+                {{if .WatchURL}}<a class="moment-embed-open" href="{{.WatchURL}}" target="_blank" rel="noopener">{{if eq .Provider "bilibili"}}在 B 站打开{{else if eq .Provider "youtube"}}在 YouTube 打开{{else}}在原站打开{{end}} ↗</a>{{end}}
+              </div>
+            {{else if .IsVideo}}
+              <video class="moment-item" src="{{.URL}}" controls preload="metadata" playsinline></video>
+            {{else}}
+              <img class="moment-item" src="{{.URL}}" alt="" loading="lazy" data-full="{{.URL}}">
+            {{end}}
+            {{end}}
+          </div>
+          {{end}}
+        </article>
+        {{end}}
+      </div>
+    {{else}}
+      <p class="empty">// 暂无瞬间（/admin/moments）</p>
+    {{end}}
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="cmd">echo "© {{year}} {{if .Profile.Name}}{{.Profile.Name}}{{else}}dev@home{{end}} — built with Go · self-hosted · no trackers"</div>
+  </div>
+</footer>
+
+<script>window.__BASE__ = "{{.Base}}";</script>
+<script src="{{.Base}}/static/js/globe.js" defer></script>
+<script src="{{.Base}}/static/js/thoughts.js" defer></script>
+<script src="{{.Base}}/static/js/moments.js" defer></script>
+<script src="{{.Base}}/static/js/search.js" defer></script>
+</body>
+</html>

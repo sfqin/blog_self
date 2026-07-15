@@ -1,0 +1,30 @@
+{{template "admin_head" .}}
+{{$isNew := .Data.IsNew}}{{$it := .Data.Item}}
+<h1>{{if $isNew}}new moment{{else}}edit moment{{end}}</h1>
+<form method="post" action="{{if $isNew}}/admin/moments{{else}}/admin/moments/{{$it.ID}}{{end}}">
+  <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+  <div class="row2">
+    <div class="field">
+      <label>place 地点</label>
+      <input type="text" name="place" value="{{if not $isNew}}{{$it.Place}}{{end}}" placeholder="例如：马来西亚 · 吉隆坡">
+    </div>
+    <div class="field">
+      <label>date 日期</label>
+      <input type="date" name="date" value="{{if not $isNew}}{{$it.Date}}{{end}}">
+    </div>
+  </div>
+  <div class="field">
+    <label>caption 文字说明</label>
+    <textarea name="caption" placeholder="这一刻的文字…（可只写文字，不配图）">{{if not $isNew}}{{$it.Caption}}{{end}}</textarea>
+  </div>
+  <div class="field">
+    <label>media 图片 / 视频链接（每行一个 URL，留空则为纯文字）</label>
+    <textarea name="media" rows="4" placeholder="https://cdn.example.com/photo.jpg&#10;https://cdn.example.com/clip.mp4">{{if not $isNew}}{{$it.Media}}{{end}}</textarea>
+    <p class="muted" style="margin:6px 0 0;font-size:12px">粘贴外部图床（如 Cloudflare R2）的直链，每行一个。<code>.mp4/.webm/.mov/.m4v/.ogv</code> 自动识别为视频；粘贴 <code>bilibili.com/video/BV…</code> 或 YouTube 链接会自动嵌入播放器。</p>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-primary" type="submit">save</button>
+    <a class="btn-ghost" style="text-decoration:none" href="/admin/moments">cancel</a>
+  </div>
+</form>
+{{template "admin_foot" .}}

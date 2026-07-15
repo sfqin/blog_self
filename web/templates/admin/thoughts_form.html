@@ -1,0 +1,25 @@
+{{template "admin_head" .}}
+{{$isNew := .Data.IsNew}}{{$it := .Data.Item}}
+<h1>{{if $isNew}}new thought{{else}}edit thought{{end}}</h1>
+<form method="post" action="{{if $isNew}}/admin/thoughts{{else}}/admin/thoughts/{{$it.ID}}{{end}}">
+  <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+  <div class="row2">
+    <div class="field">
+      <label>topic 主题</label>
+      <input type="text" name="topic" value="{{if not $isNew}}{{$it.Topic}}{{end}}">
+    </div>
+    <div class="field">
+      <label>date 日期</label>
+      <input type="date" name="date" value="{{if not $isNew}}{{$it.Date}}{{end}}">
+    </div>
+  </div>
+  <div class="field">
+    <label>body 观点文本</label>
+    <textarea name="body">{{if not $isNew}}{{$it.Body}}{{end}}</textarea>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-primary" type="submit">save</button>
+    <a class="btn-ghost" style="text-decoration:none" href="/admin/thoughts">cancel</a>
+  </div>
+</form>
+{{template "admin_foot" .}}

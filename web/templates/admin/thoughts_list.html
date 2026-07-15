@@ -1,0 +1,29 @@
+{{template "admin_head" .}}
+<div class="toolbar">
+  <h1>thoughts</h1>
+  <a class="btn-primary" style="text-decoration:none" href="/admin/thoughts/new">+ new</a>
+</div>
+{{if .Data}}
+<table>
+  <thead><tr><th>date</th><th>topic</th><th>body</th><th></th></tr></thead>
+  <tbody>
+  {{range .Data}}
+    <tr>
+      <td class="muted" style="white-space:nowrap">{{.Date}}</td>
+      <td>{{.Topic}}</td>
+      <td>{{.Body}}</td>
+      <td style="white-space:nowrap;text-align:right">
+        <a class="btn-ghost" style="text-decoration:none;padding:6px 12px" href="/admin/thoughts/{{.ID}}/edit">edit</a>
+        <form method="post" action="/admin/thoughts/{{.ID}}/delete" style="display:inline" onsubmit="return confirm('删除这条思考？')">
+          <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+          <button class="btn-danger" type="submit">del</button>
+        </form>
+      </td>
+    </tr>
+  {{end}}
+  </tbody>
+</table>
+{{else}}
+<p class="empty" style="color:var(--muted)">暂无思考。</p>
+{{end}}
+{{template "admin_foot" .}}

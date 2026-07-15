@@ -1,0 +1,49 @@
+{{template "admin_head" .}}
+<h1>profile — whoami / hero</h1>
+{{with .Data}}
+<form method="post" action="/admin/profile">
+  <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+  <div class="row2">
+    <div class="field">
+      <label>name 姓名</label>
+      <input type="text" name="name" value="{{.Name}}">
+    </div>
+    <div class="field">
+      <label>title 职位</label>
+      <input type="text" name="title" value="{{.Title}}">
+    </div>
+  </div>
+  <div class="field">
+    <label>tagline 一句话简介</label>
+    <input type="text" name="tagline" value="{{.Tagline}}">
+  </div>
+  <div class="field">
+    <label>about.md 自我介绍（Markdown）</label>
+    <textarea name="about_md" class="tall">{{.AboutMD}}</textarea>
+    <div class="hint">支持 Markdown。渲染在首页 whoami 区块。</div>
+  </div>
+  <div class="field">
+    <label>stack 技术栈（逗号分隔）</label>
+    <input type="text" name="stack" value="{{.Stack}}" placeholder="Go, SQLite, Kafka, Redis">
+  </div>
+  <div class="row2">
+    <div class="field">
+      <label>github_url</label>
+      <input type="url" name="github_url" value="{{.GitHubURL}}" placeholder="https://github.com/...">
+    </div>
+    <div class="field">
+      <label>email</label>
+      <input type="email" name="email" value="{{.Email}}">
+    </div>
+  </div>
+  <div class="field">
+    <label>location 位置</label>
+    <input type="text" name="location" value="{{.Location}}">
+  </div>
+  <div class="actions-bar">
+    <button class="btn-primary" type="submit">save</button>
+    <a class="btn-ghost" style="text-decoration:none" href="/" target="_blank">preview site ↗</a>
+  </div>
+</form>
+{{end}}
+{{template "admin_foot" .}}

@@ -1,0 +1,32 @@
+{{template "admin_head" .}}
+<div class="toolbar">
+  <h1>posts</h1>
+  <a class="btn-primary" style="text-decoration:none" href="/admin/posts/new">+ new post</a>
+</div>
+{{if .Data}}
+<table>
+  <thead><tr><th>date</th><th>title</th><th>slug</th><th>tags</th><th>status</th><th></th></tr></thead>
+  <tbody>
+  {{range .Data}}
+    <tr>
+      <td class="muted" style="white-space:nowrap">{{.Date}}</td>
+      <td>{{.Title}}</td>
+      <td class="muted">{{.Slug}}</td>
+      <td class="muted">{{range .TagList}}#{{.}} {{end}}</td>
+      <td>{{if .Published}}<span class="badge pub">published</span>{{else}}<span class="badge draft">draft</span>{{end}}</td>
+      <td style="white-space:nowrap;text-align:right">
+        {{if .Published}}<a class="btn-ghost" style="text-decoration:none;padding:6px 12px" href="/posts/{{.Slug}}" target="_blank">view</a>{{end}}
+        <a class="btn-ghost" style="text-decoration:none;padding:6px 12px" href="/admin/posts/{{.ID}}/edit">edit</a>
+        <form method="post" action="/admin/posts/{{.ID}}/delete" style="display:inline" onsubmit="return confirm('删除这篇文章？')">
+          <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+          <button class="btn-danger" type="submit">del</button>
+        </form>
+      </td>
+    </tr>
+  {{end}}
+  </tbody>
+</table>
+{{else}}
+<p class="empty" style="color:var(--muted)">暂无文章。点击 + new post 写第一篇。</p>
+{{end}}
+{{template "admin_foot" .}}

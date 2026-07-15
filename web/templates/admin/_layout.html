@@ -1,0 +1,44 @@
+{{define "admin_head"}}<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{.Title}} — admin · dev@home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/crt.css">
+<link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+<div class="crt-scanlines"></div>
+<div class="crt-vignette"></div>
+<div class="admin-shell">
+  <aside class="admin-side">
+    <a class="brand" href="/admin">dev@home:~#</a>
+    <a href="/admin" class="{{if eq .Active "dashboard"}}active{{end}}"><span class="nav-en">dashboard</span><span class="nav-zh">总览</span></a>
+    <a href="/admin/profile" class="{{if eq .Active "profile"}}active{{end}}"><span class="nav-en">profile</span><span class="nav-zh">个人资料</span></a>
+    <a href="/admin/experiences" class="{{if eq .Active "experiences"}}active{{end}}"><span class="nav-en">experiences</span><span class="nav-zh">工作经历</span></a>
+    <a href="/admin/thoughts" class="{{if eq .Active "thoughts"}}active{{end}}"><span class="nav-en">thoughts</span><span class="nav-zh">随想</span></a>
+    <a href="/admin/projects" class="{{if eq .Active "projects"}}active{{end}}"><span class="nav-en">projects</span><span class="nav-zh">项目</span></a>
+    <a href="/admin/posts" class="{{if eq .Active "posts"}}active{{end}}"><span class="nav-en">posts</span><span class="nav-zh">文章</span></a>
+    <a href="/admin/footprints" class="{{if eq .Active "footprints"}}active{{end}}"><span class="nav-en">footprints</span><span class="nav-zh">足迹</span></a>
+    <a href="/admin/moments" class="{{if eq .Active "moments"}}active{{end}}"><span class="nav-en">moments</span><span class="nav-zh">瞬间</span></a>
+    <div class="logout">
+      <a href="/" target="_blank">↗ view site</a>
+      <form method="post" action="/admin/logout" style="padding:9px 18px">
+        <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+        <button class="btn-ghost" type="submit">logout</button>
+      </form>
+    </div>
+  </aside>
+  <main class="admin-main">
+    {{if .Flash}}<div class="flash">✓ {{.Flash}}</div>{{end}}
+{{end}}
+
+{{define "admin_foot"}}
+  </main>
+</div>
+</body>
+</html>
+{{end}}

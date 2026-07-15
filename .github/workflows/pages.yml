@@ -1,0 +1,44 @@
+# OPTIONAL: deploy the pre-built ./dist to GitHub Pages as a mirror/fallback.
+#
+# You do NOT need this for Cloudflare Pages — Cloudflare watches your repo
+# directly and deploys ./dist on every push (see DEPLOY.md). This workflow is
+# only useful if you also want a github.io mirror.
+#
+# Note: it publishes the ALREADY-COMMITTED ./dist (it does not rebuild, because
+# the SQLite database with your admin password stays on your machine). The site
+# uses absolute paths (/static, /posts), so on GitHub Pages it must be served at
+# a domain root — i.e. attach a custom domain, or use a <user>.github.io repo.
+#
+# To enable: repo Settings -> Pages -> Source = "GitHub Actions".
+
+name: Deploy dist to GitHub Pages
+
+on:
+  push:
+    branches: [master, main]
+    paths: ["dist/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4

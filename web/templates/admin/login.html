@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>login — admin · dev@home</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/crt.css">
+<link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+<div class="crt-scanlines"></div>
+<div class="crt-vignette"></div>
+<div class="login-wrap">
+  <div class="cmd">ssh admin@dev.home</div>
+  {{if .Error}}<div class="login-error">✗ 登录失败，请检查用户名 / 密码。</div>{{end}}
+  <form method="post" action="/admin/login">
+    <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+    <div class="field">
+      <label>username</label>
+      <input type="text" name="username" autocomplete="username" autofocus required>
+    </div>
+    <div class="field">
+      <label>password</label>
+      <input type="password" name="password" autocomplete="current-password" required>
+    </div>
+    <div class="actions-bar">
+      <button class="btn-primary" type="submit">connect</button>
+    </div>
+  </form>
+</div>
+</body>
+</html>

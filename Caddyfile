@@ -1,0 +1,31 @@
+# Caddyfile — reverse proxy + automatic HTTPS for dev@home blog
+#
+# Replace blog.example.com with your real domain before deploying.
+# Caddy automatically obtains and renews a Let's Encrypt certificate.
+#
+# The Go service listens on 127.0.0.1:8080 (loopback only); Caddy is the
+# only public-facing process. This keeps the app safe behind TLS.
+
+blog.example.com {
+	encode zstd gzip
+
+	# App is served entirely by the Go binary (HTML, embedded static assets,
+	# and the JSON API). Everything is proxied through.
+	reverse_proxy 127.0.0.1:8080
+
+	# Long-cache the immutable static assets (css/js/geo JSON).
+	@static path /static/*
+	header @static Cache-Control "public, max-age=604800"
+
+	# Basic security headers.
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	log {
+		output file /var/log/caddy/blog.access.log
+		format json
+	}
+}
