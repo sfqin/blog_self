@@ -9,6 +9,10 @@
 > 🔰 **完全不用会编程。** 拿到发布包后双击一个文件，跟着网页里的按钮走即可。
 > 详细图文见 [`docs/新手指南.md`](docs/新手指南.md)。
 
+> 📦 **下载客户端**：[**最新版发布页**](https://github.com/sfqin/blog_self/releases/latest)
+> → 下载 `Blog.zip`（约 30MB，含 macOS + Windows，双击即用、无需装任何环境）。
+> 也可直接下 [v1.0.0 的 Blog.zip](https://github.com/sfqin/blog_self/releases/download/v1.0.0/Blog.zip)。
+
 ---
 
 ## 一、它能做什么 / 最终能得到什么

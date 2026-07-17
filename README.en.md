@@ -11,6 +11,10 @@ whole world can visit**.
 > follow the buttons in your browser. Full walkthrough:
 > [`docs/新手指南.md`](docs/新手指南.md) (Chinese).
 
+> 📦 **Download the client**: [**latest release**](https://github.com/sfqin/blog_self/releases/latest)
+> → grab `Blog.zip` (~30MB, macOS + Windows, double-click to run, no toolchain
+> needed). Or the direct [v1.0.0 Blog.zip](https://github.com/sfqin/blog_self/releases/download/v1.0.0/Blog.zip).
+
 ---
 
 ## 1. What it does / what you end up with
