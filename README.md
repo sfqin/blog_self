@@ -192,7 +192,13 @@ node scripts/gen_geo.mjs SG TH      # 只重建指定国家
 ```
 
 产物含跨平台自包含二进制 + 各系统的双击启动器（`Start-Blog.app` / `.vbs` / `.command`
-/ `.bat`）+ `docs/新手指南.md`。
+/ `.bat`）+ 启动加载页 `loading.html` + `docs/新手指南.md`。
+
+> **客户端目录**：给最终用户的「客户端」就是打包生成的 **`dist-release/Blog/`** 文件夹
+> （压缩后即 `Blog.zip`）——里面是双击即用的启动器和自包含程序，用户无需装任何环境。
+> 它由脚本自动生成、**不纳入版本库**（见 `.gitignore`）。客户端启动器的**源文件**放在仓库的
+> **`packaging/`** 目录（`mac/` 的 `.app` 外壳与 `launch`、`windows/` 的 `.vbs`、以及
+> 共用的 `loading.html`），配合仓库根目录的 `Start-Blog.command` / `Start-Blog.bat`。
 
 ### 项目结构
 
@@ -216,6 +222,12 @@ scripts/
   deploy.sh                 编译 / 推送到 VPS
   gen_geo.mjs               （重）生成地理数据（需联网）
   globe_logic_test.mjs      地球纯逻辑测试
+packaging/                  客户端启动器源文件（打包进 dist-release/Blog/ 客户端）
+  mac/                      Start-Blog.app 的 Info.plist 与 launch 控制脚本
+  windows/                  Start-Blog.vbs（无窗口启动器）
+  loading.html              双击后立即显示的启动加载页（探测服务就绪后自动进向导）
+Start-Blog.command          macOS 备用启动器（可见终端窗口）
+Start-Blog.bat              Windows 引擎 / 可见备用启动器
 ```
 
 ### 开发与验证
