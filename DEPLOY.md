@@ -21,7 +21,7 @@ Git，多个免费 Pages 平台自动部署。全程免费，国内外都能访�
                                      访客访问 https://你的域名
 ```
 
-> 关键点：`blog.db`（含你的后台密码）**永远只在本地**，不会上传。云端只有渲染好的
+> 关键点：`blog.db`（你的全部内容）**永远只在本地**，不会上传。云端只有渲染好的
 > 静态文件。所以后台绝对安全，也不需要一台一直开机的服务器。
 >
 > 三平台的选型对比、运营方、免费额度、备案要求见
@@ -60,16 +60,15 @@ $ git push -u origin master
 
 ## 第 2 步：本地写第一篇文章
 
-启动本地后台（第一次用 `ADMIN_PASSWORD` 设定登录密码）：
+启动本地后台：
 
 ```bash
 $ go build -o blogbin .
-$ ADMIN_PASSWORD='设一个你自己的密码' ./blogbin serve
-# 打开 http://localhost:8080/admin/login ，用户名 admin + 上面的密码
+$ ./blogbin serve
+# 打开 http://localhost:8080/admin （无需登录、没有密码，直接打开）
 ```
 
 在后台把个人资料、经历、项目、足迹、文章都填好。这些都存进本地 `blog.db`。
-之后再次启动只需 `./blogbin serve`（密码已存库，不用再带 `ADMIN_PASSWORD`）。
 
 ---
 
@@ -235,7 +234,7 @@ SUBPATH=/blog    ./scripts/publish-all.sh                   # 覆盖子路径（
 | GitHub Pages 打不开/404 | Settings → Pages 里 Source 要选 **`gh-pages` 分支 + `/(root)`**，不是 master |
 | Gitee push 了但没更新 | Gitee 免费版不自动部署，需到 服务 → Gitee Pages 手动点“更新” |
 | EdgeOne/Gitee 绑域名报要备案 | 国内加速区自定义域名需 ICP 备案；先用平台默认域名（免备案） |
-| 忘记本地后台密码 | 重新 `ADMIN_PASSWORD='新密码' ./blogbin serve` 覆盖即可 |
+| 后台打不开 | 后台无需登录、没有密码，直接访问 `http://localhost:8080/admin` |
 | 只想推某几个平台 | 用 `SKIP_GITEE=1` / `SKIP_GH_PAGES=1` 环境变量跳过对应目标 |
 
 ---

@@ -44,24 +44,23 @@ func deps(dbPath string) (*store.Store, *render.Renderer, fs.FS) {
 	if err != nil {
 		log.Fatalf("template fs: %v", err)
 	}
-	rnd, err := render.New(tmplFS)
-	if err != nil {
-		log.Fatalf("render: %v", err)
-	}
 	staticFS, err := fs.Sub(webFS, "web/static")
 	if err != nil {
 		log.Fatalf("static fs: %v", err)
+	}
+	rnd, err := render.New(tmplFS, staticFS)
+	if err != nil {
+		log.Fatalf("render: %v", err)
 	}
 	return st, rnd, staticFS
 }
 
 func runServe() {
 	cfg := server.Config{
-		Addr:          envOr("ADDR", ":8080"),
-		DBPath:        envOr("DB_PATH", "blog.db"),
-		AdminUsername: envOr("ADMIN_USERNAME", "admin"),
-		AdminPassword: os.Getenv("ADMIN_PASSWORD"), // sets/updates initial password when non-empty
-		Secure:        os.Getenv("SECURE_COOKIES") == "1",
+		Addr:    envOr("ADDR", ":8080"),
+		DBPath:  envOr("DB_PATH", "blog.db"),
+		Secure:  os.Getenv("SECURE_COOKIES") == "1",
+		RepoDir: envOr("REPO_DIR", "."), // where the setup wizard runs git/gh
 	}
 
 	st, rnd, staticFS := deps(cfg.DBPath)
@@ -72,8 +71,7 @@ func runServe() {
 		log.Fatalf("server: %v", err)
 	}
 
-	log.Printf("dev@home blog listening on %s (db=%s)", cfg.Addr, cfg.DBPath)
-	if err := srv.ListenAndServe(); err != nil {
+	if err := srv.Run(); err != nil {
 		log.Fatalf("serve: %v", err)
 	}
 }

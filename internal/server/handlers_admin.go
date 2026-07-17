@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"dev-home-blog/internal/models"
+	"dev-home-blog/internal/setup"
 )
 
 // adminPage is the shared layout data for admin templates.
@@ -41,9 +42,33 @@ func (s *Server) handleDashboard(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// handlePublishPage shows the "发布上线" page: whether a GitHub repo is linked,
+// where the site will publish, and a button that renders + pushes to GitHub
+// Pages (the same action the first-run wizard uses). This gives a logged-in
+// user a permanent place to re-publish after editing content.
+func (s *Server) handlePublishPage(w http.ResponseWriter, r *http.Request) {
+	st := s.detector.Detect(r.Context())
+	owner, repo, linked := setup.ParseOwnerRepo(st.RemoteURL)
+	data := map[string]any{
+		"Linked":     linked && st.GitHubUser != "",
+		"GitHubUser": st.GitHubUser,
+		"RemoteURL":  st.RemoteURL,
+	}
+	if linked {
+		data["Owner"] = owner
+		data["Repo"] = repo
+		data["LiveURL"] = "https://" + owner + ".github.io/" + repo + "/"
+	}
+	s.writeHTML(w, "publish.html", adminPage{
+		Title:  "Publish",
+		Active: "publish",
+		CSRF:   s.ensureCSRF(w, r),
+		Data:   data,
+	})
+}
+
 // handleProfileForm shows the profile editor.
-func (s *Server) handleProfileForm(w http.ResponseWriter, r *http.Request) {
-	profile, err := s.store.Profile()
+func (s *Server) handleProfileForm(w http.ResponseWriter, r *http.Request) {	profile, err := s.store.Profile()
 	if err != nil {
 		s.serverError(w, "profile", err)
 		return

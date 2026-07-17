@@ -2,9 +2,13 @@
 /tmp/
 *.exe
 /blogbin
+# Prebuilt launcher binaries (shipped as a release zip, not committed)
+/bin/
+# Assembled double-click release package (.app + launchers + bin + zip)
+/dist-release/
 
 # Local SQLite database — the admin source of truth. NEVER commit it:
-# it holds your hashed admin password and is edited only on your machine.
+# it holds all your content and is edited only on your machine.
 *.db
 *.db-shm
 *.db-wal

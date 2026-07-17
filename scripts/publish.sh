@@ -7,7 +7,7 @@
 #
 # Workflow:
 #   1. Write posts / edit data in the LOCAL admin (`./blogbin serve` -> /admin).
-#      blog.db stays on your machine (holds your admin password; never committed).
+#      blog.db stays on your machine (all your content; never committed).
 #   2. Run this script: render -> ./dist -> commit -> push to GitHub.
 #   3. Cloudflare Pages + EdgeOne Pages (output dir "dist", build command empty)
 #      deploy the new ./dist automatically, usually within ~1 minute.
@@ -26,7 +26,7 @@ MSG="${1:-publish: $(date '+%Y-%m-%d %H:%M:%S')}"
 
 if [ ! -f "$DB_PATH" ]; then
 	echo "!! database not found at '$DB_PATH'." >&2
-	echo "   Run the admin first:  ADMIN_PASSWORD=... ./blogbin serve   (then edit at /admin)" >&2
+	echo "   Run the admin first:  ./blogbin serve   (then edit at /admin)" >&2
 	exit 1
 fi
 

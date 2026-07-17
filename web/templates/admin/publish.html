@@ -1,0 +1,92 @@
+{{template "admin_head" .}}
+<h1>publish 发布上线</h1>
+<p class="muted" style="color:var(--muted);margin-top:-10px;max-width:640px">
+  把当前博客内容生成静态网页，推送到 GitHub，通过 <strong style="color:var(--green)">GitHub Pages</strong> 免费发布到网上，
+  任何人都能用网址访问。本地修改内容后，回到这里点一次「发布」即可更新线上版本。
+</p>
+
+{{with .Data}}
+{{if .Linked}}
+<div class="pub-panel">
+  <div class="pub-row"><span class="pub-k">GitHub 账号</span><span class="pub-v">{{.GitHubUser}}</span></div>
+  <div class="pub-row"><span class="pub-k">目标仓库</span><span class="pub-v">{{.Owner}}/{{.Repo}}</span></div>
+  <div class="pub-row"><span class="pub-k">发布后网址</span><span class="pub-v"><a href="{{.LiveURL}}" target="_blank">{{.LiveURL}}</a></span></div>
+
+  <div class="field" style="margin-top:18px">
+    <label>本次更新说明（选填）</label>
+    <input type="text" id="pub-msg" placeholder="例如：新增一篇文章 / 更新足迹">
+  </div>
+  <button class="btn-primary" id="btn-publish">☁ 发布到网上</button>
+  <div class="check-note" id="pub-note"></div>
+  <div class="setup-live" id="pub-live" hidden>
+    已发布！线上地址：<a id="pub-url" href="#" target="_blank"></a>
+    <div class="muted" style="color:var(--muted);font-size:12px;margin-top:6px">
+      首次启用 GitHub Pages 后，大约需要 1–2 分钟才能打开，稍等片刻刷新即可。
+    </div>
+  </div>
+</div>
+{{else}}
+<div class="pub-panel pub-panel-warn">
+  <p style="margin:0 0 10px">还没有关联 GitHub 仓库，暂时无法发布到网上。</p>
+  <p class="muted" style="color:var(--muted);font-size:13px;margin:0 0 14px">
+    发布到网上需要先连接你的 GitHub 账号并创建一个仓库。第一次使用时，
+    启动博客后浏览器会自动打开安装向导，按提示点几下即可完成；也可以点下面的按钮去向导页。
+  </p>
+  <a class="btn-primary" style="text-decoration:none" href="/setup" target="_blank">前往安装向导 →</a>
+</div>
+{{end}}
+{{end}}
+
+<script>
+(function () {
+  "use strict";
+  var btn = document.getElementById("btn-publish");
+  if (!btn) return;
+  var csrf = "{{.CSRF}}";
+
+  function startLoading(b, label) {
+    if (b.dataset.orig === undefined) b.dataset.orig = b.innerHTML;
+    b.classList.add("is-loading"); b.disabled = true; b.setAttribute("aria-busy", "true");
+    b.innerHTML = '<span class="spin"></span> ' + (label || "处理中…");
+  }
+  function stopLoading(b) {
+    b.classList.remove("is-loading"); b.disabled = false; b.removeAttribute("aria-busy");
+    if (b.dataset.orig !== undefined) b.innerHTML = b.dataset.orig;
+  }
+  function note(state, msg, detail) {
+    var el = document.getElementById("pub-note");
+    el.className = "check-note show" + (state ? " " + state : "");
+    var spin = state === "working" ? '<span class="spin"></span> ' : "";
+    el.innerHTML = spin + "<span></span>";
+    el.querySelector("span:last-child").textContent = (msg || "") + (detail ? "\n" + detail : "");
+  }
+
+  btn.addEventListener("click", async function () {
+    var message = (document.getElementById("pub-msg").value || "").trim();
+    startLoading(btn, "发布中…");
+    note("working", "正在生成静态网页并推送到 GitHub Pages…首次可能需要 1–2 分钟，请不要关闭本页。");
+    try {
+      var body = new URLSearchParams();
+      body.set("csrf_token", csrf);
+      body.set("message", message);
+      var r = await fetch("/setup/publish", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body.toString(),
+      });
+      var res = await r.json();
+      note(res.ok ? "ok" : "error", res.message, res.detail);
+      if (res.ok && res.url) {
+        var a = document.getElementById("pub-url");
+        a.href = res.url; a.textContent = res.url;
+        document.getElementById("pub-live").hidden = false;
+      }
+    } catch (e) {
+      note("error", "发布失败，请重试。", String(e));
+    } finally {
+      stopLoading(btn);
+    }
+  });
+})();
+</script>
+{{template "admin_foot" .}}

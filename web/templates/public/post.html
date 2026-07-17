@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{{.Base}}/static/css/crt.css">
+<link rel="stylesheet" href="{{.Base}}{{asset "/static/css/crt.css"}}">
 </head>
 <body>
 <div class="crt-scanlines"></div>
@@ -47,6 +47,7 @@
   </div>
 </footer>
 <script>window.__BASE__ = "{{.Base}}";</script>
-<script src="{{.Base}}/static/js/search.js" defer></script>
+<script src="{{.Base}}{{asset "/static/js/search.js"}}" defer></script>
+{{if .Live}}<script src="{{asset "/static/js/heartbeat.js"}}" defer></script>{{end}}
 </body>
 </html>

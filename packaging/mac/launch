@@ -1,0 +1,109 @@
+#!/bin/bash
+# launch — the executable inside Start-Blog.app/Contents/MacOS/.
+#
+# This is a *controller*, not the server itself. Double-clicking the .app runs
+# this with NO terminal window; it:
+#   1. locates the bundled blog binary (Contents/Resources/),
+#   2. keeps all content in a stable, easy-to-find folder: ~/dev-home-blog/,
+#   3. if a blog is already running, asks (native dialog) whether to just OPEN
+#      it or RESTART it (to pick up a newer build),
+#   4. otherwise starts the server DETACHED in the background (so the Dock has
+#      no lingering app to "re-activate" — this fixes the old "double-click does
+#      nothing" bug), waits for it to report its port, and opens the browser.
+#
+# The server picks its own port and shuts itself down a minute after the last
+# blog page is closed (heartbeat), so there is no Stop button to press.
+#
+# All failures are shown as native dialogs via osascript, never terminal text.
+
+# --- helpers ---------------------------------------------------------------
+die() {
+  /usr/bin/osascript -e "display dialog \"$1\" with title \"dev@home 博客\" buttons {\"好\"} default button 1 with icon stop" >/dev/null 2>&1
+  exit 1
+}
+
+# Resolve the bundle layout. This script lives at .../Contents/MacOS/launch,
+# so Resources is a sibling of MacOS.
+HERE="$(cd "$(dirname "$0")" && pwd)"
+RES="$(cd "$HERE/../Resources" && pwd)"
+# The instant "loading" page, shown the moment we start so the user gets
+# immediate feedback while the server boots (it polls the server and redirects
+# to /setup itself). Shipped alongside the binaries in Resources/.
+LOADING="$RES/loading.html"
+
+# --- pick the binary for this Mac's architecture ---------------------------
+ARCH="$(/usr/bin/uname -m)"
+BIN=""
+for cand in "$RES/blog" "$RES/blog-macos-$ARCH" \
+            "$RES/blog-macos-arm64" "$RES/blog-macos-amd64"; do
+  if [ -x "$cand" ]; then BIN="$cand"; break; fi
+done
+[ -n "$BIN" ] || die "没有找到博客程序（Resources 里缺少 blog 可执行文件）。请向提供者索要完整安装包。"
+
+# Gatekeeper may quarantine files copied from a zip; clear it best-effort so the
+# binary can run without the “无法验证开发者”阻断.
+/usr/bin/xattr -dr com.apple.quarantine "$BIN" 2>/dev/null || true
+
+# --- stable data folder (all your content lives here) -----------
+DATA="$HOME/dev-home-blog"
+/bin/mkdir -p "$DATA" || die "无法创建数据文件夹：$DATA"
+RUNTIME="$DATA/.runtime.json"
+
+# --- read the live URL/PID the server advertises, if any -------------------
+# The server writes {"port","pid","url"} to .runtime.json while running.
+running_url() { [ -f "$RUNTIME" ] && /usr/bin/sed -n 's/.*"url"[ ]*:[ ]*"\([^"]*\)".*/\1/p' "$RUNTIME" | head -1; }
+running_pid() { [ -f "$RUNTIME" ] && /usr/bin/sed -n 's/.*"pid"[ ]*:[ ]*\([0-9]*\).*/\1/p' "$RUNTIME" | head -1; }
+# Probe the ultra-light readiness endpoint, NOT /setup/status: the latter runs a
+# network-bound GitHub check that can take several seconds on a weak connection,
+# which used to make the launcher time out (curl -m 1) and feel unresponsive.
+is_alive()    { /usr/bin/curl -s -m 2 "$1/internal/ready" 2>/dev/null | /usr/bin/grep -q "\"ready\""; }
+
+start_detached() {
+  # nohup + & fully detaches the server from this script, so the .app exits
+  # immediately and the next double-click always re-runs this controller.
+  cd "$DATA"
+  ADDR=":8080" REPO_DIR="$DATA" DB_PATH="$DATA/blog.db" \
+    /usr/bin/nohup "$BIN" serve >"$DATA/server.log" 2>&1 &
+  disown 2>/dev/null || true
+}
+
+open_when_ready() {
+  for _ in $(seq 1 40); do
+    URL="$(running_url)"
+    if [ -n "$URL" ] && is_alive "$URL"; then /usr/bin/open "$URL/setup"; return 0; fi
+    /bin/sleep 0.25
+  done
+  # Fall back to the conventional address if the file never appeared.
+  /usr/bin/open "http://localhost:8080/setup"
+}
+
+# open_ui shows the self-contained loading page IMMEDIATELY (it polls the server
+# and redirects to /setup on its own), so the user sees a CRT spinner instead of
+# a blank few seconds during boot. If the loading file is missing for any reason,
+# fall back to the old poll-then-open path.
+open_ui() {
+  if [ -f "$LOADING" ]; then /usr/bin/open "$LOADING"; else open_when_ready; fi
+}
+
+# --- already running? offer OPEN / RESTART ---------------------------------
+URL="$(running_url)"
+if [ -n "$URL" ] && is_alive "$URL"; then
+  CHOICE="$(/usr/bin/osascript -e 'button returned of (display dialog "博客已经在运行中。\n\n· 打开网页：继续使用当前正在运行的博客。\n· 重启：先停止再用最新版本重新启动（更新后用这个）。" with title "dev@home 博客" buttons {"取消", "重启", "打开网页"} default button "打开网页")' 2>/dev/null)"
+  case "$CHOICE" in
+    "打开网页") /usr/bin/open "$URL/setup"; exit 0 ;;
+    "重启")
+      PID="$(running_pid)"
+      [ -n "$PID" ] && /bin/kill "$PID" 2>/dev/null || true
+      # Wait for the old server to release the port / remove its runtime file.
+      for _ in $(seq 1 20); do is_alive "$URL" || break; /bin/sleep 0.25; done
+      start_detached
+      open_ui
+      exit 0 ;;
+    *) exit 0 ;;  # 取消
+  esac
+fi
+
+# --- not running: start it detached and open the browser -------------------
+start_detached
+open_ui
+exit 0

@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>正在启动 dev@home 博客…</title>
+<!--
+  loading.html — the double-click launchers open THIS file (file://) the instant
+  you start the app, so you get immediate feedback instead of a blank several
+  seconds while the server boots. It is fully self-contained (no server assets,
+  no required network): it shows a CRT-styled spinner, probes the local server
+  on ports 8080..8090, and redirects to /setup the moment the server answers.
+-->
+<style>
+  :root {
+    --bg: #0a0e0a;
+    --green: #4ade80;
+    --amber: #fbbf24;
+    --text: #c8f5d3;
+    --muted: #5a7d63;
+    --line: #1c2a1c;
+    --glow: 0 0 8px rgba(74, 222, 128, 0.45);
+    --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 15px;
+    line-height: 1.65;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  /* CRT overlays, matched to crt.css */
+  .crt-scanlines, .crt-vignette { pointer-events: none; position: fixed; inset: 0; z-index: 9999; }
+  .crt-scanlines {
+    background: repeating-linear-gradient(to bottom,
+      rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0.16) 3px, rgba(0,0,0,0.16) 3px);
+    mix-blend-mode: multiply;
+    animation: flick 7s infinite;
+  }
+  .crt-vignette { background: radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%); }
+  @keyframes flick { 0%,96%,100% { opacity: 1; } 97% { opacity: 0.92; } 98% { opacity: 1; } }
+
+  .box { width: min(560px, 88vw); padding: 8px 20px; text-align: left; }
+  .cmd { color: var(--green); text-shadow: var(--glow); font-size: 13px; letter-spacing: 0.02em; }
+  .cmd::before { content: "dev@home:~# "; color: var(--muted); }
+  h1 { font-size: 22px; margin: 14px 0 6px; color: var(--green); text-shadow: var(--glow); font-weight: 600; }
+  p { margin: 6px 0; color: var(--muted); }
+
+  /* spinner: a blinking block cursor + rotating braille dots, pure CSS */
+  .spin { display: inline-block; width: 1ch; color: var(--green); text-shadow: var(--glow); }
+  .bar {
+    margin: 20px 0 10px; height: 8px; border: 1px solid var(--line);
+    background: #0d140d; position: relative; overflow: hidden; border-radius: 2px;
+  }
+  .bar::after {
+    content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 40%;
+    background: linear-gradient(90deg, transparent, var(--green), transparent);
+    box-shadow: var(--glow); animation: sweep 1.25s ease-in-out infinite;
+  }
+  @keyframes sweep { 0% { left: -40%; } 100% { left: 100%; } }
+
+  .dots::after { content: ""; animation: dots 1.4s steps(4, end) infinite; }
+  @keyframes dots { 0% { content: ""; } 25% { content: "·"; } 50% { content: "··"; } 75% { content: "···"; } 100% { content: ""; } }
+
+  .hint { margin-top: 22px; font-size: 12.5px; color: var(--muted); }
+  .hint a { color: var(--green); text-decoration: none; border-bottom: 1px dashed var(--line); }
+  .hint a:hover { border-bottom-color: var(--green); }
+  .slow { color: var(--amber); }
+  .cursor { display: inline-block; width: 8px; height: 1.05em; background: var(--green);
+    margin-left: 2px; vertical-align: text-bottom; box-shadow: var(--glow);
+    animation: blink 1.1s steps(1) infinite; }
+  @keyframes blink { 0%,50% { opacity: 1; } 50.01%,100% { opacity: 0; } }
+</style>
+</head>
+<body>
+<div class="crt-scanlines"></div>
+<div class="crt-vignette"></div>
+
+<div class="box">
+  <div class="cmd">./start-blog</div>
+  <h1>正在启动博客<span class="dots"></span></h1>
+  <p id="status">初始化本地服务，浏览器稍后会自动进入向导页…<span class="cursor"></span></p>
+  <div class="bar"></div>
+  <p class="hint" id="slow" style="display:none">
+    <span class="slow">启动比平时久？</span> 首次运行需要几秒。若一直没反应，可
+    <a id="manual" href="#" target="_self">点这里手动打开</a>。
+  </p>
+</div>
+
+<script>
+(function () {
+  // The server picks 8080, or the next free port (8081, 8082, …) if taken.
+  // We probe a small range in parallel and redirect to whichever answers first.
+  var PORTS = [8080, 8081, 8082, 8083, 8084, 8085, 8086, 8087, 8088, 8089, 8090];
+  var done = false;
+  var start = Date.now();
+  var statusEl = document.getElementById('status');
+  var slowEl = document.getElementById('slow');
+  var manualEl = document.getElementById('manual');
+  manualEl.setAttribute('href', 'http://localhost:8080/setup');
+
+  function go(base) {
+    if (done) return;
+    done = true;
+    window.location.replace(base + '/setup');
+  }
+
+  function probe(port) {
+    if (done) return;
+    var base = 'http://localhost:' + port;
+    // /internal/ready is the ultra-light liveness endpoint (no network/gh work),
+    // and it sends Access-Control-Allow-Origin:* so this file:// page can read it.
+    fetch(base + '/internal/ready', { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.text() : Promise.reject(); })
+      .then(function (t) { if (t.indexOf('"ready"') >= 0) go(base); })
+      .catch(function () { /* not up yet — the interval will retry */ });
+  }
+
+  function tick() {
+    if (done) return;
+    for (var i = 0; i < PORTS.length; i++) probe(PORTS[i]);
+    if (Date.now() - start > 6000) {
+      slowEl.style.display = 'block';
+      statusEl.textContent = '仍在启动中，请稍候…';
+    }
+  }
+
+  tick();
+  var timer = setInterval(function () {
+    if (done) { clearInterval(timer); return; }
+    tick();
+  }, 500);
+})();
+</script>
+</body>
+</html>

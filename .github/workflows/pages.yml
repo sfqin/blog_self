@@ -5,7 +5,7 @@
 # only useful if you also want a github.io mirror.
 #
 # Note: it publishes the ALREADY-COMMITTED ./dist (it does not rebuild, because
-# the SQLite database with your admin password stays on your machine). The site
+# the SQLite database with all your content stays on your machine). The site
 # uses absolute paths (/static, /posts), so on GitHub Pages it must be served at
 # a domain root — i.e. attach a custom domain, or use a <user>.github.io repo.
 #

@@ -87,16 +87,3 @@ CREATE TABLE IF NOT EXISTS moments (
 );
 CREATE INDEX IF NOT EXISTS idx_moments_date ON moments (date DESC);
 
--- Single admin account.
-CREATE TABLE IF NOT EXISTS admin_user (
-    id            INTEGER PRIMARY KEY CHECK (id = 1),
-    username      TEXT NOT NULL DEFAULT 'admin',
-    password_hash TEXT NOT NULL DEFAULT ''
-);
-
--- Login sessions.
-CREATE TABLE IF NOT EXISTS sessions (
-    token      TEXT PRIMARY KEY,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    expires_at TEXT NOT NULL
-);

@@ -3,7 +3,6 @@ package store
 import (
 	"path/filepath"
 	"testing"
-	"time"
 
 	"dev-home-blog/internal/models"
 )
@@ -91,28 +90,3 @@ func TestPostCRUDAndPublishing(t *testing.T) {
 	}
 }
 
-func TestSessions(t *testing.T) {
-	s := newTestStore(t)
-	if ok, _ := s.SessionValid("nope"); ok {
-		t.Fatal("unknown token should be invalid")
-	}
-	if err := s.CreateSession("tok1", time.Now().Add(time.Hour)); err != nil {
-		t.Fatalf("create session: %v", err)
-	}
-	if ok, err := s.SessionValid("tok1"); err != nil || !ok {
-		t.Fatalf("valid session: ok=%v err=%v", ok, err)
-	}
-	// Expired session.
-	if err := s.CreateSession("tok2", time.Now().Add(-time.Hour)); err != nil {
-		t.Fatalf("create expired: %v", err)
-	}
-	if ok, _ := s.SessionValid("tok2"); ok {
-		t.Fatal("expired session should be invalid")
-	}
-	if err := s.DeleteSession("tok1"); err != nil {
-		t.Fatalf("delete: %v", err)
-	}
-	if ok, _ := s.SessionValid("tok1"); ok {
-		t.Fatal("deleted session should be invalid")
-	}
-}

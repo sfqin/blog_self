@@ -26,7 +26,10 @@ import (
 // homeVM mirrors the fields the public home.html template reads. It is kept
 // in sync with the live server's view model by field name.
 type homeVM struct {
-	Base        string
+	Base string
+	// Live stays false for exported pages: the template gates heartbeat.js on
+	// it, so the static GitHub Pages build never pings a (nonexistent) server.
+	Live        bool
 	Profile     models.Profile
 	Experiences []models.Experience
 	Thoughts    []models.Thought

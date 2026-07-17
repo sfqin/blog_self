@@ -6,7 +6,6 @@ toolchain go1.23.12
 
 require (
 	github.com/yuin/goldmark v1.8.2
-	golang.org/x/crypto v0.31.0
 	modernc.org/sqlite v1.34.4
 )
 

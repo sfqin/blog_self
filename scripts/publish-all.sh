@@ -15,7 +15,7 @@
 #     both serve under the SAME "/blog" sub-path (the repo name), so ONE
 #     BASE_URL=/blog build feeds both.
 #
-# The SQLite DB (with your admin password) never leaves your machine; only the
+# The SQLite DB (all your content) never leaves your machine; only the
 # rendered static files are pushed.
 #
 # Prerequisites (one-time):
@@ -42,7 +42,7 @@ MSG="${1:-publish: $(date '+%Y-%m-%d %H:%M:%S')}"
 
 if [ ! -f "$DB_PATH" ]; then
 	echo "!! database not found at '$DB_PATH'." >&2
-	echo "   Run the admin first:  ADMIN_PASSWORD=... ./blogbin serve   (edit at /admin)" >&2
+	echo "   Run the admin first:  ./blogbin serve   (edit at /admin)" >&2
 	exit 1
 fi
 

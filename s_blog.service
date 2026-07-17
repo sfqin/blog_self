@@ -17,15 +17,11 @@ User=blog
 Group=blog
 WorkingDirectory=/opt/s_blog
 
-# Runtime configuration. ADMIN_PASSWORD only needs to be set on the FIRST
-# start (it creates/updates the admin login); after that you may remove it
-# and restart. Change ADMIN_USERNAME if you like.
+# Runtime configuration. The admin has no login/password (single user); if you
+# expose /admin publicly, add access control at the reverse-proxy layer.
 Environment=ADDR=127.0.0.1:8080
 Environment=DB_PATH=/opt/s_blog/data/blog.db
-Environment=ADMIN_USERNAME=admin
 Environment=SECURE_COOKIES=1
-# Set this once, then restart. Use a strong value.
-Environment=ADMIN_PASSWORD=CHANGE_ME_ON_FIRST_BOOT
 
 ExecStart=/opt/s_blog/s_blog
 Restart=on-failure

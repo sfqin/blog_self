@@ -1,31 +1,13 @@
-// Package auth handles the admin login: password hashing, session tokens,
-// and CSRF token generation/validation.
+// Package auth provides the CSRF token helpers used by the admin forms:
+// random token generation and constant-time comparison. There is no login or
+// password — the admin runs locally on the user's own machine.
 package auth
 
 import (
 	"crypto/rand"
 	"crypto/subtle"
 	"encoding/base64"
-
-	"golang.org/x/crypto/bcrypt"
 )
-
-// HashPassword returns a bcrypt hash of the plaintext password.
-func HashPassword(plain string) (string, error) {
-	b, err := bcrypt.GenerateFromPassword([]byte(plain), bcrypt.DefaultCost)
-	if err != nil {
-		return "", err
-	}
-	return string(b), nil
-}
-
-// CheckPassword reports whether the plaintext matches the stored bcrypt hash.
-func CheckPassword(hash, plain string) bool {
-	if hash == "" {
-		return false
-	}
-	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(plain)) == nil
-}
 
 // RandomToken returns a URL-safe random token with n bytes of entropy.
 func RandomToken(n int) (string, error) {

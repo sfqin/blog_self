@@ -1,246 +1,230 @@
-# dev@home —— 复古 CRT 终端风个人博客（含本地后台）
+# dev@home —— 复古 CRT 终端风个人博客
 
 **中文** · [English](README.en.md)
 
 一个复古终端 / CRT 风格的个人主页博客，带一个可交互的 3D「足迹」地球。
+你在**本地后台**里写文章、传照片、标足迹，然后**一键发布**到网上——最终得到一个
+**免费、全世界都能访问**的个人网站。
 
-它是一个 **Go 服务 + SQLite 单文件数据库**：所有内容都在本地后台 `/admin` 里
-增删改，前台首页即时可见，**无需重新构建、无需重新部署**。整个前端（HTML 模板、
-CSS、JS、地理数据）通过 `//go:embed` 编译进**一个可执行文件**，部署就是拷一个二
-进制。
-
-## 两种使用方式（同一套代码都支持）
-
-- **静态发布（免费、推荐）**：后台只在你自己电脑上跑，写完一键导出静态站并推送到
-  Git，由免费 Pages 平台（Cloudflare 等）托管，国内外均可访问。详见
-  [`DEPLOY.md`](DEPLOY.md)。
-- **动态部署（付费 VPS）**：把 Go 服务跑在服务器上，线上 `/admin` 随处可访问、改
-  完即时生效。详见下文「动态部署」。
-
-> **数据安全**：`blog.db`（含你的后台密码哈希）**永远只在本地**。静态发布只推送
-> 渲染好的 HTML/JSON/静态资源，密码绝不上传。
+> 🔰 **完全不用会编程。** 拿到发布包后双击一个文件，跟着网页里的按钮走即可。
+> 详细图文见 [`docs/新手指南.md`](docs/新手指南.md)。
 
 ---
 
-## 功能一览
+## 一、它能做什么 / 最终能得到什么
 
-**前台（`/`）**
-- 个人资料、职业经历、随想、项目、最新文章
-- 可交互 3D 地球「足迹」：拖拽旋转、缩放、下钻到 国家 → 省/州 → 城市；随真实
-  时间显示昼夜光照；移动端支持双指缩放
-- 「瞬间」信息流：图片 / 短视频 / 纯文字日记
-- 全站模糊搜索（`/api/search`，前端 JS 消费）
+- ✅ 在**自己电脑的后台**里写博客：个人资料、经历、随想、项目、文章、足迹、瞬间，
+  **保存即时生效**，不用重新构建。
+- ✅ **一键发布上线**：把内容渲染成静态网页并推送到 GitHub，自动开启 GitHub Pages。
+- ✅ 得到一个**免费的公网地址**，形如 `https://你的用户名.github.io/blog/`，用手机、
+  电脑、发给朋友都能直接打开，**无需服务器、无需付费**。
+- ✅ 一个可交互的 **3D 地球**，展示你去过的城市（可下钻到 国家 → 省/州 → 城市）。
 
-**文章页（`/posts/{slug}`）**：Markdown 渲染为 HTML。
-
-**后台（`/admin`，密码保护）**：对每一块页面数据做增删改——资料、经历、随想、
-项目、文章、足迹、瞬间。保存即写入 SQLite，前台下次加载即生效。
-
-**安全**
-- 会话 Cookie（`dh_session`，7 天有效）+ bcrypt 密码哈希
-- CSRF 防护：双提交 Cookie（`dh_csrf` + 表单 `csrf_token`）
-- 生产环境设 `SECURE_COOKIES=1`，Cookie 标记为 `Secure`（仅 HTTPS）
+**最终效果**：一个属于你自己的、复古终端风、带 3D 足迹地球的个人网站，长期免费在线。
 
 ---
 
-## 快速开始
+## 二、需要准备什么
 
-需要 **Go 1.23+**。
+只要两样东西：
 
-```bash
-# 首次运行：用 ADMIN_PASSWORD 设定后台密码（自己挑一个）。
-ADMIN_PASSWORD='choose-a-strong-password' go run .
-# → 监听 :8080
-```
+1. **一台电脑**（Windows 或苹果 macOS 都行）。不用安装开发环境——发布包里已自带程序。
+2. **一个 GitHub 账号**（免费）。没有就去 <https://github.com> 用邮箱注册一个；
+   它用来免费托管你的网站。
 
-打开：
-- 前台：http://localhost:8080/
-- 后台：http://localhost:8080/admin/login （用户名 `admin`，密码为上面所设）
+> 你会拿到一个 **`Blog.zip`** 发布包（由维护者用 `scripts/package-release.sh` 生成）。
+> 双击解压得到 `Blog` 文件夹，把**整个文件夹**放到桌面或「文稿」里。
 
-密码写进数据库后，之后再启动就**不必**再带 `ADMIN_PASSWORD`。想改密码时，再带一次
-新值启动即可。
+---
 
-也可以先编译再运行（部署时用同一个二进制）：
+## 三、怎么做（demo 全流程）
+
+全程**不用打开终端敲命令**，都在网页里点按钮。
+
+### 第 0 步：启动（分系统）
+
+| 系统 | 双击这个文件 | 说明 |
+|------|-------------|------|
+| **苹果 macOS** | `Start-Blog.app` | 首次可能提示「身份不明的开发者」：**右键 → 打开 → 再点打开**即可。没有黑窗口。 |
+| **Windows** | `Start-Blog.vbs` | 若弹「Windows 已保护你的电脑」：点**更多信息 → 仍要运行**。没有黑窗口。 |
+
+> 备用启动方式：macOS 用 `Start-Blog.command`、Windows 用 `Start-Blog.bat`（会显示一个文字窗口）。
+
+启动后浏览器会**自动打开**一个叫「一步步上线你的博客」的向导页
+（地址类似 `http://localhost:8080/setup`；若 8080 被占用会自动换 8081、8082……，
+以浏览器实际打开的地址为准）。
+
+### 第 1～5 步：跟着网页向导走
+
+每一步都有状态灯：**✓ 绿色**=没问题，**✗ 红色**=点旁边的按钮处理。
+
+| 步骤 | 做什么 |
+|------|--------|
+| **① 环境检测** | 检查 Git 和 GitHub CLI 两个小工具。显示 ✗ 就点按钮，程序会**自动下载安装**（macOS 弹系统对话框点「安装」；GitHub CLI 直接从官网下载），**不需要 Homebrew 等任何别的软件**。装完点 **↻ 重新检测**。 |
+| **② 连接 GitHub** | 点「用浏览器登录 GitHub」，网页显示一个一次性代码（像 `ABCD-1234`），粘到自动打开的授权页里确认。之后再也不用输密码。 |
+| **③ 创建仓库** | 给博客起个名字（默认 `blog`，会成为网址的一部分）。仓库固定创建为**公开（Public）**——GitHub Pages 免费版只能发布公开仓库。 |
+| **④ 写文章 / 本地预览** | 进入后台 `/admin`（**无需登录、没有密码，直接打开**），填资料、经历、项目、文章、足迹、瞬间；随时点「本地预览首页」看效果，**保存即生效**。 |
+| **⑤ 一键发布上线** | 回到向导页点 **🚀 一键发布上线**。等 1～2 分钟，页面显示你的**网站地址**（`https://你的用户名.github.io/blog/`），点开就是你的博客！ |
+
+### 以后怎么用
+
+就三步：**双击启动器 → 后台写/改内容并本地预览 → 打开 `/setup` 点一键发布**。
+不发布，改动只在本地；发布后，全世界都能看到。
+
+> 不用找「停止」按钮：关掉所有博客网页后，程序约 1 分钟自动停止。想立刻用最新版本，
+> 再次双击启动器（会问你「打开网页 / 重启」）。
+
+---
+
+## 四、博客的特色与模块
+
+**前台（`/`，访客看到的页面）**
+- **个人资料**、**职业经历**、**随想**、**项目**、**最新文章**
+- **3D 足迹地球**：拖拽旋转、缩放、下钻到 国家 → 省/州 → 城市；随真实时间显示昼夜
+  光照；手机支持双指缩放与拖动。已内置 **5 个国家**的可下钻数据，且外国地名**中英双语**：
+  中国（全省 + 港澳台，34 个省级可下钻）、日本、马来西亚、新加坡、泰国。
+- **瞬间信息流**：图片 / 短视频 / 纯文字日记
+- **全站模糊搜索**
+
+**文章页（`/posts/{slug}`）**：Markdown 自动渲染为网页。
+
+**后台（`/admin`，无需登录）**：对每一块内容增删改，保存即写入本地数据库，前台下次
+加载即生效。后台只在你自己电脑上运行，所以不设密码、打开即用。
+
+| 版块 | 说明 |
+|------|------|
+| **资料 Profile** | 名字、标题、slogan、关于（Markdown）、技术栈标签、GitHub、邮箱、位置 |
+| **经历 Experiences** | 职业时间线，可排序 |
+| **随想 Thoughts** | 短观点卡片，带主题和日期 |
+| **项目 Projects** | 名称、描述、语言、星标、License、链接，可排序 |
+| **文章 Posts** | Markdown 文章；勾选 `published` 才会上线，草稿不外泄 |
+| **足迹 Footprints** | 一条 = 一座去过的城市（国家 → 省/州 → 城市联动选择），可写备注、关联多条瞬间 |
+| **瞬间 Moments** | 图片 / 短视频 / 纯文字动态 |
+
+**关于媒体**：站点本身**不托管图片/视频**，而是引用外部 URL（推荐图片放 Cloudflare R2
+等对象存储），因此无体积限制、加载快。B 站 / YouTube 链接粘普通观看页即可自动内嵌播放。
+
+**安全**：后台无登录、无密码（本机单人使用）；表单仍有 CSRF 双提交 Cookie 防护。
+如果你选择把它部署成**公网动态站**（见下文），`/admin` 是公开可写的——请在反向代理
+层自行加访问控制（如 Caddy `basicauth`），或仅用静态发布模式。
+
+---
+
+## 五、未来展望 & 联系方式
+
+- 🎨 **多主题**：当前是复古 CRT 终端风，后续计划支持更多可切换主题（明亮 / 极简 /
+  杂志风等），让每个人的博客更有个性。
+- 更多国家的足迹数据、更多内容模块，也在路上。
+
+有问题、建议或想一起完善，欢迎联系： **sfqincsu@163.com**
+
+---
+
+## 进阶：开发者 / 技术参考
+
+上面是「小白双击即用」的路线。如果你会命令行，也可以直接用源码运行、或部署成动态站点。
+
+### 快速开始（源码运行，需 Go 1.23+）
 
 ```bash
 go build -o ./blogbin .
-ADMIN_PASSWORD='...' ./blogbin serve
+./blogbin serve
+# → 监听 :8080；后台 http://localhost:8080/admin （无需登录，直接打开）
 ```
+
+整个前端（HTML 模板、CSS、JS、地理数据）通过 `//go:embed` 编译进**一个可执行文件**，
+部署就是拷一个二进制。
 
 ### 环境变量
 
-| 变量             | 默认值     | 含义                                                     |
-|------------------|-----------|----------------------------------------------------------|
-| `ADDR`           | `:8080`   | 监听地址。生产建议 `127.0.0.1:8080`（回环，前置反代）      |
-| `DB_PATH`        | `blog.db` | SQLite 文件路径                                          |
-| `ADMIN_USERNAME` | `admin`   | 后台登录名                                              |
-| `ADMIN_PASSWORD` | *(空)*    | 非空时设置/更新后台密码；首次运行必须带，之后可去掉        |
-| `SECURE_COOKIES` | *(关)*    | 设为 `1` 时 Cookie 仅走 HTTPS；生产环境开启               |
+| 变量 | 默认值 | 含义 |
+|------|--------|------|
+| `ADDR` | `:8080` | 监听地址。生产建议 `127.0.0.1:8080`（回环，前置反代） |
+| `DB_PATH` | `blog.db` | SQLite 文件路径 |
+| `SECURE_COOKIES` | *(关)* | 设为 `1` 时 CSRF Cookie 仅走 HTTPS；生产环境开启 |
 
 ### 子命令
 
 ```bash
 ./blogbin serve          # （默认）启动后台 + 前台服务
 ./blogbin export [dir]   # 把当前数据库渲染成静态站（默认输出 ./dist）
+BASE_URL=/blog ./blogbin export dist   # 子路径构建（用于 user.github.io/blog 这类子路径）
 ```
 
----
+「一键发布」本质就是 `export` + 推送到 GitHub Pages（见 `internal/setup/publish.go`）。
+`export` 会把首页、每篇已发布文章渲染成 HTML，把足迹 JSON 写到 `dist/api/footprints`
+（正是地球 fetch 的路径）、搜索索引写到 `dist/api/search`，再拷贝全部静态资源。后台只在
+本地跑，数据库不出本机。
 
-## 后台使用说明
+### 数据与备份
 
-登录 `/admin` 后，左侧导航（中英对照）分为以下几块：
+你的**全部内容**都在一个文件里：`~/dev-home-blog/blog.db`
+（macOS `/Users/你/dev-home-blog/blog.db`，Windows `C:\Users\你\dev-home-blog\blog.db`）。
+备份就复制它；换电脑就拷到新电脑同样位置。
 
-| 版块 | 说明 |
-|------|------|
-| **资料 Profile** | 单条：名字、标题、slogan、关于（Markdown）、技术栈标签、GitHub、邮箱、位置 |
-| **经历 Experiences** | 职业时间线，可排序 |
-| **随想 Thoughts** | 短观点卡片，带主题和日期 |
-| **项目 Projects** | 项目卡片：名称、描述、语言、星标、License、链接，可排序 |
-| **文章 Posts** | Markdown 文章。`published` 打勾才会出现在前台/被导出；草稿不外泄 |
-| **足迹 Footprints** | 一条 = 一座去过的城市（国家 → 省/州 → 城市）。表单为**联动选择**，可填备注，并可关联多条「瞬间」 |
-| **瞬间 Moments** | 图片 / 短视频 / 纯文字动态，见下 |
+### 动态部署（可选，付费 VPS，线上后台随处可编辑）
 
-### 瞬间（Moments）与媒体
-
-「瞬间」用来记录生活片段。**站点本身不托管图片/视频**，而是引用外部 URL（每行一
-个），从而不受体积限制、加载也快：
-
-- **图片**：直接填图片 URL（推荐放 Cloudflare R2 等对象存储）。
-- **直链视频**（`.mp4/.webm/.mov/...`）：用 `<video>` 内联播放。
-- **B 站 / YouTube 链接**：粘贴普通观看页链接即可，会自动改写成可内嵌的播放器地址
-  内联播放（B 站用 H5 移动端播放器，手机上不跳 App），并附「在原站打开」兜底链接。
-
-前台看图支持轮播灯箱（跟手滑动、到头提示、不循环）。
-
-### 足迹 ↔ 瞬间 关联
-
-足迹和瞬间是**多对多**：一条足迹可关联多条瞬间，一条瞬间也可被多条足迹引用。在
-足迹表单里勾选要关联的瞬间即可。前台地球下钻到城市/省份时，点击会把关联的瞬间列在
-下方（不直接跳转），用户可再点具体链接进入某条瞬间。
-
----
-
-## 静态发布到免费 Pages（推荐）
-
-`export` 会把首页、每篇已发布文章渲染成 HTML，并把足迹 JSON 写到
-`dist/api/footprints`（正是地球 fetch 的路径，无需改前端）、搜索索引写到
-`dist/api/search`，再拷贝全部静态资源。后台只在本地跑，数据库不出本机。
-
-### 一键发布
+若想让线上 `/admin` 随时可编辑、改完即时生效，可把 Go 服务跑在服务器上。推荐
+**香港（或就近海外）VPS + Cloudflare + 自有域名**。仓库内已含 `Caddyfile`（反代 + 自动
+HTTPS）与 systemd 单元；详见 [`DEPLOY.md`](DEPLOY.md)。
 
 ```bash
-# 从本地 blog.db 渲染两种构建，推送到各免费平台：
-DB_PATH=./blog.db ./scripts/publish-all.sh "post: 你好世界"
+./scripts/deploy.sh push blog@your-server-ip   # 编译 → 上传 → 重启
+./scripts/deploy.sh build                       # 只编译 Linux 二进制（输出 dist/s_blog）
 ```
 
-`publish-all.sh` 会产出**两种构建**并推到对应位置：
-
-| 构建 | 资源路径 | 推送目标 | 适配的托管 |
-|------|----------|----------|------------|
-| 根路径（`BASE_URL` 空） | `/static/...` | GitHub `master` 的 `dist/` | Cloudflare / EdgeOne（域名根，自动部署） |
-| 子路径（`BASE_URL=/blog`） | `/blog/static/...` | GitHub `gh-pages` 分支、Gitee `master` | GitHub Pages、Gitee Pages（`用户名.github.io/blog` 这类子路径） |
-
-可用开关：`SKIP_GITEE=1`、`SKIP_GH_PAGES=1`、`SUBPATH=/xxx`（改子路径）。
-
-也可只手动导出，不推送：
-
-```bash
-./blogbin export dist                    # 根路径
-BASE_URL=/blog ./blogbin export dist     # 子路径
-```
-
-### 平台现状（截至 2026-07，可能变化）
-
-- **Cloudflare**（当前线上，已跑通）：连 GitHub `master`，`wrangler.jsonc` 让它把
-  预构建的 `dist/` 当纯静态资源直接发布，无构建步骤。海外/全球访问良好。
-- **EdgeOne Pages（腾讯云）**：免费版**「全球（不含中国大陆）」**区才有永久免费域
-  名；「中国大陆 / 全球含大陆」区只给 3 小时临时预览链接，且需绑**已 ICP 备案**的
-  自有域名才能长期访问。免费+不备案这条路拿不到大陆加速。
-- **Gitee Pages**：个人版 Pages **已下线**，不再可用（脚本仍保留相关分支推送，仅
-  作历史备份）。
-
-各平台完整开通/连库/自定义域名/备案说明见 [`DEPLOY.md`](DEPLOY.md)；带日期的选型
-对比见 [`docs/hosting-research-2026-07-13.md`](docs/hosting-research-2026-07-13.md)。
-
-> **结论**：免费 + 不备案，天然有大陆访问速度上限。想要真正的大陆加速，需要「买域
-> 名（约 ¥30–70/年）+ ICP 备案」后再上 EdgeOne 中国区。当前个人博客用 Cloudflare
-> 已够用。
-
----
-
-## 动态部署（可选，付费 VPS，线上后台随处可访问）
-
-若你想让线上 `/admin` 随时可编辑、改完即时生效，可把 Go 服务跑在服务器上。推荐
-**香港（或就近海外）VPS + Cloudflare + 自有域名**：海外机对大陆延迟低、无需备案，
-再叠加 Cloudflare CDN。
-
-```bash
-# 在本机（仓库内）一步完成：编译 → 上传 → 重启：
-./scripts/deploy.sh push blog@your-server-ip
-
-# 首次还需在服务器上安装服务文件：
-sudo cp /opt/s_blog/s_blog.service /etc/systemd/system/
-sudo cp /opt/s_blog/Caddyfile /etc/caddy/Caddyfile
-sudo systemctl daemon-reload && sudo systemctl enable --now s_blog
-sudo systemctl reload caddy
-```
-
-`Caddyfile`（反代 + 自动 HTTPS）和 `s_blog.service`（systemd 单元）已在仓库内，改
-好域名和 `ADMIN_PASSWORD` 即可。只想编译 Linux 二进制不部署：`./scripts/deploy.sh
-build`（输出 `dist/s_blog`）。
-
----
-
-## 重新生成地球地理数据
+### 重新生成地球地理数据
 
 `web/static/geo/` 下的地理 JSON 已预生成，通常不用动。要重建（需联网 + Node）：
 
 ```bash
-node scripts/gen_geo.mjs
+node scripts/gen_geo.mjs            # 重建全部国家
+node scripts/gen_geo.mjs SG TH      # 只重建指定国家
 ```
 
-下钻范围：CN 省份 北京/湖南/广东/浙江/四川/江苏；JP 东京/大阪；MY 雪兰莪/沙巴；
-SG 整国。初始只加载 `world.json`（约 64KB），区域文件在下钻时按需懒加载。
+已内置国家：CN（34 省级可下钻）、JP（25）、MY（13）、SG（5）、TH（15），外国地名均为中英双语。
+初始只加载 `world.json`，区域文件在下钻时按需懒加载。
 
----
+### 打包发布包（维护者）
 
-## 项目结构
+```bash
+./scripts/package-release.sh   # 生成 dist-release/Blog/ 与可直接发送的 Blog.zip
+```
+
+产物含跨平台自包含二进制 + 各系统的双击启动器（`Start-Blog.app` / `.vbs` / `.command`
+/ `.bat`）+ `docs/新手指南.md`。
+
+### 项目结构
 
 ```
 main.go                     入口；embed ./web；serve / export 两个子命令
 internal/
   models/                   内容类型 + 搜索索引、标签、足迹分组、瞬间媒体解析
   store/                    SQLite 访问（schema.sql + 每类内容一个文件）
-  auth/                     bcrypt + token 助手
+  auth/                     token 助手（CSRF）
   render/                   html/template + goldmark（Markdown）
-  server/                   路由、中间件（会话 / CSRF）、handlers、gzip
+  server/                   路由、中间件（CSRF）、handlers、gzip
+  setup/                    新手向导：环境检测 / GitHub 登录 / 建仓 / 一键发布
   export/                   把数据库渲染成静态站
 web/
   templates/public/         home.html, post.html
-  templates/admin/          登录、仪表盘、各版块 list/form
-  static/css|js/            CRT 主题、后台、globe.js、moments.js、search.js
+  templates/admin/          仪表盘、各版块 list/form、setup 向导页
+  static/css|js/            CRT 主题、后台、globe.js、moments.js、search.js、setup.js
   static/geo/               地球用的 world + 区域 JSON（预生成）
 scripts/
-  publish-all.sh            一键发布到多个免费 Pages（含两种构建）
+  package-release.sh        打包小白双击发布包（含跨平台二进制 + 启动器）
   deploy.sh                 编译 / 推送到 VPS
   gen_geo.mjs               （重）生成地理数据（需联网）
   globe_logic_test.mjs      地球纯逻辑测试
-Caddyfile                   反向代理 + TLS（VPS 用）
-s_blog.service              systemd 单元（VPS 用）
-wrangler.jsonc              Cloudflare Workers 静态资源发布配置
 ```
 
----
-
-## 开发与验证
-
-改完 JS/CSS/Go 后的校验顺序：
+### 开发与验证
 
 ```bash
 node --check web/static/js/xxx.js   # 改了 JS 时
 go build -o ./blogbin .             # 编译（静态资源已 embed，改前端也要重新编译）
 go vet ./...
-go test ./...                       # 全部测试（store 层、搜索、足迹分组、瞬间媒体等）
+go test ./...                       # 全部测试
 node scripts/globe_logic_test.mjs   # 地球纯逻辑测试
 ```
 

@@ -3,68 +3,75 @@ package server
 
 import (
 	"io/fs"
-	"log"
 	"net/http"
+	"os"
+	"path/filepath"
+	"runtime"
+	"sync/atomic"
+	"time"
 
-	"dev-home-blog/internal/auth"
 	"dev-home-blog/internal/render"
+	"dev-home-blog/internal/setup"
 	"dev-home-blog/internal/store"
 )
 
 // Config holds runtime configuration for the server.
 type Config struct {
-	Addr          string
-	DBPath        string
-	AdminUsername string
-	AdminPassword string // if non-empty, (re)sets the admin password on startup
-	Secure        bool   // set Secure flag on cookies (HTTPS deployments)
+	Addr    string
+	DBPath  string
+	Secure  bool   // set Secure flag on cookies (HTTPS deployments)
+	RepoDir string // working dir for git/gh commands in the setup wizard
 }
 
 // Server holds shared dependencies for all handlers.
 type Server struct {
-	cfg    Config
-	store  *store.Store
-	render *render.Renderer
-	mux    *http.ServeMux
-	static fs.FS
+	cfg      Config
+	store    *store.Store
+	render   *render.Renderer
+	mux      *http.ServeMux
+	static   fs.FS
+	detector *setup.Detector
+	actor    *setup.Actor
+	goos     string
+	// lastBeat is the Unix-nanosecond timestamp of the most recent browser
+	// heartbeat (GET /internal/alive). The watchdog in lifecycle.go shuts the
+	// server down once no page has pinged for idleTimeout, so closing every
+	// blog tab makes the background process exit on its own.
+	lastBeat atomic.Int64
 }
 
-// New constructs the server, seeds the admin password if provided, and registers routes.
+// New constructs the server and registers routes.
 func New(cfg Config, st *store.Store, rnd *render.Renderer, static fs.FS) (*Server, error) {
-	s := &Server{cfg: cfg, store: st, render: rnd, static: static, mux: http.NewServeMux()}
-
-	if err := s.seedAdmin(); err != nil {
-		return nil, err
+	repo := cfg.RepoDir
+	if repo == "" {
+		repo = "."
 	}
+	// binDir is where the wizard drops tools it downloads itself (the GitHub
+	// CLI), so a beginner never needs Homebrew or any package manager. The
+	// runner searches it before the system PATH.
+	binDir := managedBinDir()
+	runner := setup.ExecRunner{BinDir: binDir}
+	s := &Server{
+		cfg: cfg, store: st, render: rnd, static: static, mux: http.NewServeMux(),
+		detector: &setup.Detector{Run: runner, Repo: repo},
+		actor:    &setup.Actor{Run: runner, Repo: repo, BinDir: binDir},
+		goos:     runtime.GOOS,
+	}
+
+	// Treat startup as a fresh heartbeat so the idle watchdog gives the browser
+	// time to load the first page and start pinging before it can shut down.
+	s.lastBeat.Store(time.Now().UnixNano())
 	s.routes()
 	return s, nil
 }
 
-// seedAdmin sets the admin password from config when provided, or warns when
-// no password has ever been set (admin login would be impossible otherwise).
-func (s *Server) seedAdmin() error {
-	if s.cfg.AdminPassword != "" {
-		hash, err := auth.HashPassword(s.cfg.AdminPassword)
-		if err != nil {
-			return err
-		}
-		if err := s.store.SetAdminPassword(s.cfg.AdminUsername, hash); err != nil {
-			return err
-		}
-		log.Printf("admin password set for user %q", s.cfg.AdminUsername)
-		return nil
+// managedBinDir returns the app-private directory for self-downloaded tools,
+// e.g. ~/.dev-home-blog/bin. It falls back to a local ".dev-home-blog/bin" if
+// the user home cannot be resolved, so the wizard still works.
+func managedBinDir() string {
+	home, err := os.UserHomeDir()
+	if err != nil || home == "" {
+		return filepath.Join(".dev-home-blog", "bin")
 	}
-	hash, err := s.store.AdminPasswordHash()
-	if err != nil {
-		return err
-	}
-	if hash == "" {
-		log.Printf("WARNING: no admin password set. Start once with ADMIN_PASSWORD=... to enable /admin login.")
-	}
-	return nil
-}
-
-// ListenAndServe starts the HTTP server.
-func (s *Server) ListenAndServe() error {
-	return http.ListenAndServe(s.cfg.Addr, s.logRequests(s.gzipStatic(s.mux)))
+	return filepath.Join(home, ".dev-home-blog", "bin")
 }

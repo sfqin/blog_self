@@ -52,13 +52,18 @@ function makeProject(rotX, rotY, R, CX, CY) {
 
 // 3. Region files exist and are well-formed for every target + drill combo.
 {
-  const targets = { CN: "中国", JP: "日本", MY: "马来西亚", SG: "新加坡" };
+  const targets = { CN: "中国", JP: "日本", MY: "马来西亚", SG: "新加坡", TH: "泰国" };
   for (const [code, name] of Object.entries(targets)) {
     const d = load(`regions/${code}.json`);
     ok(d.regions.length > 0 && Array.isArray(d.view), `${code}: ${d.regions.length} ADM1 regions`);
     const drillable = d.regions.filter((r) => r.drill);
-    if (code === "SG") ok(drillable.length === 0, "SG: no drill (city-level whole country)");
-    else ok(drillable.length > 0, `${code}: has drillable provinces (${drillable.map((r) => r.name).join(",")})`);
+    ok(drillable.length > 0, `${code}: has drillable provinces (${drillable.length})`);
+    // Foreign ADM1 provinces must carry a Chinese label for bilingual display
+    // (CN names are already Chinese in the name field, so zh stays empty).
+    if (code !== "CN") {
+      const noZh = d.regions.filter((r) => !r.zh).map((r) => r.name);
+      ok(noZh.length === 0, `${code}: all provinces bilingual${noZh.length ? " (missing: " + noZh.join(",") + ")" : ""}`);
+    }
     // Every polygon has >= 3 points.
     let bad = 0;
     d.regions.forEach((r) => r.polys.forEach((p) => { if (p.length < 3) bad++; }));
@@ -66,23 +71,26 @@ function makeProject(rotX, rotY, R, CX, CY) {
   }
 }
 
-// 4. Province-key mapping (globe.js) resolves to real city files on disk.
+// 4. Province-key mapping (globe.js) resolves to real city files on disk, and
+// every foreign city carries a Chinese label (bilingual curation invariant).
 {
-  const CN_ADCODE = { "北京市": "110000", "湖南省": "430000", "广东省": "440000", "浙江省": "330000", "四川省": "510000", "江苏省": "320000" };
+  const CN_ADCODE = { "北京市": "110000", "湖南省": "430000", "广东省": "440000", "浙江省": "330000", "四川省": "510000", "江苏省": "320000", "台湾省": "710000" };
   for (const [prov, code] of Object.entries(CN_ADCODE)) {
     ok(existsSync(join(GEO, `regions/CN/${code}.json`)), `CN drill file exists for ${prov} -> ${code}.json`);
   }
-  // JP drill uses ADM1 English name with spaces -> underscores
-  const jp = load("regions/JP.json");
-  jp.regions.filter((r) => r.drill).forEach((r) => {
-    const key = r.name.replace(/\s+/g, "_");
-    ok(existsSync(join(GEO, `regions/JP/${key}.json`)), `JP drill file exists for ${r.name} -> ${key}.json`);
-  });
-  const my = load("regions/MY.json");
-  my.regions.filter((r) => r.drill).forEach((r) => {
-    const key = r.name.replace(/\s+/g, "_");
-    ok(existsSync(join(GEO, `regions/MY/${key}.json`)), `MY drill file exists for ${r.name} -> ${key}.json`);
-  });
+  // Foreign drill uses ADM1 English name with spaces -> underscores; each drill
+  // file must exist and list only bilingual (zh-labeled) cities.
+  for (const code of ["JP", "MY", "SG", "TH"]) {
+    const c = load(`regions/${code}.json`);
+    c.regions.filter((r) => r.drill).forEach((r) => {
+      const key = r.name.replace(/\s+/g, "_");
+      const rel = `regions/${code}/${key}.json`;
+      ok(existsSync(join(GEO, rel)), `${code} drill file exists for ${r.name} -> ${key}.json`);
+      const cities = load(rel).regions;
+      const noZh = cities.filter((x) => !x.zh).map((x) => x.name);
+      ok(noZh.length === 0, `${code}/${key}: all cities bilingual${noZh.length ? " (missing: " + noZh.join(",") + ")" : ""}`);
+    });
+  }
 }
 
 // 5. point-in-polygon (region hit-test) on a known city polygon.

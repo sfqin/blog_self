@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>setup — 一步步上线你的博客 · dev@home</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{asset "/static/css/crt.css"}}">
+<link rel="stylesheet" href="{{asset "/static/css/admin.css"}}">
+</head>
+<body>
+<div class="crt-scanlines"></div>
+<div class="crt-vignette"></div>
+
+<div class="setup-wrap" data-os="{{.OS}}">
+  <input type="hidden" id="csrf" value="{{.CSRF}}">
+
+  <header class="setup-head">
+    <div class="cmd">dev@home:~# ./setup</div>
+    <h1>一步步上线你的博客</h1>
+    <p class="muted">不用敲命令。跟着下面的步骤，从零到发布到网上。遇到红色 ✗ 就点旁边的按钮，它会替你处理。</p>
+  </header>
+
+  <!-- Progress rail -->
+  <ol class="setup-rail" id="rail">
+    <li data-step="env">1 · 环境检测</li>
+    <li data-step="github">2 · 连接 GitHub</li>
+    <li data-step="repo">3 · 创建仓库</li>
+    <li data-step="write">4 · 写文章 / 预览</li>
+    <li data-step="publish">5 · 发布上线</li>
+  </ol>
+
+  <!-- Step 1: environment -->
+  <section class="setup-step" id="step-env">
+    <h2>① 环境检测</h2>
+    <p class="muted">发布需要两个小工具：<b>Git</b>（版本管理）和 <b>GitHub CLI</b>（连你的 GitHub 账号）。没有也没关系，点“安装”，程序会自动帮你装好——<b>不需要 Homebrew 等其他任何软件</b>。</p>
+    <div class="check" id="check-git">
+      <span class="dot">…</span>
+      <div class="check-body"><b>Git</b><div class="check-detail">检测中…</div></div>
+      <button class="btn-primary" data-install="git" hidden>安装 Git</button>
+    </div>
+    <div class="check" id="check-gh">
+      <span class="dot">…</span>
+      <div class="check-body"><b>GitHub CLI</b><div class="check-detail">检测中…</div></div>
+      <button class="btn-primary" data-install="gh" hidden>一键下载 GitHub CLI</button>
+    </div>
+    <div class="actions-bar">
+      <button class="btn-ghost" id="btn-recheck">↻ 重新检测</button>
+    </div>
+    <div class="check-note" id="env-note"></div>
+  </section>
+
+  <!-- Step 2: GitHub login -->
+  <section class="setup-step" id="step-github">
+    <h2>② 连接 GitHub 账号</h2>
+    <p class="muted">GitHub 是免费存放并发布网站的地方。点下面的按钮，程序会自动打开授权页——你只要把页面上的一小段代码粘进去、点授权就行，不用输密码或配密钥。</p>
+    <div class="check" id="check-auth">
+      <span class="dot">…</span>
+      <div class="check-body"><b>GitHub 登录状态</b><div class="check-detail">检测中…</div></div>
+    </div>
+    <div class="actions-bar">
+      <button class="btn-primary" id="btn-ghlogin">用浏览器登录 GitHub</button>
+      <a class="btn-ghost" href="https://github.com/signup" target="_blank" rel="noopener" style="text-decoration:none">还没有账号？免费注册 ↗</a>
+    </div>
+    <!-- One-time device code, shown big with a one-click copy button. -->
+    <div class="code-box" id="ghcode-box" hidden>
+      <div class="code-label">① 复制这个一次性代码：</div>
+      <div class="code-row">
+        <code id="ghcode" class="code-value">----</code>
+        <button class="btn-primary" id="btn-copycode">复制</button>
+      </div>
+      <div class="code-hint">② 在自动打开的 GitHub 页面粘贴它并点授权（没自动打开就点
+        <a id="ghcode-url" href="https://github.com/login/device" target="_blank" rel="noopener">这里</a>）。
+        授权后本页会自动变绿，无需其他操作。</div>
+    </div>
+    <div class="check-note" id="gh-note"></div>
+  </section>
+
+  <!-- Step 3: create repo -->
+  <section class="setup-step" id="step-repo">
+    <h2>③ 创建代码仓库</h2>
+    <p class="muted">给你的博客起个仓库名（会成为网址的一部分，比如 <code>blog</code> → <code>你的名字.github.io/blog</code>）。</p>
+    <div class="field">
+      <label>仓库名</label>
+      <input type="text" id="repo-name" value="blog" autocomplete="off">
+      <div class="hint">只用字母、数字、连字符。仓库会创建为<strong>公开（Public）</strong>——GitHub Pages 免费版只能发布公开仓库。</div>
+    </div>
+    <div class="actions-bar">
+      <button class="btn-primary" id="btn-createrepo">创建 / 关联仓库</button>
+    </div>
+    <div class="check-detail" id="repo-result"></div>
+    <div class="check-note" id="repo-note"></div>
+  </section>
+
+  <!-- Step 4: write -->
+  <section class="setup-step" id="step-write">
+    <h2>④ 写文章 / 本地预览</h2>
+    <p class="muted">进入后台增删改内容，随时在前台预览——本地即时生效，不用重新构建。后台无需登录、没有密码，直接打开即可。</p>
+    <div class="actions-bar">
+      <a class="btn-primary" href="/admin" style="text-decoration:none" target="_blank">打开后台 /admin ↗</a>
+      <a class="btn-ghost" href="/" style="text-decoration:none" target="_blank">本地预览首页 ↗</a>
+    </div>
+  </section>
+
+  <!-- Step 5: publish -->
+  <section class="setup-step" id="step-publish">
+    <h2>⑤ 发布到网上（GitHub Pages）</h2>
+    <p class="muted">一键把当前内容渲染成静态网站，推送到 GitHub 并开启 Pages。首次开启后约 1–2 分钟生效。</p>
+    <div class="field">
+      <label>本次更新说明（可选）</label>
+      <input type="text" id="pub-msg" placeholder="例如：发布我的第一篇文章" autocomplete="off">
+    </div>
+    <div class="actions-bar">
+      <button class="btn-primary" id="btn-publish">🚀 一键发布上线</button>
+    </div>
+    <div class="check-detail" id="pub-result"></div>
+    <div class="check-note" id="pub-note"></div>
+    <div class="setup-live" id="pub-live" hidden>
+      🎉 你的网站地址：<a id="pub-url" href="#" target="_blank"></a>
+    </div>
+  </section>
+
+  <footer class="setup-foot muted">
+    需要更详细的图文说明？见仓库里的 <code>docs/新手指南.md</code>。
+  </footer>
+</div>
+
+<script src="{{asset "/static/js/heartbeat.js"}}" defer></script>
+<script src="{{asset "/static/js/setup.js"}}"></script>
+</body>
+</html>

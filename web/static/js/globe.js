@@ -32,11 +32,6 @@
 
   // ---- province-name -> drill-file key mapping (admin stores localized names) ----
   // China uses adcode; JP/MY files are keyed by English ADM1 name (spaces -> _).
-  var CN_ADCODE = {
-    "北京市": "110000", "湖南省": "430000", "广东省": "440000",
-    "浙江省": "330000", "四川省": "510000", "江苏省": "320000",
-  };
-
   // ============================================================
   // State
   // ============================================================
@@ -305,18 +300,44 @@
   // ============================================================
   // Layers 2 & 3 — flat region maps (country / city)
   // ============================================================
+  // Actual bounding box of the region map's polygons in viewBox units. The
+  // declared data.view can be wrong (e.g. MY.json says [1000,359] but its
+  // polygons live at y≈341..660), which mis-centers the map and makes the lower
+  // part unreachable when zoomed. Driving layout from real geometry self-heals
+  // that for any region file. Cached on the data object (computed once).
+  function regionExtent(data) {
+    if (data.__ext) return data.__ext;
+    var minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
+    data.regions.forEach(function (reg) {
+      reg.polys.forEach(function (poly) {
+        for (var i = 0; i < poly.length; i++) {
+          var x = poly[i][0], y = poly[i][1];
+          if (x < minx) minx = x; if (x > maxx) maxx = x;
+          if (y < miny) miny = y; if (y > maxy) maxy = y;
+        }
+      });
+    });
+    if (!isFinite(minx)) { minx = 0; miny = 0; maxx = data.view[0]; maxy = data.view[1]; }
+    data.__ext = {
+      cx: (minx + maxx) / 2, cy: (miny + maxy) / 2,
+      w: (maxx - minx) || 1, h: (maxy - miny) || 1,
+    };
+    return data.__ext;
+  }
+
   // Shared viewBox→screen mapping for the flat region layers, folding in the
   // user's pan/zoom (state.rv). pickRegion() inverts this exact transform.
   function regionTransform() {
     var data = state.regionData;
     var size = SIZE;
-    var vw = data.view[0], vh = data.view[1];
+    var ext = regionExtent(data);
     var pad = 16;
-    var base = Math.min((size - pad * 2) / vw, (size - pad * 2) / vh);
+    var base = Math.min((size - pad * 2) / ext.w, (size - pad * 2) / ext.h);
     var scale = base * state.rv.zoom;
-    // Center the (zoomed) map, then apply pan. Panning is in screen pixels.
-    var ox = (size - vw * scale) / 2 + state.rv.panx;
-    var oy = (size - vh * scale) / 2 + state.rv.pany;
+    // Center the content bounding box (not the possibly-wrong declared view),
+    // then apply pan. Panning is in screen pixels.
+    var ox = size / 2 - ext.cx * scale + state.rv.panx;
+    var oy = size / 2 - ext.cy * scale + state.rv.pany;
     return { scale: scale, ox: ox, oy: oy, size: size };
   }
 
@@ -339,8 +360,11 @@
     data.regions.forEach(function (reg) {
       var visited = visitedSet.has(reg.name);
       var isSel = state.selected === reg.name;
-      var fill = visited ? C.visited : (reg.drill ? C.drill : C.region);
-      var line = visited ? C.visitedLine : (reg.drill ? C.drillLine : C.regionLine);
+      // Color reflects only visited/selected state now — drillable regions are
+      // NOT tinted amber by default (that read as "highlighted" even for places
+      // never visited). Drill affordance stays via hover glow + cursor + tap.
+      var fill = visited ? C.visited : C.region;
+      var line = visited ? C.visitedLine : C.regionLine;
       var isHover = state.hover === reg.name;
       ctx.save();
       reg.polys.forEach(function (poly) {
@@ -352,9 +376,9 @@
         ctx.closePath();
         ctx.fillStyle = isSel ? C.drill : fill;
         ctx.fill();
-        ctx.lineWidth = isSel ? 1.6 : (reg.drill || visited ? 1.1 : 0.6);
+        ctx.lineWidth = isSel ? 1.6 : (visited ? 1.1 : 0.6);
         ctx.strokeStyle = isSel ? C.amber : line;
-        if (reg.drill || visited || isHover || isSel) { ctx.shadowColor = isSel ? C.amber : line; ctx.shadowBlur = isSel ? 16 : (isHover ? 12 : 6); }
+        if (visited || isHover || isSel) { ctx.shadowColor = isSel ? C.amber : line; ctx.shadowBlur = isSel ? 16 : (isHover ? 12 : 6); }
         ctx.stroke();
       });
       ctx.restore();
@@ -381,7 +405,7 @@
     // on the city layer, append the visited city's note.
     var labelName = state.hover || state.selected;
     if (labelName) {
-      var label = labelName;
+      var label = dispName(labelName);
       var note = cityNote(labelName);
       ctx.font = "12px 'IBM Plex Mono', monospace";
       if (note) {
@@ -402,6 +426,23 @@
         ctx.fillText(label, 12, size - 12);
       }
     }
+  }
+
+  // Bilingual display name for a region key. Foreign regions carry a Chinese
+  // label (zh) in the geo data, shown as "中文 · English"; CN names are already
+  // Chinese (no zh). state.hover/selected keep the English key for matching, so
+  // this is display-only.
+  function dispName(name) {
+    var data = state.regionData;
+    if (data && data.regions) {
+      for (var i = 0; i < data.regions.length; i++) {
+        if (data.regions[i].name === name) {
+          var z = data.regions[i].zh;
+          return z ? z + " · " + name : name;
+        }
+      }
+    }
+    return name;
   }
 
   // Set of visited region names for the current layer.
@@ -577,9 +618,13 @@
     });
   }
 
-  function provinceKey(countryCode, provinceName) {
-    if (countryCode === "CN") return CN_ADCODE[provinceName] || null;
-    return provinceName.replace(/\s+/g, "_"); // JP/MY use English ADM1 name
+  // Drill-file key for a region. The geo generator stores the child-file id as
+  // reg.key (CN → province adcode; JP/MY/SG → ADM1 name). City files are named
+  // by that key with spaces turned into underscores, so any drillable province
+  // resolves without a hardcoded name→id table.
+  function drillKey(reg) {
+    if (!reg || !reg.key) return null;
+    return String(reg.key).replace(/\s+/g, "_");
   }
 
   // Reset region pan/zoom (called on every layer change so each map opens fitted).
@@ -630,22 +675,32 @@
     scrollToTop();
   }
 
-  // Quietly pre-load the city JSON for every drillable province in the current
-  // country, so the first drill-in feels instant (main fix for P1 slowness).
+  // Warm one province's city JSON into the cache (used on hover and for the
+  // small visited-set prefetch). No-op if already cached or not drillable.
+  function warmDrill(reg) {
+    if (!reg || !reg.drill) return;
+    var key = drillKey(reg);
+    if (!key || !state.country) return;
+    var url = "/static/geo/regions/" + state.country.code + "/" + key + ".json";
+    if (!regionCache[url]) fetchRegion(url).catch(function () {});
+  }
+
+  // Prefetch only the city files the user is most likely to open next: the
+  // provinces they have actually visited in this country. With every province
+  // now drillable (CN ~34, JP 47), warming ALL of them would fire dozens of
+  // requests on country open — the slowness we want to avoid. Hover warms the
+  // rest on demand (see onMove), so drilling still feels instant.
   function prefetchDrills(countryCode, data) {
     if (!data || !data.regions) return;
+    var visited = currentVisitedSet();
     data.regions.forEach(function (reg) {
-      if (!reg.drill) return;
-      var key = provinceKey(countryCode, reg.name);
-      if (!key) return;
-      var url = "/static/geo/regions/" + countryCode + "/" + key + ".json";
-      if (!regionCache[url]) fetchRegion(url).catch(function () {});
+      if (reg.drill && visited.has(reg.name)) warmDrill(reg);
     });
   }
 
   function goCity(reg) {
     if (!reg.drill) return;
-    var key = provinceKey(state.country.code, reg.name);
+    var key = drillKey(reg);
     if (!key) return;
     state.layer = "city";
     state.province = { name: reg.name, key: key };
@@ -681,7 +736,7 @@
     var stats = document.getElementById("globe-stats");
     var parts = ['<a data-nav="globe">~/globe</a>'];
     if (state.country) parts.push('<a data-nav="country">' + esc(state.country.code) + "</a>");
-    if (state.province) parts.push('<span>' + esc(state.province.name) + "</span>");
+    if (state.province) parts.push('<span>' + esc(dispName(state.province.name)) + "</span>");
     if (bc) {
       bc.innerHTML = parts.join('<span class="sep">/</span>');
       bc.querySelectorAll("[data-nav]").forEach(function (a) {
@@ -804,12 +859,14 @@
     z = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, z));
     var T = regionTransform();
     var vx = (cx - T.ox) / T.scale, vy = (cy - T.oy) / T.scale;
-    var size = SIZE, vw = data.view[0], vh = data.view[1], pad = 16;
-    var base = Math.min((size - pad * 2) / vw, (size - pad * 2) / vh);
+    var ext = regionExtent(data), size = SIZE, pad = 16;
+    var base = Math.min((size - pad * 2) / ext.w, (size - pad * 2) / ext.h);
     var scale2 = base * z;
     state.rv.zoom = z;
-    state.rv.panx = cx - vx * scale2 - (size - vw * scale2) / 2;
-    state.rv.pany = cy - vy * scale2 - (size - vh * scale2) / 2;
+    // Invert the extent-centered transform: screen = size/2 - ext.c*scale + pan
+    // + v*scale, solved for pan so the point v stays under (cx,cy).
+    state.rv.panx = cx - size / 2 + (ext.cx - vx) * scale2;
+    state.rv.pany = cy - size / 2 + (ext.cy - vy) * scale2;
     clampPan();
     applyTouchAction();
     drawRegions();
@@ -819,10 +876,13 @@
   function clampPan() {
     if (state.rv.zoom <= 1.01) { state.rv.panx = 0; state.rv.pany = 0; return; }
     var data = state.regionData; if (!data) return;
-    var size = SIZE, vw = data.view[0], vh = data.view[1], pad = 16;
-    var base = Math.min((size - pad * 2) / vw, (size - pad * 2) / vh), scale = base * state.rv.zoom;
-    var limX = Math.max(0, (vw * scale - (size - pad * 2)) / 2) + size * 0.12;
-    var limY = Math.max(0, (vh * scale - (size - pad * 2)) / 2) + size * 0.12;
+    var ext = regionExtent(data), size = SIZE, pad = 16;
+    var base = Math.min((size - pad * 2) / ext.w, (size - pad * 2) / ext.h), scale = base * state.rv.zoom;
+    // panx/pany are the content center's offset from the viewport center. Allow
+    // the far edge of the content to reach the center (±half the on-screen
+    // content size), plus a full-viewport margin so any point is centerable.
+    var limX = ext.w * scale / 2 + size / 2;
+    var limY = ext.h * scale / 2 + size / 2;
     state.rv.panx = Math.max(-limX, Math.min(limX, state.rv.panx));
     state.rv.pany = Math.max(-limY, Math.min(limY, state.rv.pany));
   }
@@ -883,14 +943,22 @@
       state.lastPt = p;
       if (e.cancelable) e.preventDefault();
     } else if (state.layer !== "globe") {
-      if (state.rv.zoom > 1.01 && panLast) {     // pan the magnified map
+      // After a pinch releases one finger, onUp cleared panLast/downPt but a
+      // finger is still down. Re-seat the pan origin so a continued one-finger
+      // drag keeps panning the zoomed map instead of dead-locking (a no-op this
+      // frame — zero delta — then pans normally on the next move).
+      if (e.touches && !panLast && state.rv.zoom > 1.01) panLast = p;
+      if (state.rv.zoom > 1.01 && panLast && (e.touches || (downPt && (e.buttons & 1)))) {
+        // Pan the magnified map. Touch: one-finger drag. Desktop: left-button
+        // drag (a press that started on the canvas). Lets an off-screen city be
+        // dragged into the center of the view (P2: no pan when not zoomed in).
         state.rv.panx += p.x - panLast.x;
         state.rv.pany += p.y - panLast.y;
         clampPan();
         panLast = p;
         if (e.cancelable) e.preventDefault();
         drawRegions();
-      } else if (!e.touches) {                   // desktop hover highlight only
+      } else if (!e.touches) {                   // desktop: hover highlight only when not dragging (P2)
         var reg = pickRegion(p.x, p.y);
         var name = reg ? reg.name : null;
         if (name !== state.hover) {
@@ -898,6 +966,9 @@
           var linkable = reg && ((reg.drill && state.layer === "country") ||
             ((state.layer === "city" || state.layer === "country") && regionMomentIds(name).length));
           canvas.style.cursor = linkable ? "pointer" : "default";
+          // Warm just this province's city file on hover, so the drill-in feels
+          // instant without firing a request for every province up front.
+          if (reg && reg.drill && state.layer === "country") warmDrill(reg);
           drawRegions();   // hover highlight; the 瞬间 list is pinned by click, not hover
         }
       }
@@ -918,8 +989,10 @@
     }
     state.dragging = false;
     panLast = null;
-    // P5: horizontal swipe on a fitted region map goes back one level.
-    if (state.layer !== "globe" && state.rv.zoom <= 1.01 && downPt && mvPt) {
+    // P5: horizontal swipe on a fitted region map goes back one level. Touch
+    // only — a desktop mouse drag must not move the map or navigate (P2).
+    var isTouch = !!(e.changedTouches || e.touches);
+    if (isTouch && state.layer !== "globe" && state.rv.zoom <= 1.01 && downPt && mvPt) {
       var sdx = mvPt.x - downPt.x, sdy = mvPt.y - downPt.y;
       if (Math.abs(sdx) > 55 && Math.abs(sdx) > Math.abs(sdy) * 1.8) {
         downPt = null;
