@@ -9,9 +9,11 @@
 > 🔰 **完全不用会编程。** 拿到发布包后双击一个文件，跟着网页里的按钮走即可。
 > 详细图文见 [`docs/新手指南.md`](docs/新手指南.md)。
 
-> 📦 **下载客户端**：[**最新版发布页**](https://github.com/sfqin/blog_self/releases/latest)
-> → 下载 `Blog.zip`（约 30MB，含 macOS + Windows，双击即用、无需装任何环境）。
-> 也可直接下 [v1.0.0 的 Blog.zip](https://github.com/sfqin/blog_self/releases/download/v1.0.0/Blog.zip)。
+> 📦 **下载客户端**（按你的系统二选一，双击即用、无需装任何环境）：
+> - 苹果电脑 macOS → [**Blog-macOS.zip**](https://github.com/sfqin/blog_self/releases/download/v1.0.0/Blog-macOS.zip)（解压后双击 `Start-Blog.app`）
+> - Windows → [**Blog-Windows.zip**](https://github.com/sfqin/blog_self/releases/download/v1.0.0/Blog-Windows.zip)（解压后双击 `Start-Blog.vbs`）
+>
+> 也可到 [**最新版发布页**](https://github.com/sfqin/blog_self/releases/latest) 挑选。
 
 ---
 
@@ -36,8 +38,9 @@
 2. **一个 GitHub 账号**（免费）。没有就去 <https://github.com> 用邮箱注册一个；
    它用来免费托管你的网站。
 
-> 你会拿到一个 **`Blog.zip`** 发布包（由维护者用 `scripts/package-release.sh` 生成）。
-> 双击解压得到 `Blog` 文件夹，把**整个文件夹**放到桌面或「文稿」里。
+> 你会拿到一个对应系统的发布包（由维护者用 `scripts/package-release.sh` 生成）：
+> 苹果电脑下 **`Blog-macOS.zip`**、Windows 下 **`Blog-Windows.zip`**。
+> 双击解压得到 `Blog-macOS` / `Blog-Windows` 文件夹，把**整个文件夹**放到桌面或「文稿」里。
 
 ---
 
@@ -192,17 +195,19 @@ node scripts/gen_geo.mjs SG TH      # 只重建指定国家
 ### 打包发布包（维护者）
 
 ```bash
-./scripts/package-release.sh   # 生成 dist-release/Blog/ 与可直接发送的 Blog.zip
+./scripts/package-release.sh   # 生成 dist-release/ 下的两个分平台压缩包
 ```
 
-产物含跨平台自包含二进制 + 各系统的双击启动器（`Start-Blog.app` / `.vbs` / `.command`
-/ `.bat`）+ 启动加载页 `loading.html` + `docs/新手指南.md`。
+产物是**按系统拆分的两个压缩包**：`Blog-macOS.zip`（含 `Start-Blog.app` / `.command`
++ macOS 二进制）与 `Blog-Windows.zip`（含 `Start-Blog.vbs` / `.bat` + Windows `.exe`），
+各自都带启动加载页 `loading.html` 与 `docs/新手指南.md`。用户只需下载对应自己系统的那个。
 
-> **客户端目录**：给最终用户的「客户端」就是打包生成的 **`dist-release/Blog/`** 文件夹
-> （压缩后即 `Blog.zip`）——里面是双击即用的启动器和自包含程序，用户无需装任何环境。
-> 它由脚本自动生成、**不纳入版本库**（见 `.gitignore`）。客户端启动器的**源文件**放在仓库的
-> **`packaging/`** 目录（`mac/` 的 `.app` 外壳与 `launch`、`windows/` 的 `.vbs`、以及
-> 共用的 `loading.html`），配合仓库根目录的 `Start-Blog.command` / `Start-Blog.bat`。
+> **客户端目录**：给最终用户的「客户端」就是打包生成的 **`dist-release/Blog-macOS/`** 与
+> **`dist-release/Blog-Windows/`** 文件夹（压缩后即两个 zip）——里面是双击即用的启动器和
+> 自包含程序，用户无需装任何环境。它由脚本自动生成、**不纳入版本库**（见 `.gitignore`）。
+> 客户端启动器的**源文件**放在仓库的 **`packaging/`** 目录（`mac/` 的 `.app` 外壳与 `launch`、
+> `windows/` 的 `.vbs`、以及共用的 `loading.html`），配合仓库根目录的 `Start-Blog.command` /
+> `Start-Blog.bat`。
 
 ### 项目结构
 
@@ -226,7 +231,7 @@ scripts/
   deploy.sh                 编译 / 推送到 VPS
   gen_geo.mjs               （重）生成地理数据（需联网）
   globe_logic_test.mjs      地球纯逻辑测试
-packaging/                  客户端启动器源文件（打包进 dist-release/Blog/ 客户端）
+packaging/                  客户端启动器源文件（打包进 dist-release/ 的分平台客户端）
   mac/                      Start-Blog.app 的 Info.plist 与 launch 控制脚本
   windows/                  Start-Blog.vbs（无窗口启动器）
   loading.html              双击后立即显示的启动加载页（探测服务就绪后自动进向导）
