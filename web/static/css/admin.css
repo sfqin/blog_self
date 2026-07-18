@@ -222,7 +222,6 @@ button:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
   background: rgba(74,222,128,0.1); border: 1px solid var(--green); color: var(--green);
 }
 .setup-live a { color: var(--green); text-decoration: underline; }
-.setup-foot { margin-top: 22px; font-size: 12px; text-align: center; }
 
 /* One-time GitHub device code: shown big with a copy button. */
 .code-box {

@@ -11,7 +11,6 @@
 #     Start-Blog.command  ← 备用      Start-Blog.bat   ← 引擎/可见备用
 #     bin/blog-macos-*    ← 程序      bin/blog-windows-amd64.exe ← 程序
 #     loading.html                   loading.html
-#     docs/新手指南.md               docs/新手指南.md
 #     使用说明.txt                    使用说明.txt
 #   Blog-macOS.zip                 Blog-Windows.zip   ← 可直接发送
 #
@@ -80,11 +79,7 @@ cp "$ROOT/packaging/windows/Start-Blog.vbs" "$WIN/Start-Blog.vbs"
 cp "$ROOT/Start-Blog.bat"                    "$WIN/Start-Blog.bat"
 cp "$ROOT/packaging/loading.html"            "$WIN/loading.html"
 
-# --- 4. docs + ultra-short per-platform pointer ----------------------------
-mkdir -p "$MAC/docs" "$WIN/docs"
-cp "$ROOT/docs/新手指南.md" "$MAC/docs/新手指南.md"
-cp "$ROOT/docs/新手指南.md" "$WIN/docs/新手指南.md"
-
+# --- 4. ultra-short per-platform pointer -----------------------------------
 cat > "$MAC/使用说明.txt" <<'TXT'
 欢迎使用 dev@home 博客！（苹果电脑 macOS 版）
 
@@ -101,7 +96,6 @@ cat > "$MAC/使用说明.txt" <<'TXT'
 “打开网页”继续用，或“重启”用最新版重新启动。
 
 你的全部内容保存在“主目录/dev-home-blog/blog.db”，只在本地，想备份就复制它。
-更详细的图文说明见 docs/新手指南.md。
 TXT
 
 cat > "$WIN/使用说明.txt" <<'TXT'
@@ -120,7 +114,6 @@ cat > "$WIN/使用说明.txt" <<'TXT'
 “是”打开网页继续用，“否”用最新版重启。
 
 你的全部内容保存在“用户目录\dev-home-blog\blog.db”，只在本地，想备份就复制它。
-更详细的图文说明见 docs/新手指南.md。
 TXT
 
 # --- 5. zip each platform up for easy sending ------------------------------

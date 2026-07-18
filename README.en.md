@@ -2,21 +2,7 @@
 
 [中文](README.md) · **English**
 
-A retro terminal / CRT-styled personal blog with an interactive 3D "footprint"
-globe. You write posts, add photos, and mark places you've visited in a **local
-admin**, then **publish with one click** — and end up with a **free website the
-whole world can visit**.
-
-> 🔰 **No coding required.** Get the release package, double-click one file, and
-> follow the buttons in your browser. Full walkthrough:
-> [`docs/新手指南.md`](docs/新手指南.md) (Chinese).
-
-> 📦 **Download the client** (pick the one for your OS — double-click to run, no
-> toolchain needed):
-> - macOS → [**Blog-macOS.zip**](https://github.com/sfqin/blog_self/releases/download/v1.0.0/Blog-macOS.zip) (unzip, double-click `Start-Blog.app`)
-> - Windows → [**Blog-Windows.zip**](https://github.com/sfqin/blog_self/releases/download/v1.0.0/Blog-Windows.zip) (unzip, double-click `Start-Blog.vbs`)
->
-> Or browse the [**latest release**](https://github.com/sfqin/blog_self/releases/latest).
+A retro CRT terminal-styled personal blog with an interactive 3D "footprint" globe. Write posts, add photos, and mark places you've visited in a local admin, then publish with one click to get a free website the whole world can visit.
 
 ---
 
@@ -31,8 +17,6 @@ whole world can visit**.
   openable on phone, laptop, or shared with friends — **no server, no cost**.
 - ✅ An interactive **3D globe** showing the cities you've visited (drill down
   through country → province/state → city).
-- ✅ Your **data never leaves your machine**; publishing uploads only the
-  rendered static pages.
 
 **End result**: your own retro-terminal personal website with a 3D footprint
 globe, online for free, long term.
@@ -41,60 +25,45 @@ globe, online for free, long term.
 
 ## 2. What you need to prepare
 
-Just two things:
-
-1. **A computer** (Windows or macOS). No dev environment to install — the
-   program is bundled in the release package.
+1. **A computer** (Windows or macOS).
 2. **A GitHub account** (free). Don't have one? Sign up at
    <https://github.com> with an email; it hosts your website for free.
 
-> You'll receive an OS-specific release package (the maintainer generates it
-> with `scripts/package-release.sh`): **`Blog-macOS.zip`** on a Mac,
-> **`Blog-Windows.zip`** on Windows. Unzip it to get a `Blog-macOS` /
-> `Blog-Windows` folder and put the **whole folder** on your Desktop or in Documents.
-
 ---
 
-## 3. How to do it (full-flow demo)
+## 3. How to do it
 
-The whole thing is **done in the browser by clicking buttons — no terminal**.
+The whole thing is done in the browser by clicking buttons — no terminal.
 
-### Step 0: Launch (per OS)
+### Step 1: Download the client
 
-| OS | Double-click this file | Notes |
-|----|-----------------------|-------|
-| **macOS** | `Start-Blog.app` | First time may say "unidentified developer": **right-click → Open → Open** again. No console window. |
-| **Windows** | `Start-Blog.vbs` | If "Windows protected your PC" appears: click **More info → Run anyway**. No console window. |
+Go to the [**releases page**](https://github.com/sfqin/blog_self/releases) and grab the file for your OS — double-click to run, no toolchain needed:
 
-> Fallback launchers: `Start-Blog.command` (macOS) / `Start-Blog.bat` (Windows) —
-> these show a text window.
+- macOS → `Blog-macOS.zip`, unzip and double-click `Start-Blog.app`
+- Windows → `Blog-Windows.zip`, unzip and double-click `Start-Blog.vbs`
 
-The browser then **opens automatically** to a wizard called "Get your blog
-online, step by step" (URL like `http://localhost:8080/setup`; if 8080 is busy
-it auto-picks 8081, 8082…, so trust whatever the browser opened).
+> If the system blocks it on first open: on macOS right-click `Start-Blog.app` →
+> "Open" → "Open" again; on Windows click "More info → Run anyway". Fallback
+> launchers: `Start-Blog.command` (macOS) / `Start-Blog.bat` (Windows) — these
+> show a text window.
 
-### Steps 1–6: follow the browser wizard
+### Step 2: Launch, then follow the wizard top to bottom
 
-Each step has a status light: **✓ green** = fine, **✗ red** = click the button
+Double-clicking opens the browser **automatically** to a wizard. Each step, top
+to bottom, has a status light: **✓ green** = fine, **✗ red** = click the button
 next to it.
 
 | Step | What to do |
 |------|-----------|
-| **① Environment check** | Checks two small tools: Git and GitHub CLI. If ✗, click the button — the program **downloads and installs them automatically** (macOS shows the system dialog, click Install; GitHub CLI is fetched straight from the official site), **no Homebrew or any other software needed**. Then click **↻ Re-check**. |
-| **② Connect GitHub** | Click "Log in to GitHub in the browser". The page shows a one-time code (like `ABCD-1234`); paste it into the authorization page that opens. No password needed afterward. |
+| **① Environment check** | Checks two small tools: Git and GitHub CLI. If ✗, click the button — the program **downloads and installs them automatically** (macOS shows the system dialog, click Install; GitHub CLI is fetched straight from the official site). |
+| **② Connect GitHub** | Click "Log in to GitHub in the browser" and follow the prompts to authorize. |
 | **③ Create repository** | Name your blog (default `blog`; it becomes part of the URL). The repo is always created **Public** — GitHub Pages' free tier only serves public repos. |
-| **④ Write posts / local preview** | Enter the admin at `/admin` (**no login, no password — just open it**), fill in profile, experiences, projects, posts, footprints, moments; click "Preview homepage locally" anytime — **saves take effect instantly**. |
-| **⑤ Publish with one click** | Back on the wizard, click **🚀 Publish online**. Wait 1–2 minutes and the page shows your **site URL** (`https://<your-username>.github.io/blog/`) — open it and there's your blog! |
+| **④ Write posts / local preview** | Enter the admin at `/admin` (**no login, no password — just open it**), fill in profile, experiences, projects, posts, footprints, moments; **after saving, click "Preview homepage locally" to see the result**. |
+| **⑤ Publish with one click (public access)** | Back on the wizard, click **🚀 Publish online**. Wait 1–2 minutes and the page shows your **site URL** (`https://<your-username>.github.io/blog/`) — open it and there's your blog! |
 
 ### From then on
 
-Just three steps: **double-click the launcher → write/edit in the admin and
-preview locally → open `/setup` and click Publish**. Without publishing, changes
-stay local; after publishing, the whole world can see them.
-
-> No "Stop" button needed: after you close all blog pages, the program stops
-> itself in about a minute. To use the latest version immediately, double-click
-> the launcher again (it offers "open page / restart").
+**Double-click the launcher → write/edit in the admin and preview locally → open `/setup` and click Publish.** Without publishing, changes stay local; after publishing, the whole world can see them.
 
 ---
 
@@ -228,7 +197,7 @@ files are lazy-loaded on drill.
 
 The output is **split into two per-OS packages**: `Blog-macOS.zip` (`Start-Blog.app`
 / `.command` + macOS binaries) and `Blog-Windows.zip` (`Start-Blog.vbs` / `.bat` +
-the Windows `.exe`), each with the startup `loading.html` and `docs/新手指南.md`.
+the Windows `.exe`), each with the startup `loading.html` and a `使用说明.txt` note.
 Users download only the one for their system.
 
 > **Client directory**: the "client" you hand to end users is the packaged
