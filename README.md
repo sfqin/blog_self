@@ -35,7 +35,7 @@
 到 [**发布页**](https://github.com/sfqin/blog_self/releases) 按自己的系统下载，双击即用、无需装任何环境：
 
 - 苹果电脑 macOS → `Blog-macOS.zip`，解压后双击 `Start-Blog.app`
-- Windows → `Blog-Windows.zip`，解压后双击 `Start-Blog.vbs`
+- Windows → `Blog-Windows.zip`，解压后双击 `Start-Blog.exe`
 
 > 首次打开若被系统拦截：macOS 右键 `Start-Blog.app` →「打开」→ 再点「打开」；
 > Windows 点「更多信息 → 仍要运行」。备用启动器：macOS 用 `Start-Blog.command`、
@@ -176,15 +176,15 @@ node scripts/gen_geo.mjs SG TH      # 只重建指定国家
 ```
 
 产物是**按系统拆分的两个压缩包**：`Blog-macOS.zip`（含 `Start-Blog.app` / `.command`
-+ macOS 二进制）与 `Blog-Windows.zip`（含 `Start-Blog.vbs` / `.bat` + Windows `.exe`），
++ macOS 二进制）与 `Blog-Windows.zip`（含 `Start-Blog.exe` / `.bat` + Windows 程序），
 各自都带启动加载页 `loading.html` 与一份 `使用说明.txt`。用户只需下载对应自己系统的那个。
 
 > **客户端目录**：给最终用户的「客户端」就是打包生成的 **`dist-release/Blog-macOS/`** 与
 > **`dist-release/Blog-Windows/`** 文件夹（压缩后即两个 zip）——里面是双击即用的启动器和
 > 自包含程序，用户无需装任何环境。它由脚本自动生成、**不纳入版本库**（见 `.gitignore`）。
-> 客户端启动器的**源文件**放在仓库的 **`packaging/`** 目录（`mac/` 的 `.app` 外壳与 `launch`、
-> `windows/` 的 `.vbs`、以及共用的 `loading.html`），配合仓库根目录的 `Start-Blog.command` /
-> `Start-Blog.bat`。
+> 客户端启动器的**源文件**放在仓库的 **`packaging/`** 与 **`cmd/windows-launcher/`** 目录
+> （macOS 的 `.app` 外壳与 `launch`、Windows 的 `.exe` 启动器、以及共用的 `loading.html`），
+> 配合仓库根目录的 `Start-Blog.command` / `Start-Blog.bat`。
 
 ### 项目结构
 
@@ -210,8 +210,8 @@ scripts/
   globe_logic_test.mjs      地球纯逻辑测试
 packaging/                  客户端启动器源文件（打包进 dist-release/ 的分平台客户端）
   mac/                      Start-Blog.app 的 Info.plist 与 launch 控制脚本
-  windows/                  Start-Blog.vbs（无窗口启动器）
   loading.html              双击后立即显示的启动加载页（探测服务就绪后自动进向导）
+cmd/windows-launcher/       Windows Start-Blog.exe 无窗口启动器
 Start-Blog.command          macOS 备用启动器（可见终端窗口）
 Start-Blog.bat              Windows 引擎 / 可见备用启动器
 ```

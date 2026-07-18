@@ -7,8 +7,8 @@
 # needs (no mixing macOS + Windows files in one zip):
 #
 #   Blog-macOS/                     Blog-Windows/
-#     Start-Blog.app      ← 双击      Start-Blog.vbs   ← 双击（无黑窗）
-#     Start-Blog.command  ← 备用      Start-Blog.bat   ← 引擎/可见备用
+#     Start-Blog.app      ← 双击      Start-Blog.exe   ← 双击（无黑窗）
+#     Start-Blog.command  ← 备用      Start-Blog.bat   ← 可见备用
 #     bin/blog-macos-*    ← 程序      bin/blog-windows-amd64.exe ← 程序
 #     loading.html                   loading.html
 #     使用说明.txt                    使用说明.txt
@@ -45,6 +45,10 @@ build darwin  amd64 "$MAC/bin/blog-macos-amd64"
 build windows amd64 "$WIN/bin/blog-windows-amd64.exe"
 chmod +x "$MAC/bin/blog-macos-arm64" "$MAC/bin/blog-macos-amd64"
 
+echo ">> building windows/amd64 launcher -> $WIN/Start-Blog.exe"
+CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
+  go build -trimpath -ldflags "-s -w -H=windowsgui" -o "$WIN/Start-Blog.exe" ./cmd/windows-launcher
+
 # --- 2. assemble the macOS .app --------------------------------------------
 # Layout:
 #   Start-Blog.app/Contents/Info.plist
@@ -74,10 +78,10 @@ echo "== 复制启动器与加载页 =="
 cp "$ROOT/Start-Blog.command" "$MAC/Start-Blog.command"
 chmod +x "$MAC/Start-Blog.command"
 cp "$ROOT/packaging/loading.html" "$MAC/loading.html"
-# Windows: the .vbs (no console) and the .bat engine / visible fallback.
-cp "$ROOT/packaging/windows/Start-Blog.vbs" "$WIN/Start-Blog.vbs"
-cp "$ROOT/Start-Blog.bat"                    "$WIN/Start-Blog.bat"
-cp "$ROOT/packaging/loading.html"            "$WIN/loading.html"
+# Windows: Start-Blog.exe is the no-console launcher; .bat stays as a visible
+# fallback for troubleshooting.
+cp "$ROOT/Start-Blog.bat"         "$WIN/Start-Blog.bat"
+cp "$ROOT/packaging/loading.html" "$WIN/loading.html"
 
 # --- 4. ultra-short per-platform pointer -----------------------------------
 cat > "$MAC/使用说明.txt" <<'TXT'
@@ -101,8 +105,8 @@ TXT
 cat > "$WIN/使用说明.txt" <<'TXT'
 欢迎使用 dev@home 博客！（Windows 版）
 
-只需双击：  Start-Blog.vbs
-（想看运行进度，可改双击 Start-Blog.bat）
+只需双击：  Start-Blog.exe
+（想看运行进度，可改双击备用的 Start-Blog.bat）
 
 之后浏览器会自动打开一个网页向导，跟着上面的按钮一步步点即可：
 装工具 → 连 GitHub → 建仓库 → 写文章 → 一键发布上线。
@@ -110,7 +114,7 @@ cat > "$WIN/使用说明.txt" <<'TXT'
 关于停止：不用手动停。博客在后台运行，关掉所有博客网页后
 约 1 分钟它会自动停止。
 
-想立刻用最新版本：再次双击 Start-Blog.vbs，会弹出选择——
+想立刻用最新版本：再次双击 Start-Blog.exe，会弹出选择——
 “是”打开网页继续用，“否”用最新版重启。
 
 你的全部内容保存在“用户目录\dev-home-blog\blog.db”，只在本地，想备份就复制它。
@@ -135,4 +139,4 @@ ls -la "$WIN"
 echo ""
 echo "把对应系统的压缩包发给完全不懂编程的人即可："
 echo "  苹果电脑 → Blog-macOS.zip，解压后双击 Start-Blog.app"
-echo "  Windows  → Blog-Windows.zip，解压后双击 Start-Blog.vbs"
+echo "  Windows  → Blog-Windows.zip，解压后双击 Start-Blog.exe"

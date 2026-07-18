@@ -1,8 +1,8 @@
 @echo off
 REM Start-Blog.bat — Windows engine for the dev@home blog.
 REM
-REM Usually launched invisibly by Start-Blog.vbs (no console window). You can also
-REM double-click this .bat directly if you prefer seeing progress text.
+REM Usually launched by double-clicking Start-Blog.exe (no console window). You can
+REM also double-click this .bat directly if you prefer seeing progress text.
 REM
 REM It finds a self-contained program (bin\blog-windows-amd64.exe), keeps all
 REM content in a stable folder (%USERPROFILE%\dev-home-blog), and runs the server.
@@ -10,7 +10,7 @@ REM The server picks its own port (auto-bumps if 8080 is busy) and shuts itself
 REM down about a minute after the last blog page is closed (heartbeat), so there
 REM is no Stop step. Closing this window also stops it.
 REM
-REM Arg "noopen": don't open the browser (Start-Blog.vbs opens it itself). Arg
+REM Arg "noopen": don't open the browser (Start-Blog.exe opens it itself). Arg
 REM "__openwait": internal — the detached helper that waits for the port then
 REM opens the browser.
 setlocal enabledelayedexpansion
@@ -52,7 +52,7 @@ set "DATA=%USERPROFILE%\dev-home-blog"
 if not exist "%DATA%" mkdir "%DATA%"
 
 REM --- 3. open the browser once the server reports its port (unless told not
-REM        to; Start-Blog.vbs opens it itself). Prefer the instant loading page
+REM        to; Start-Blog.exe opens it itself). Prefer the instant loading page
 REM        (loading.html polls the server and redirects itself) so there is
 REM        immediate feedback; fall back to the poll-then-open helper.
 if /i not "%~1"=="noopen" (
