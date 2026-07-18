@@ -177,7 +177,8 @@ node scripts/gen_geo.mjs SG TH      # 只重建指定国家
 
 产物是**按系统拆分的两个压缩包**：`Blog-macOS.zip`（含 `Start-Blog.app` / `.command`
 + macOS 二进制）与 `Blog-Windows.zip`（含 `Start-Blog.exe` / `.bat` + Windows 程序），
-各自都带启动加载页 `loading.html` 与一份 `使用说明.txt`。用户只需下载对应自己系统的那个。
+各自都带启动加载页 `loading.html` 与一份说明文件（macOS 为 `使用说明.txt`，Windows 为
+`README.txt`）。用户只需下载对应自己系统的那个。
 
 > **客户端目录**：给最终用户的「客户端」就是打包生成的 **`dist-release/Blog-macOS/`** 与
 > **`dist-release/Blog-Windows/`** 文件夹（压缩后即两个 zip）——里面是双击即用的启动器和

@@ -197,7 +197,8 @@ files are lazy-loaded on drill.
 
 The output is **split into two per-OS packages**: `Blog-macOS.zip` (`Start-Blog.app`
 / `.command` + macOS binaries) and `Blog-Windows.zip` (`Start-Blog.exe` / `.bat` +
-the Windows program), each with the startup `loading.html` and a `使用说明.txt` note.
+the Windows program), each with the startup `loading.html` and a note file
+(`使用说明.txt` on macOS, `README.txt` on Windows).
 Users download only the one for their system.
 
 > **Client directory**: the "client" you hand to end users is the packaged

@@ -11,7 +11,7 @@
 #     Start-Blog.command  ← 备用      Start-Blog.bat   ← 可见备用
 #     bin/blog-macos-*    ← 程序      bin/blog-windows-amd64.exe ← 程序
 #     loading.html                   loading.html
-#     使用说明.txt                    使用说明.txt
+#     使用说明.txt                    README.txt
 #   Blog-macOS.zip                 Blog-Windows.zip   ← 可直接发送
 #
 # There is no Stop-Blog file: the server runs in the background, picks its own
@@ -102,7 +102,7 @@ cat > "$MAC/使用说明.txt" <<'TXT'
 你的全部内容保存在“主目录/dev-home-blog/blog.db”，只在本地，想备份就复制它。
 TXT
 
-cat > "$WIN/使用说明.txt" <<'TXT'
+cat > "$WIN/README.txt" <<'TXT'
 欢迎使用 dev@home 博客！（Windows 版）
 
 只需双击：  Start-Blog.exe

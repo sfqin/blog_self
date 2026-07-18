@@ -9,7 +9,7 @@
   you start the app, so you get immediate feedback instead of a blank several
   seconds while the server boots. It is fully self-contained (no server assets,
   no required network): it shows a CRT-styled spinner, probes the local server
-  on ports 8080..8090, and redirects to /setup the moment the server answers.
+  on ports 8080..8129, and redirects to /setup the moment the server answers.
 -->
 <style>
   :root {
@@ -96,9 +96,10 @@
 
 <script>
 (function () {
-  // The server picks 8080, or the next free port (8081, 8082, …) if taken.
-  // We probe a small range in parallel and redirect to whichever answers first.
-  var PORTS = [8080, 8081, 8082, 8083, 8084, 8085, 8086, 8087, 8088, 8089, 8090];
+  // The server picks 8080, or the next free port if taken. Keep this range in
+  // sync with internal/server/lifecycle.go (50 attempts).
+  var PORTS = [];
+  for (var p = 8080; p < 8130; p++) PORTS.push(p);
   var done = false;
   var start = Date.now();
   var statusEl = document.getElementById('status');

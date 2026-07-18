@@ -178,7 +178,8 @@ func startServer(bin, data string) error {
 	cmd := exec.Command(bin, "serve")
 	cmd.Dir = data
 	cmd.Env = os.Environ()
-	cmd.Env = setEnv(cmd.Env, "ADDR", ":8080")
+	// Loopback-only avoids a Windows Firewall prompt; the admin is local-only.
+	cmd.Env = setEnv(cmd.Env, "ADDR", "127.0.0.1:8080")
 	cmd.Env = setEnv(cmd.Env, "REPO_DIR", data)
 	cmd.Env = setEnv(cmd.Env, "DB_PATH", filepath.Join(data, "blog.db"))
 	cmd.Stdout = logFile

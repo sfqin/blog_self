@@ -70,7 +70,7 @@ echo own about a minute after you close the last blog page.
 echo.
 
 REM --- 4. run the server (foreground; it self-selects the port) --------------
-set "ADDR=:8080"
+set "ADDR=127.0.0.1:8080"
 set "REPO_DIR=%DATA%"
 set "DB_PATH=%DATA%\blog.db"
 cd /d "%DATA%"
