@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>同一个解析器，我重写了三遍 — dev@home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/blog_self/static/css/crt.css">
+</head>
+<body>
+<div class="crt-scanlines"></div>
+<div class="crt-vignette"></div>
+
+<nav class="nav">
+  <div class="container">
+    <span class="brand">dev@home</span>
+    <span class="spacer"></span>
+    <div class="search-box">
+      <input type="text" id="site-search" autocomplete="off" spellcheck="false" placeholder="搜索…  /  聚焦" aria-label="搜索站点内容">
+      <div class="search-results" id="search-results"></div>
+    </div>
+    <a class="link" href="/blog_self/">$ cd ~</a>
+    <a class="link" href="/blog_self/#notes">notes/</a>
+  </div>
+</nav>
+
+<section>
+  <div class="container">
+    <div class="cmd">cat notes/rewrote-parser-three-times.md</div>
+    <h1 class="name" style="font-size:clamp(24px,5vw,40px)">同一个解析器，我重写了三遍</h1>
+    <div class="note-row" style="border:none">
+      <span class="date">2026-06-20</span>
+      <span class="tags-inline">#解析 #正则 #Go </span>
+    </div>
+    <article class="article">
+      <p>今年同一个 300 行的解析器，我重写了三遍。这里说说为什么第三版留了下来。</p>
+<h2>先正则，再手写状态机，最后……又回到正则</h2>
+<p>第一版是正则。它一直好用，直到输入里长出了一个嵌套的分支。<br>
+第二版是&quot;正规&quot;的状态机——正确，但一个月后没人（包括我自己）读得懂。<br>
+第三版又回到了正则，但都是<strong>小而专一的正则</strong>，每个只干一件事，在 Go 里组合起来。</p>
+<ul>
+<li>一个正则负责切分记录。</li>
+<li>一个正则负责校验每个字段。</li>
+<li>任何有真正结构的东西，一律不用正则——交给真正的解析器。</li>
+</ul>
+<p>结论不是&quot;正则好&quot;或&quot;正则坏&quot;，而是：让工具去匹配文本的<em>形状</em>。<br>
+扁平、按行组织？用正则。递归嵌套？用文法。</p>
+<h2>收获</h2>
+<p>先写笨版本。让输入自己告诉你，它什么时候才配得上更聪明的方案。</p>
+
+    </article>
+    <p style="margin-top:32px"><a class="btn" href="/blog_self/#notes">$ cd ..</a></p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="cmd">echo "© 2026 流浪"</div>
+  </div>
+</footer>
+<script>window.__BASE__ = "\/blog_self";</script>
+<script src="/blog_self/static/js/search.js" defer></script>
+</body>
+</html>

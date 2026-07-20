@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>追查 p99：延迟究竟藏在哪里 — dev@home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/blog_self/static/css/crt.css">
+</head>
+<body>
+<div class="crt-scanlines"></div>
+<div class="crt-vignette"></div>
+
+<nav class="nav">
+  <div class="container">
+    <span class="brand">dev@home</span>
+    <span class="spacer"></span>
+    <div class="search-box">
+      <input type="text" id="site-search" autocomplete="off" spellcheck="false" placeholder="搜索…  /  聚焦" aria-label="搜索站点内容">
+      <div class="search-results" id="search-results"></div>
+    </div>
+    <a class="link" href="/blog_self/">$ cd ~</a>
+    <a class="link" href="/blog_self/#notes">notes/</a>
+  </div>
+</nav>
+
+<section>
+  <div class="container">
+    <div class="cmd">cat notes/chasing-the-p99.md</div>
+    <h1 class="name" style="font-size:clamp(24px,5vw,40px)">追查 p99：延迟究竟藏在哪里</h1>
+    <div class="note-row" style="border:none">
+      <span class="date">2026-07-05</span>
+      <span class="tags-inline">#Go #性能 #延迟 </span>
+    </div>
+    <article class="article">
+      <p>每个人都在测试顺畅路径（happy path）。真正有意思的数字，藏在长尾里。</p>
+<h2>背景</h2>
+<p>我们有一个 Go 服务，大约 20 万 req/s，<strong>p50 很正常（2ms）</strong>，但<br>
+<strong>p99 很难看（85ms）</strong>。这是典型的竞争（contention）信号，而不是纯算力问题。</p>
+<pre><code class="language-go">// 改动前：整张 map 用一把大锁
+mu.Lock()
+v := cache[key]
+mu.Unlock()
+</code></pre>
+<h2>真正起作用的改动</h2>
+<ol>
+<li>按 <code>fnv(key) % N</code> 对 map 分片，让锁不再互相碰撞。</li>
+<li>把写路径换成无锁环形缓冲区（lock-free ring buffer）。</li>
+<li>别在热点循环里分配内存——用 <code>sync.Pool</code> 复用临时缓冲区。</li>
+</ol>
+<p>p99 降到了 <strong>11ms</strong>。p50 几乎没动，而这恰恰是重点：<br>
+你优化的不是平均值，而是<em>用户真正能感受到的最坏情况</em>。</p>
+<blockquote>
+<p>去测量长尾。平均值只是均值讲给自己听、好让自己显得有用的故事。</p>
+</blockquote>
+
+    </article>
+    <p style="margin-top:32px"><a class="btn" href="/blog_self/#notes">$ cd ..</a></p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="cmd">echo "© 2026 流浪"</div>
+  </div>
+</footer>
+<script>window.__BASE__ = "\/blog_self";</script>
+<script src="/blog_self/static/js/search.js" defer></script>
+</body>
+</html>

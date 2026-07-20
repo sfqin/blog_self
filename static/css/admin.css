@@ -1,0 +1,141 @@
+/* Admin panel styling — shares CRT tokens from crt.css */
+.admin-shell { display: flex; min-height: 100vh; }
+.admin-side {
+  width: 200px;
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  padding: 18px 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  flex-shrink: 0;
+}
+.admin-side .brand { display: block; color: var(--green); font-weight: 600; padding: 0 18px 16px; text-shadow: var(--glow); }
+.admin-side a {
+  display: block;
+  color: var(--muted);
+  padding: 9px 18px;
+  font-size: 13px;
+  border-left: 2px solid transparent;
+}
+.admin-side a:hover { color: var(--green); background: rgba(74,222,128,0.06); }
+.admin-side a.active { color: var(--green); border-left-color: var(--green); background: rgba(74,222,128,0.08); }
+.admin-side a .nav-en { display: block; font-family: var(--font-mono); }
+.admin-side a .nav-zh { display: block; font-size: 11px; color: var(--muted); margin-top: 1px; }
+.admin-side a:hover .nav-zh, .admin-side a.active .nav-zh { color: var(--green); opacity: 0.75; }
+.admin-side .logout { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 12px; }
+
+.admin-main { flex: 1; padding: 28px 32px; max-width: 900px; }
+.admin-main h1 { color: var(--green); font-size: 22px; margin: 0 0 20px; }
+.admin-main h1::before { content: "$ "; color: var(--amber); font-family: var(--font-mono); }
+
+.flash {
+  background: rgba(74,222,128,0.12);
+  border: 1px solid var(--green);
+  color: var(--green);
+  padding: 8px 14px;
+  border-radius: 4px;
+  margin-bottom: 18px;
+  font-size: 13px;
+}
+
+/* Forms */
+.field { margin-bottom: 16px; }
+.field label { display: block; color: var(--amber); font-size: 12px; margin-bottom: 6px; }
+.field input[type=text],
+.field input[type=number],
+.field input[type=url],
+.field input[type=email],
+.field input[type=date],
+.field input[type=password],
+.field textarea,
+.field select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  padding: 9px 11px;
+  border-radius: 4px;
+}
+.field input:focus, .field textarea:focus, .field select:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: var(--glow);
+}
+.field textarea { resize: vertical; min-height: 120px; }
+.field textarea.tall { min-height: 320px; }
+.field .hint { color: var(--muted); font-size: 11px; margin-top: 4px; }
+.field.inline { display: flex; align-items: center; gap: 8px; }
+.field.inline label { margin: 0; }
+.field.inline input[type=checkbox] { width: auto; accent-color: var(--green); }
+
+/* Multi-select checkbox list (e.g. footprint → moments links). */
+.checkbox-list {
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  padding: 6px;
+}
+.checkbox-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+}
+.checkbox-item:hover { background: var(--panel-2); }
+.checkbox-item input[type=checkbox] { width: auto; margin-top: 2px; accent-color: var(--green); flex: none; }
+.checkbox-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.actions-bar { display: flex; gap: 10px; margin-top: 20px; align-items: center; }
+.btn-primary {
+  background: var(--green);
+  color: var(--bg);
+  border: none;
+  padding: 9px 20px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-primary:hover { box-shadow: var(--glow); }
+.btn-ghost { border: 1px solid var(--line); color: var(--muted); padding: 9px 18px; border-radius: 4px; background: transparent; cursor: pointer; }
+.btn-danger { border: 1px solid #f87171; color: #f87171; background: transparent; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+.btn-danger:hover { background: rgba(248,113,113,0.12); }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--amber); font-weight: 500; font-size: 12px; }
+td .muted { color: var(--muted); }
+.badge { font-size: 11px; padding: 2px 8px; border-radius: 3px; border: 1px solid var(--line); }
+.badge.pub { color: var(--green); border-color: rgba(74,222,128,0.4); }
+.badge.draft { color: var(--muted); }
+
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+
+/* Login */
+.login-wrap { max-width: 360px; margin: 12vh auto; padding: 0 20px; }
+.login-wrap .cmd { text-align: center; }
+.login-error { color: #f87171; font-size: 13px; margin-bottom: 12px; text-align: center; }
+
+.dash-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 14px; }
+.dash-card { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px; text-align: center; }
+.dash-card .num { font-size: 30px; color: var(--green); font-family: var(--font-display); }
+.dash-card .lbl { color: var(--muted); font-size: 12px; }
+
+@media (max-width: 700px) {
+  .admin-shell { flex-direction: column; }
+  .admin-side { width: 100%; height: auto; position: static; display: flex; flex-wrap: wrap; }
+  .admin-side .brand { width: 100%; }
+  .row2 { grid-template-columns: 1fr; }
+}
