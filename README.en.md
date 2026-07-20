@@ -4,6 +4,8 @@
 
 A retro CRT terminal-styled personal blog with an interactive 3D "footprint" globe. Write posts, add photos, and mark places you've visited in a local admin, then publish with one click to get a free website the whole world can visit.
 
+> 🔗 **Live demo**: <https://sfqin.github.io/blog_test/> (a reference of the published result)
+
 ---
 
 ## 1. What it does / what you end up with
@@ -42,10 +44,18 @@ Go to the [**releases page**](https://github.com/sfqin/blog_self/releases) and g
 - macOS → `Blog-macOS.zip`, unzip and double-click `Start-Blog.app`
 - Windows → `Blog-Windows.zip`, unzip and double-click `Start-Blog.exe`
 
-> If the system blocks it on first open: on macOS right-click `Start-Blog.app` →
-> "Open" → "Open" again; on Windows click "More info → Run anyway". Fallback
-> launchers: `Start-Blog.command` (macOS) / `Start-Blog.bat` (Windows) — these
-> show a text window.
+**Blocked on first open on macOS?** The app isn't signed with a paid Apple certificate, so the first time you double-click `Start-Blog.app` macOS blocks it and shows the "Start-Blog Not Opened" dialog below — this is normal. Click **"Done"** to dismiss it (do **not** click "Move to Trash"):
+
+<img src="fengxian.png" alt="macOS blocks the app on first open" width="360">
+
+**The fix: authorize it in Privacy settings.** Open **System Settings → Privacy & Security**, scroll down to the "Security" section, and you'll see "Start-Blog was blocked to protect your Mac." Click **"Open Anyway"** next to it (confirm with your login password or Touch ID):
+
+<img src="yinsi.png" alt="Click Open Anyway in Privacy & Security" width="560">
+
+After authorizing, go back and **double-click `Start-Blog.app` again**, then click **"Open"** in the dialog — it launches normally (and won't be blocked again).
+
+> If Windows SmartScreen blocks it on first open: click "More info → Run anyway".
+> Fallback launchers: `Start-Blog.command` (macOS) / `Start-Blog.bat` (Windows) — these show a text window.
 
 ### Step 2: Launch, then follow the wizard top to bottom
 

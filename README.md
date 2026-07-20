@@ -4,6 +4,8 @@
 
 一个复古 CRT 终端风格的个人主页博客，带一个可交互的 3D「足迹」地球。在本地后台写文章、传照片、标足迹，一键发布到网上，就能得到一个免费、全世界都能访问的个人网站。
 
+> 🔗 **在线 Demo**：<https://sfqin.github.io/blog_test/>（发布后的效果参考）
+
 ---
 
 ## 一、它能做什么 / 最终能得到什么
@@ -37,9 +39,18 @@
 - 苹果电脑 macOS → `Blog-macOS.zip`，解压后双击 `Start-Blog.app`
 - Windows → `Blog-Windows.zip`，解压后双击 `Start-Blog.exe`
 
-> 首次打开若被系统拦截：macOS 右键 `Start-Blog.app` →「打开」→ 再点「打开」；
-> Windows 点「更多信息 → 仍要运行」。备用启动器：macOS 用 `Start-Blog.command`、
-> Windows 用 `Start-Blog.bat`（会显示一个文字窗口）。
+**macOS 首次打开被拦截怎么办？** 因为这个程序没有做 Apple 付费签名，第一次双击 `Start-Blog.app` 会被系统拦下，弹出下面这个「未打开 Start-Blog」的提示——这是正常现象，先点**「完成」**关掉它（不要点「移到废纸篓」）：
+
+<img src="fengxian.png" alt="macOS 首次打开被拦截" width="360">
+
+**解决办法：到隐私设置里授权。** 打开 **系统设置 → 隐私与安全性**，向下滚动到「安全性」一栏，会看到「已阻止 “Start-Blog” 以保护 Mac」，点它右边的**「仍要打开」**（按提示输入开机密码或用指纹确认）：
+
+<img src="yinsi.png" alt="在隐私与安全性里点「仍要打开」" width="560">
+
+授权后回到 `Start-Blog.app` **再次双击**，弹窗里点**「打开」**即可正常启动（以后打开都不会再被拦）。
+
+> Windows 首次打开若被 SmartScreen 拦截：点「更多信息 → 仍要运行」。
+> 备用启动器：macOS 用 `Start-Blog.command`、Windows 用 `Start-Blog.bat`（会显示一个文字窗口）。
 
 ### 第二步：启动，跟着网页向导从上往下点
 
