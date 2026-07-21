@@ -50,7 +50,8 @@
 授权后回到 `Start-Blog.app` **再次双击**，弹窗里点**「打开」**即可正常启动（以后打开都不会再被拦）。
 
 > Windows 首次打开若被 SmartScreen 拦截：点「更多信息 → 仍要运行」。
-> 备用启动器：macOS 用 `Start-Blog.command`、Windows 用 `Start-Blog.bat`（会显示一个文字窗口）。
+> 备用启动器：macOS 用 `Start-Blog.command`；Windows 用 `Start-Blog-console.bat`
+> （双击它会直接转交 `Start-Blog.exe`，不会卡窗口；想看运行日志就以 `log` 模式运行它）。
 
 ### 第二步：启动，跟着网页向导从上往下点
 
@@ -196,7 +197,7 @@ node scripts/gen_geo.mjs SG TH      # 只重建指定国家
 > 自包含程序，用户无需装任何环境。它由脚本自动生成、**不纳入版本库**（见 `.gitignore`）。
 > 客户端启动器的**源文件**放在仓库的 **`packaging/`** 与 **`cmd/windows-launcher/`** 目录
 > （macOS 的 `.app` 外壳与 `launch`、Windows 的 `.exe` 启动器、以及共用的 `loading.html`），
-> 配合仓库根目录的 `Start-Blog.command` / `Start-Blog.bat`。
+> 配合仓库根目录的 `Start-Blog.command` / `Start-Blog-console.bat`。
 
 ### 项目结构
 
@@ -225,7 +226,7 @@ packaging/                  客户端启动器源文件（打包进 dist-release
   loading.html              双击后立即显示的启动加载页（探测服务就绪后自动进向导）
 cmd/windows-launcher/       Windows Start-Blog.exe 无窗口启动器
 Start-Blog.command          macOS 备用启动器（可见终端窗口）
-Start-Blog.bat              Windows 引擎 / 可见备用启动器
+Start-Blog-console.bat      Windows 进阶/排错启动器（双击转交 .exe；log 模式看日志）
 ```
 
 ### 开发与验证

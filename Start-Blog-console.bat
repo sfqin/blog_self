@@ -1,26 +1,42 @@
 @echo off
-REM Start-Blog.bat — Windows engine for the dev@home blog.
+REM Start-Blog-console.bat — advanced / troubleshooting launcher for Windows.
 REM
-REM Usually launched by double-clicking Start-Blog.exe (no console window). You can
-REM also double-click this .bat directly if you prefer seeing progress text.
+REM Normal users should double-click Start-Blog.exe (no window). This file exists
+REM only for troubleshooting, and it is SAFE to double-click by mistake:
 REM
-REM It finds a self-contained program (bin\blog-windows-amd64.exe), keeps all
-REM content in a stable folder (%USERPROFILE%\dev-home-blog), and runs the server.
-REM The server picks its own port (auto-bumps if 8080 is busy) and shuts itself
-REM down about a minute after the last blog page is closed (heartbeat), so there
-REM is no Stop step. Closing this window also stops it.
+REM   * Double-click (no args): it just hands off to Start-Blog.exe and closes
+REM     immediately — it never leaves a stuck console window.
+REM   * Run with the "log" argument (Start-Blog-console.bat log): it runs the
+REM     server HERE in this window so you can watch the progress/log text. That
+REM     window stays open on purpose — closing it stops the blog.
 REM
-REM Arg "noopen": don't open the browser (Start-Blog.exe opens it itself). Arg
-REM "__openwait": internal — the detached helper that waits for the port then
-REM opens the browser.
+REM The server keeps all content in %USERPROFILE%\dev-home-blog, picks its own
+REM port (auto-bumps if 8080 is busy), and shuts itself down about a minute after
+REM the last blog page is closed (heartbeat).
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
 
+REM Internal helper used by the visible/console mode below (waits for the port
+REM then opens the browser). Not meant to be invoked by hand.
 if "%~1"=="__openwait" goto openwait
 
+REM --- Default: delegate to the windowless launcher --------------------------
+REM A plain double-click must never hang. If Start-Blog.exe is present next to
+REM this file, launch it and quit right away (the .exe starts the server hidden
+REM and opens the browser itself). Pass "log" to force the visible mode instead.
+if /i not "%~1"=="log" (
+  if exist "%~dp0Start-Blog.exe" (
+    start "" "%~dp0Start-Blog.exe"
+    exit /b 0
+  )
+)
+
 echo ======================================================
-echo   dev@home Blog - Launcher
+echo   dev@home Blog - Console / troubleshooting launcher
 echo ======================================================
+echo.
+echo This window IS the blog server. Keep it open while you use the blog;
+echo closing it stops the blog. To run without a window, use Start-Blog.exe.
 echo.
 
 REM --- 1. locate a runnable program ------------------------------------------
@@ -51,22 +67,17 @@ REM --- 2. stable data folder (all your content lives here) ------------------
 set "DATA=%USERPROFILE%\dev-home-blog"
 if not exist "%DATA%" mkdir "%DATA%"
 
-REM --- 3. open the browser once the server reports its port (unless told not
-REM        to; Start-Blog.exe opens it itself). Prefer the instant loading page
-REM        (loading.html polls the server and redirects itself) so there is
-REM        immediate feedback; fall back to the poll-then-open helper.
-if /i not "%~1"=="noopen" (
-  if exist "%~dp0loading.html" (
-    start "" "%~dp0loading.html"
-  ) else (
-    start "" /min cmd /c ""%~f0" __openwait"
-  )
+REM --- 3. open the browser once the server reports its port. Prefer the instant
+REM        loading page (loading.html polls the server and redirects itself) so
+REM        there is immediate feedback; fall back to the poll-then-open helper.
+if exist "%~dp0loading.html" (
+  start "" "%~dp0loading.html"
+) else (
+  start "" /min cmd /c ""%~f0" __openwait"
 )
 
 echo.
 echo Starting server. A browser will open shortly.
-echo Keep this program running - closing it stops the blog. It also stops on its
-echo own about a minute after you close the last blog page.
 echo.
 
 REM --- 4. run the server (foreground; it self-selects the port) --------------

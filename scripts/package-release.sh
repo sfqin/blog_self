@@ -7,8 +7,8 @@
 # needs (no mixing macOS + Windows files in one zip):
 #
 #   Blog-macOS/                     Blog-Windows/
-#     Start-Blog.app      ← 双击      Start-Blog.exe   ← 双击（无黑窗）
-#     Start-Blog.command  ← 备用      Start-Blog.bat   ← 可见备用
+#     Start-Blog.app      ← 双击      Start-Blog.exe        ← 双击（无黑窗）
+#     Start-Blog.command  ← 备用      Start-Blog-console.bat ← 进阶/排错（可见日志）
 #     bin/blog-macos-*    ← 程序      bin/blog-windows-amd64.exe ← 程序
 #     loading.html                   loading.html
 #     使用说明.txt                    README.txt
@@ -78,9 +78,11 @@ echo "== 复制启动器与加载页 =="
 cp "$ROOT/Start-Blog.command" "$MAC/Start-Blog.command"
 chmod +x "$MAC/Start-Blog.command"
 cp "$ROOT/packaging/loading.html" "$MAC/loading.html"
-# Windows: Start-Blog.exe is the no-console launcher; .bat stays as a visible
-# fallback for troubleshooting.
-cp "$ROOT/Start-Blog.bat"         "$WIN/Start-Blog.bat"
+# Windows: Start-Blog.exe is the no-console launcher; the console .bat stays as a
+# visible troubleshooting fallback. It is renamed Start-Blog-console.bat and made
+# safe to double-click: with no args it just hands off to Start-Blog.exe (never a
+# stuck window); run it with the "log" arg to watch progress in a console.
+cp "$ROOT/Start-Blog-console.bat"  "$WIN/Start-Blog-console.bat"
 cp "$ROOT/packaging/loading.html" "$WIN/loading.html"
 
 # --- 4. ultra-short per-platform pointer -----------------------------------
@@ -106,7 +108,7 @@ cat > "$WIN/README.txt" <<'TXT'
 欢迎使用 dev@home 博客！（Windows 版）
 
 只需双击：  Start-Blog.exe
-（想看运行进度，可改双击备用的 Start-Blog.bat）
+（想看运行进度/排错，可双击 Start-Blog-console.bat，再按提示以 log 模式运行）
 
 之后浏览器会自动打开一个网页向导，跟着上面的按钮一步步点即可：
 装工具 → 连 GitHub → 建仓库 → 写文章 → 一键发布上线。

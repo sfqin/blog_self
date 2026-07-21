@@ -7,9 +7,9 @@
 #   bin/blog-macos-amd64     (Intel Macs)
 #   bin/blog-windows-amd64.exe
 #
-# Ship the whole folder (including Start-Blog.command / Start-Blog.bat and bin/)
-# to a non-programmer. They double-click the launcher for their OS; it picks the
-# matching prebuilt binary from bin/ — no Go, no terminal.
+# Ship the whole folder (including Start-Blog.command / Start-Blog-console.bat and
+# bin/) to a non-programmer. They double-click the launcher for their OS; it picks
+# the matching prebuilt binary from bin/ — no Go, no terminal.
 #
 # All templates/CSS/JS/geo data are embedded via //go:embed, so each binary is
 # fully self-contained.
@@ -36,7 +36,7 @@ echo ">> done. Contents of bin/:"
 ls -lh bin/
 echo ""
 echo "Ship these to a beginner along with the launchers:"
-echo "   Start-Blog.command   (macOS — double-click)"
-echo "   Start-Blog.bat       (Windows — double-click)"
+echo "   Start-Blog.command       (macOS — double-click)"
+echo "   Start-Blog.exe           (Windows — double-click; Start-Blog-console.bat is the console fallback)"
 echo "   bin/                 (the prebuilt programs above)"
 echo "   web/, docs/          (optional; binaries already embed web assets)"

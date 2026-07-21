@@ -55,7 +55,9 @@ Go to the [**releases page**](https://github.com/sfqin/blog_self/releases) and g
 After authorizing, go back and **double-click `Start-Blog.app` again**, then click **"Open"** in the dialog — it launches normally (and won't be blocked again).
 
 > If Windows SmartScreen blocks it on first open: click "More info → Run anyway".
-> Fallback launchers: `Start-Blog.command` (macOS) / `Start-Blog.bat` (Windows) — these show a text window.
+> Fallback launchers: `Start-Blog.command` (macOS) / `Start-Blog-console.bat`
+> (Windows — double-clicking it just hands off to `Start-Blog.exe`, so it never
+> leaves a stuck window; run it with the `log` argument to watch progress).
 
 ### Step 2: Launch, then follow the wizard top to bottom
 
@@ -206,7 +208,8 @@ files are lazy-loaded on drill.
 ```
 
 The output is **split into two per-OS packages**: `Blog-macOS.zip` (`Start-Blog.app`
-/ `.command` + macOS binaries) and `Blog-Windows.zip` (`Start-Blog.exe` / `.bat` +
+/ `.command` + macOS binaries) and `Blog-Windows.zip` (`Start-Blog.exe` /
+`Start-Blog-console.bat` +
 the Windows program), each with the startup `loading.html` and a note file
 (`使用说明.txt` on macOS, `README.txt` on Windows).
 Users download only the one for their system.
@@ -218,7 +221,7 @@ Users download only the one for their system.
 > tracked in git** (see `.gitignore`). The launcher **sources** live in
 > **`packaging/`** and **`cmd/windows-launcher/`** (`mac/` `.app` shell +
 > `launch`, the Windows `.exe` launcher, and the shared `loading.html`),
-> together with the root-level `Start-Blog.command` / `Start-Blog.bat`.
+> together with the root-level `Start-Blog.command` / `Start-Blog-console.bat`.
 
 ### Project layout
 
@@ -246,7 +249,7 @@ packaging/                  client launcher sources (bundled into the dist-relea
   loading.html              startup splash opened on double-click (polls the server, then enters the wizard)
 cmd/windows-launcher/       Windows Start-Blog.exe windowless launcher
 Start-Blog.command          macOS fallback launcher (visible terminal)
-Start-Blog.bat              Windows engine / visible fallback launcher
+Start-Blog-console.bat      Windows advanced/troubleshooting launcher (hands off to .exe; 'log' mode shows a console)
 ```
 
 ### Development & verification
