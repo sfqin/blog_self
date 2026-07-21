@@ -1,0 +1,16 @@
+/* Theme N · Soft UI — warm light neumorphic ground, low-contrast, soft accent. */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@500;600&display=swap');
+:root[data-theme="N"] {
+  --bg: #ecf0f3; --panel: #f4f7fa; --panel-2: #e2e8ee;
+  --text: #33404f; --muted: #8a97a6; --accent: #6d7ff5; --accent-2: #f58a9b; --line: #d5dde5;
+  --glow: none;
+  --accent-rgb: 109,127,245; --accent-2-rgb: 245,138,155;
+  --bg-rgb: 236,240,243; --panel-rgb: 244,247,250; --overlay-rgb: 51,64,79; --scrim-rgb: 51,64,79; --shadow-rgb: 163,177,198;
+  --font-display: "Sora", system-ui, sans-serif;
+  --font-body: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono: "Plus Jakarta Sans", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #dde5ec; --globe-ocean2: #ecf0f3; --globe-land: #cbd5df;
+  --globe-land-line: #6d7ff5; --globe-border: #6d7ff5;
+  --globe-region: rgba(109,127,245,0.16); --globe-region-line: #8a97a6;
+}

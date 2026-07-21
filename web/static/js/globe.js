@@ -19,16 +19,38 @@
   // when hosted under a sub-path (Gitee Pages: user.gitee.io/repo/).
   var BASE = (window.__BASE__ || "").replace(/\/$/, "");
 
-  // ---- theme colors (mirror crt.css tokens) ----
-  var C = {
-    ocean1: "#0e2a1a", ocean2: "#061309",
-    land: "#123a24", landLine: "#1f5c3a",
-    border: "#2a6b45", rim: "rgba(74,222,128,0.55)",
-    green: "#4ade80", amber: "#fbbf24", text: "#c8f5d3", muted: "#5a7d63",
-    visited: "rgba(74,222,128,0.42)", visitedLine: "#4ade80",
-    drill: "rgba(251,191,36,0.16)", drillLine: "#fbbf24",
-    region: "rgba(30,60,40,0.55)", regionLine: "#2a6b45",
-  };
+  // ---- theme colors — read live from crt.css tokens so the globe follows the
+  // admin-selected site theme. Reads once at init (no live switching); falls back
+  // to the F · Retro Terminal palette if a token is unset. Alpha-tinted colors
+  // (rim/visited/drill) are rebuilt from the accent channel tokens. ----
+  function readTheme() {
+    var s = getComputedStyle(document.documentElement);
+    function v(name, fallback) {
+      var x = s.getPropertyValue(name);
+      return x ? x.trim() : fallback;
+    }
+    var accent = v("--accent", "#4ade80");
+    var accent2 = v("--accent-2", "#fbbf24");
+    var accentRGB = v("--accent-rgb", "74,222,128");
+    var accent2RGB = v("--accent-2-rgb", "251,191,36");
+    return {
+      ocean1: v("--globe-ocean1", "#0e2a1a"),
+      ocean2: v("--globe-ocean2", "#061309"),
+      land: v("--globe-land", "#123a24"),
+      landLine: v("--globe-land-line", "#1f5c3a"),
+      border: v("--globe-border", "#2a6b45"),
+      rim: "rgba(" + accentRGB + ",0.55)",
+      green: accent, amber: accent2,
+      text: v("--text", "#c8f5d3"), muted: v("--muted", "#5a7d63"),
+      visited: "rgba(" + accentRGB + ",0.42)", visitedLine: accent,
+      drill: "rgba(" + accent2RGB + ",0.16)", drillLine: accent2,
+      region: v("--globe-region", "rgba(30,60,40,0.55)"),
+      regionLine: v("--globe-region-line", "#2a6b45"),
+      halo: "rgba(" + accent2RGB + ",0.18)",              // marker pulse halo
+      overlay: "rgba(" + v("--overlay-rgb", "6,19,9") + ",0.82)", // label backdrop
+    };
+  }
+  var C = readTheme();
 
   // ---- province-name -> drill-file key mapping (admin stores localized names) ----
   // China uses adcode; JP/MY files are keyed by English ADM1 name (spaces -> _).
@@ -249,7 +271,7 @@
       ctx.save();
       ctx.beginPath();
       ctx.arc(p.x, p.y, pulse + 3, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(251,191,36,0.18)";
+      ctx.fillStyle = C.halo;
       ctx.fill();
       ctx.beginPath();
       ctx.arc(p.x, p.y, pulse, 0, Math.PI * 2);
@@ -413,7 +435,7 @@
         var full = label + " — " + note;
         var tw = ctx.measureText(full).width;
         ctx.save();
-        ctx.fillStyle = "rgba(6,19,9,0.82)";
+        ctx.fillStyle = C.overlay;
         ctx.fillRect(8, size - 28, Math.min(tw + 16, size - 16), 22);
         ctx.restore();
         ctx.fillStyle = C.amber;

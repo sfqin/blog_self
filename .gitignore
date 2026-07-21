@@ -2,6 +2,8 @@
 /tmp/
 *.exe
 /blogbin
+# Server runtime state (port/pid), written while running, removed on clean exit.
+.runtime.json
 # Prebuilt launcher binaries (shipped as a release zip, not committed)
 /bin/
 # Assembled double-click release package (.app + launchers + bin + zip)

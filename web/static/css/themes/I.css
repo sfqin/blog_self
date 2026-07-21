@@ -1,0 +1,16 @@
+/* Theme I · Organic — warm paper, earthy ink, botanical green, humanist serif. */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;1,400&family=Newsreader:ital@0;1&display=swap');
+:root[data-theme="I"] {
+  --bg: #f3efe4; --panel: #fbf8f0; --panel-2: #e9e2d2;
+  --text: #33291f; --muted: #857a68; --accent: #6a7f4a; --accent-2: #b0703a; --line: #ddd4c2;
+  --glow: none;
+  --accent-rgb: 106,127,74; --accent-2-rgb: 176,112,58;
+  --bg-rgb: 243,239,228; --panel-rgb: 251,248,240; --overlay-rgb: 51,41,31; --scrim-rgb: 51,41,31; --shadow-rgb: 51,41,31;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Newsreader", Georgia, serif;
+  --font-mono: "Newsreader", ui-monospace, serif;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #e2dcc9; --globe-ocean2: #f3efe4; --globe-land: #cdc4ab;
+  --globe-land-line: #6a7f4a; --globe-border: #6a7f4a;
+  --globe-region: rgba(106,127,74,0.18); --globe-region-line: #857a68;
+}

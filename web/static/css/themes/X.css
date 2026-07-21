@@ -1,0 +1,16 @@
+/* Theme X · Scandi — bright airy off-white, muted sage + clay, humanist sans. */
+@import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600&display=swap');
+:root[data-theme="X"] {
+  --bg: #f4f1ea; --panel: #fbf9f4; --panel-2: #e8e3d8;
+  --text: #2b2b28; --muted: #8a877c; --accent: #7d9a7d; --accent-2: #c98a6a; --line: #ddd8cc;
+  --glow: none;
+  --accent-rgb: 125,154,125; --accent-2-rgb: 201,138,106;
+  --bg-rgb: 244,241,234; --panel-rgb: 251,249,244; --overlay-rgb: 43,43,40; --scrim-rgb: 43,43,40; --shadow-rgb: 200,196,186;
+  --font-display: "Epilogue", system-ui, sans-serif;
+  --font-body: "Hanken Grotesk", system-ui, sans-serif;
+  --font-mono: "Hanken Grotesk", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #e8e3d8; --globe-ocean2: #f4f1ea; --globe-land: #d5cfc0;
+  --globe-land-line: #7d9a7d; --globe-border: #7d9a7d;
+  --globe-region: rgba(125,154,125,0.18); --globe-region-line: #8a877c;
+}

@@ -1,0 +1,16 @@
+/* Theme A · Editorial Noir — dark warm ink, terracotta accent, serif display. */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap');
+:root[data-theme="A"] {
+  --bg: #14110f; --panel: #1c1815; --panel-2: #24201b;
+  --text: #ece5db; --muted: #9a8f82; --accent: #c8734a; --accent-2: #e0a56a; --line: #33291f;
+  --glow: none;
+  --accent-rgb: 200,115,74; --accent-2-rgb: 224,165,106;
+  --bg-rgb: 20,17,15; --panel-rgb: 28,24,21; --overlay-rgb: 36,32,27; --scrim-rgb: 10,8,6; --shadow-rgb: 0,0,0;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #241a12; --globe-ocean2: #14110f; --globe-land: #3a2c20;
+  --globe-land-line: #5c4531; --globe-border: #c8734a;
+  --globe-region: rgba(200,115,74,0.18); --globe-region-line: #8a5a3a;
+}

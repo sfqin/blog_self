@@ -16,6 +16,7 @@ type Profile struct {
 	GitHubURL string
 	Email     string
 	Location  string
+	Theme     string // site-wide visual theme code (A–Z; F = Retro Terminal)
 	UpdatedAt string
 }
 

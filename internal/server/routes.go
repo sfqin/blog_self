@@ -50,6 +50,10 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("GET /admin/profile", s.handleProfileForm)
 	s.mux.HandleFunc("POST /admin/profile", s.guard(s.handleProfileSave))
 
+	// Site theme (single setting, its own tab).
+	s.mux.HandleFunc("GET /admin/theme", s.handleThemeForm)
+	s.mux.HandleFunc("POST /admin/theme", s.guard(s.handleThemeSave))
+
 	// Generic CRUD sections. Each collection has list/new/create/edit/update/delete.
 	s.registerCRUD("experiences")
 	s.registerCRUD("thoughts")

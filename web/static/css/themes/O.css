@@ -1,0 +1,16 @@
+/* Theme O · Zine — photocopied cream, raw black, marker accents, cut-paste feel. */
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Caveat:wght@500;700&family=Permanent+Marker&display=swap');
+:root[data-theme="O"] {
+  --bg: #efe7d6; --panel: #f7f1e3; --panel-2: #e2d8c2;
+  --text: #14120e; --muted: #6a6152; --accent: #d61f2b; --accent-2: #1f6fd6; --line: #14120e;
+  --glow: none;
+  --accent-rgb: 214,31,43; --accent-2-rgb: 31,111,214;
+  --bg-rgb: 239,231,214; --panel-rgb: 247,241,227; --overlay-rgb: 20,18,14; --scrim-rgb: 20,18,14; --shadow-rgb: 20,18,14;
+  --font-display: "Archivo Black", system-ui, sans-serif;
+  --font-body: "Caveat", "Comic Sans MS", cursive;
+  --font-mono: "Permanent Marker", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #e2d8c2; --globe-ocean2: #efe7d6; --globe-land: #cdc1a6;
+  --globe-land-line: #14120e; --globe-border: #d61f2b;
+  --globe-region: rgba(214,31,43,0.16); --globe-region-line: #14120e;
+}

@@ -1,0 +1,11 @@
+/* Theme F · Retro Terminal — the site default.
+
+   Intentionally (almost) empty: the full F palette, fonts and decorative
+   toggles already live in crt.css :root as the universal fallback, and the
+   terminal flourishes (scanlines / vignette / "$ " prefix / "~" suffix) are
+   gated to [data-theme="F"] there. So selecting F just means "use the base
+   tokens as-is". This file exists so home.html / post.html can always link a
+   themes/<CODE>.css without a special case. */
+:root[data-theme="F"] {
+  /* no overrides — inherits the crt.css :root contract */
+}

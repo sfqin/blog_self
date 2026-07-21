@@ -1,0 +1,16 @@
+/* Theme C · Interactive Spatial — deep green-black, teal glow, serif + geometric sans. */
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Sora:wght@400;500;600&display=swap');
+:root[data-theme="C"] {
+  --bg: #0b0f0e; --panel: #111817; --panel-2: #16201e;
+  --text: #e3f0ec; --muted: #6f8d86; --accent: #5eead4; --accent-2: #99f6e4; --line: #1e2b28;
+  --glow: 0 0 10px rgba(94,234,212,0.4);
+  --accent-rgb: 94,234,212; --accent-2-rgb: 153,246,228;
+  --bg-rgb: 11,15,14; --panel-rgb: 17,24,23; --overlay-rgb: 10,20,18; --scrim-rgb: 4,8,7; --shadow-rgb: 0,0,0;
+  --font-display: "Instrument Serif", Georgia, serif;
+  --font-body: "Sora", system-ui, sans-serif;
+  --font-mono: "Sora", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #0f2420; --globe-ocean2: #071310; --globe-land: #12332d;
+  --globe-land-line: #1f5c52; --globe-border: #5eead4;
+  --globe-region: rgba(94,234,212,0.16); --globe-region-line: #2a6b60;
+}

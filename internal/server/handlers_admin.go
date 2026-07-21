@@ -104,3 +104,36 @@ func (s *Server) handleProfileSave(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Redirect(w, r, "/admin/profile?flash=saved", http.StatusSeeOther)
 }
+
+// handleThemeForm shows the site-theme picker (its own admin tab).
+func (s *Server) handleThemeForm(w http.ResponseWriter, r *http.Request) {
+	profile, err := s.store.Profile()
+	if err != nil {
+		s.serverError(w, "theme", err)
+		return
+	}
+	theme := profile.Theme
+	if theme == "" {
+		theme = "F"
+	}
+	s.writeHTML(w, "theme_form.html", adminPage{
+		Title:  "Theme",
+		Active: "theme",
+		CSRF:   s.ensureCSRF(w, r),
+		Flash:  r.URL.Query().Get("flash"),
+		Data:   map[string]any{"Theme": theme},
+	})
+}
+
+// handleThemeSave persists the selected site-wide theme.
+func (s *Server) handleThemeSave(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return
+	}
+	if err := s.store.SaveTheme(r.PostForm.Get("theme")); err != nil {
+		s.serverError(w, "save theme", err)
+		return
+	}
+	http.Redirect(w, r, "/admin/theme?flash=saved", http.StatusSeeOther)
+}

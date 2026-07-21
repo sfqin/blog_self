@@ -1,0 +1,16 @@
+/* Theme J · Newspaper — cream newsprint, black body, red masthead, serif stack. */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Lora:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@700;900&display=swap');
+:root[data-theme="J"] {
+  --bg: #f5f1e6; --panel: #fdfaf2; --panel-2: #e8e2d2;
+  --text: #181410; --muted: #6f665a; --accent: #8a2b1e; --accent-2: #181410; --line: #cfc7b4;
+  --glow: none;
+  --accent-rgb: 138,43,30; --accent-2-rgb: 24,20,16;
+  --bg-rgb: 245,241,230; --panel-rgb: 253,250,242; --overlay-rgb: 24,20,16; --scrim-rgb: 24,20,16; --shadow-rgb: 24,20,16;
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Lora", Georgia, serif;
+  --font-mono: "DM Serif Display", ui-monospace, serif;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #e8e2d2; --globe-ocean2: #f5f1e6; --globe-land: #d3cab4;
+  --globe-land-line: #181410; --globe-border: #8a2b1e;
+  --globe-region: rgba(138,43,30,0.15); --globe-region-line: #181410;
+}

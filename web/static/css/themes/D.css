@@ -1,0 +1,16 @@
+/* Theme D · Aurora Shader — dark violet, iridescent violet/cyan accents, glow. */
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap');
+:root[data-theme="D"] {
+  --bg: #0d0a1a; --panel: #161130; --panel-2: #1e1740;
+  --text: #f5f3ff; --muted: #8b83b8; --accent: #a78bfa; --accent-2: #22d3ee; --line: #2a2350;
+  --glow: 0 0 14px rgba(167,139,250,0.5);
+  --accent-rgb: 167,139,250; --accent-2-rgb: 34,211,238;
+  --bg-rgb: 13,10,26; --panel-rgb: 22,17,48; --overlay-rgb: 14,10,32; --scrim-rgb: 6,4,16; --shadow-rgb: 0,0,0;
+  --font-display: "Sora", system-ui, sans-serif;
+  --font-body: "Sora", system-ui, sans-serif;
+  --font-mono: "Sora", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #1a1240; --globe-ocean2: #0d0a1a; --globe-land: #2a2160;
+  --globe-land-line: #4a3a90; --globe-border: #a78bfa;
+  --globe-region: rgba(167,139,250,0.2); --globe-region-line: #6d5bc0;
+}

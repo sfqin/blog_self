@@ -1,0 +1,44 @@
+{{template "admin_head" .}}
+<h1>theme — 站点主题</h1>
+{{with .Data}}
+<form method="post" action="/admin/theme">
+  <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+  <div class="field">
+    <label>site theme 全站主题</label>
+    <select name="theme">
+      <option value="A"{{if eq .Theme "A"}} selected{{end}}>A · Editorial Noir 编辑黑</option>
+      <option value="B"{{if eq .Theme "B"}} selected{{end}}>B · Kinetic Brutalist 动态野兽派</option>
+      <option value="C"{{if eq .Theme "C"}} selected{{end}}>C · Interactive Spatial 空间交互</option>
+      <option value="D"{{if eq .Theme "D"}} selected{{end}}>D · Aurora Shader 极光着色</option>
+      <option value="E"{{if eq .Theme "E"}} selected{{end}}>E · 3D Bento 立体便当</option>
+      <option value="F"{{if eq .Theme "F"}} selected{{end}}>F · Retro Terminal 复古终端（默认）</option>
+      <option value="G"{{if eq .Theme "G"}} selected{{end}}>G · Swiss 瑞士国际主义</option>
+      <option value="H"{{if eq .Theme "H"}} selected{{end}}>H · Y2K 千禧数码</option>
+      <option value="I"{{if eq .Theme "I"}} selected{{end}}>I · Organic 有机自然</option>
+      <option value="J"{{if eq .Theme "J"}} selected{{end}}>J · Newspaper 报刊排版</option>
+      <option value="K"{{if eq .Theme "K"}} selected{{end}}>K · Memphis 孟菲斯</option>
+      <option value="L"{{if eq .Theme "L"}} selected{{end}}>L · Luxury 奢华</option>
+      <option value="M"{{if eq .Theme "M"}} selected{{end}}>M · Data-viz 数据可视化</option>
+      <option value="N"{{if eq .Theme "N"}} selected{{end}}>N · Soft UI 新拟态</option>
+      <option value="O"{{if eq .Theme "O"}} selected{{end}}>O · Zine 独立杂志</option>
+      <option value="P"{{if eq .Theme "P"}} selected{{end}}>P · Minimal 极简</option>
+      <option value="Q"{{if eq .Theme "Q"}} selected{{end}}>Q · Blueprint 蓝图</option>
+      <option value="R"{{if eq .Theme "R"}} selected{{end}}>R · Clay 黏土</option>
+      <option value="S"{{if eq .Theme "S"}} selected{{end}}>S · Synthwave 合成波</option>
+      <option value="T"{{if eq .Theme "T"}} selected{{end}}>T · Art Deco 装饰艺术</option>
+      <option value="U"{{if eq .Theme "U"}} selected{{end}}>U · Comic 漫画</option>
+      <option value="V"{{if eq .Theme "V"}} selected{{end}}>V · Isometric 等距</option>
+      <option value="W"{{if eq .Theme "W"}} selected{{end}}>W · Topographic 地形图</option>
+      <option value="X"{{if eq .Theme "X"}} selected{{end}}>X · Scandi 北欧</option>
+      <option value="Y"{{if eq .Theme "Y"}} selected{{end}}>Y · Pixel 像素</option>
+      <option value="Z"{{if eq .Theme "Z"}} selected{{end}}>Z · Kinetic Type 动态字体</option>
+    </select>
+    <div class="hint">切换全站访客可见的视觉主题；后台页面始终保持 F · 复古终端。保存后打开预览查看效果。</div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn-primary" type="submit">save</button>
+    <a class="btn-ghost" style="text-decoration:none" href="/" target="_blank">preview site ↗</a>
+  </div>
+</form>
+{{end}}
+{{template "admin_foot" .}}

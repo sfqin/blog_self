@@ -1,5 +1,5 @@
 {{define "admin_head"}}<!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="F">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,6 +18,7 @@
     <a class="brand" href="/admin">dev@home:~#</a>
     <a href="/admin" class="{{if eq .Active "dashboard"}}active{{end}}"><span class="nav-en">dashboard</span><span class="nav-zh">总览</span></a>
     <a href="/admin/profile" class="{{if eq .Active "profile"}}active{{end}}"><span class="nav-en">profile</span><span class="nav-zh">个人资料</span></a>
+    <a href="/admin/theme" class="{{if eq .Active "theme"}}active{{end}}"><span class="nav-en">theme</span><span class="nav-zh">主题</span></a>
     <a href="/admin/experiences" class="{{if eq .Active "experiences"}}active{{end}}"><span class="nav-en">experiences</span><span class="nav-zh">工作经历</span></a>
     <a href="/admin/thoughts" class="{{if eq .Active "thoughts"}}active{{end}}"><span class="nav-en">thoughts</span><span class="nav-zh">随想</span></a>
     <a href="/admin/projects" class="{{if eq .Active "projects"}}active{{end}}"><span class="nav-en">projects</span><span class="nav-zh">项目</span></a>

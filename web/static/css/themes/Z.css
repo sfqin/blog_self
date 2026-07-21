@@ -1,0 +1,16 @@
+/* Theme Z · Kinetic Type — bone ground, huge black type, hot-red accent, tight sans. */
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800;900&family=Space+Grotesk:wght@400;500;700&display=swap');
+:root[data-theme="Z"] {
+  --bg: #f2f0ea; --panel: #fafaf6; --panel-2: #e6e4dc;
+  --text: #0e0e0e; --muted: #7a776e; --accent: #ff2e17; --accent-2: #0e0e0e; --line: #d6d3c8;
+  --glow: none;
+  --accent-rgb: 255,46,23; --accent-2-rgb: 14,14,14;
+  --bg-rgb: 242,240,234; --panel-rgb: 250,250,246; --overlay-rgb: 14,14,14; --scrim-rgb: 14,14,14; --shadow-rgb: 14,14,14;
+  --font-display: "Archivo", system-ui, sans-serif;
+  --font-body: "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "Space Grotesk", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #e6e4dc; --globe-ocean2: #f2f0ea; --globe-land: #d2cfc4;
+  --globe-land-line: #0e0e0e; --globe-border: #ff2e17;
+  --globe-region: rgba(255,46,23,0.14); --globe-region-line: #0e0e0e;
+}

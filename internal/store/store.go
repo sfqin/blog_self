@@ -59,6 +59,10 @@ func migrate(db *sql.DB) error {
 			return fmt.Errorf("backfill moment_ids: %w", err)
 		}
 	}
+	// profile.theme: site-wide visual theme code (A–Z; F = Retro Terminal default).
+	if err := addColumnIfMissing(db, "profile", "theme", "TEXT NOT NULL DEFAULT 'F'"); err != nil {
+		return err
+	}
 	return nil
 }
 
