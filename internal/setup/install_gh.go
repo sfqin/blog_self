@@ -104,7 +104,13 @@ func installGHDirect(ctx context.Context, binDir, goos, goarch string) (string, 
 
 // fetchLatestRelease queries the GitHub API for the newest gh release.
 func fetchLatestRelease(ctx context.Context) (*ghRelease, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, ghLatestAPI, nil)
+	return fetchRelease(ctx, ghLatestAPI)
+}
+
+// fetchRelease queries a GitHub "releases/latest" API endpoint and decodes the
+// asset list. Shared by the gh and git (MinGit) installers.
+func fetchRelease(ctx context.Context, api string) (*ghRelease, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, api, nil)
 	if err != nil {
 		return nil, err
 	}

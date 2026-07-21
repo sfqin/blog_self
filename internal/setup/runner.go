@@ -47,21 +47,56 @@ func exeName(name string) string {
 	return name
 }
 
-// managed returns the path of name inside BinDir if it exists and is a file.
+// managed returns the path of name inside BinDir if we manage it there.
+//
+// Most tools (gh) live flat as <BinDir>/<name>(.exe). Git is special: the
+// Windows installer (install_git.go) unpacks the portable MinGit tree into
+// <BinDir>/git, whose runnable entry point is <BinDir>/git/cmd/git.exe. So for
+// "git" we also probe that nested location.
 func (e ExecRunner) managed(name string) (string, bool) {
 	if e.BinDir == "" {
 		return "", false
 	}
-	p := filepath.Join(e.BinDir, exeName(name))
-	if fi, err := os.Stat(p); err == nil && !fi.IsDir() {
-		return p, true
+	if flat := filepath.Join(e.BinDir, exeName(name)); isFile(flat) {
+		return flat, true
+	}
+	if base := strings.ToLower(strings.TrimSuffix(name, ".exe")); base == "git" {
+		if nested := filepath.Join(e.BinDir, gitSubdir, "cmd", exeName("git")); isFile(nested) {
+			return nested, true
+		}
 	}
 	return "", false
 }
 
+// isFile reports whether p exists and is a regular file (not a directory).
+func isFile(p string) bool {
+	fi, err := os.Stat(p)
+	return err == nil && !fi.IsDir()
+}
+
+// childPATH builds the PATH handed to child processes: our managed dirs first,
+// then the inherited system PATH. Besides BinDir (where gh lives), it includes
+// the portable MinGit dirs when present so that (a) a bare "git" resolves to our
+// copy and (b) git's own subprocesses — git-remote-https, credential helpers —
+// are found during a push.
+func (e ExecRunner) childPATH() string {
+	sep := string(os.PathListSeparator)
+	dirs := []string{e.BinDir}
+	if gitCmd := filepath.Join(e.BinDir, gitSubdir, "cmd"); isDir(gitCmd) {
+		dirs = append(dirs, gitCmd, filepath.Join(e.BinDir, gitSubdir, "mingw64", "bin"))
+	}
+	return strings.Join(dirs, sep) + sep + os.Getenv("PATH")
+}
+
+// isDir reports whether p exists and is a directory.
+func isDir(p string) bool {
+	fi, err := os.Stat(p)
+	return err == nil && fi.IsDir()
+}
+
 // Run executes the command, capturing stdout and stderr separately. If name is
-// a tool we manage in BinDir, it runs that exact binary; either way BinDir is
-// prepended to the child's PATH so any tool it shells out to is found too.
+// a tool we manage in BinDir, it runs that exact binary; either way our managed
+// dirs are prepended to the child's PATH so any tool it shells out to is found.
 func (e ExecRunner) Run(ctx context.Context, name string, args ...string) (string, string, error) {
 	resolved := name
 	if p, ok := e.managed(name); ok {
@@ -69,7 +104,7 @@ func (e ExecRunner) Run(ctx context.Context, name string, args ...string) (strin
 	}
 	cmd := exec.CommandContext(ctx, resolved, args...)
 	if e.BinDir != "" {
-		cmd.Env = append(os.Environ(), "PATH="+e.BinDir+string(os.PathListSeparator)+os.Getenv("PATH"))
+		cmd.Env = append(os.Environ(), "PATH="+e.childPATH())
 	}
 	var out, errb bytes.Buffer
 	cmd.Stdout = &out

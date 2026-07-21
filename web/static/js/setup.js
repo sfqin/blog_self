@@ -140,13 +140,20 @@
     btn.addEventListener("click", async () => {
       const tool = btn.dataset.install;
       const rowId = tool === "git" ? "check-git" : "check-gh";
-      // git triggers a system installer dialog; gh is downloaded directly by us
-      // (no Homebrew / package manager), so the guidance differs per tool.
-      const loadingLabel = tool === "git" ? "安装中…" : "下载中…";
-      const workingMsg =
-        tool === "git"
-          ? "正在安装 Git…可能会弹出系统对话框，请按提示点“安装/继续”。这一步可能需要几分钟，请耐心等待。"
-          : "正在从 github.com 下载 GitHub CLI（约 10–15MB，无需安装其他软件）…请保持网络畅通，稍候片刻。";
+      // On macOS, installing git triggers the system CLT installer dialog. On
+      // Windows, git (like gh) is downloaded directly by us — no dialog, no
+      // package manager — so the guidance differs per tool AND per OS.
+      const loadingLabel = tool === "git" && os === "darwin" ? "安装中…" : "下载中…";
+      let workingMsg;
+      if (tool === "git") {
+        workingMsg =
+          os === "darwin"
+            ? "正在安装 Git…可能会弹出系统对话框，请按提示点“安装/继续”。这一步可能需要几分钟，请耐心等待。"
+            : "正在从 github.com 下载 Git（约 40MB，无需安装其他软件）…请保持网络畅通，稍候片刻。";
+      } else {
+        workingMsg =
+          "正在从 github.com 下载 GitHub CLI（约 10–15MB，无需安装其他软件）…请保持网络畅通，稍候片刻。";
+      }
       markDotWorking(rowId);
       startLoading(btn, loadingLabel);
       note("env-note", "working", workingMsg);

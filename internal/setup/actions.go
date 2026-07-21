@@ -38,10 +38,15 @@ func (a *Actor) runRepoGit(ctx context.Context, args ...string) (string, string,
 	return a.Run.Run(ctx, "git", full...)
 }
 
-// InstallGit installs git using the platform package manager. On macOS this
-// triggers the Xcode Command Line Tools installer (a native GUI dialog); on
-// Windows it uses winget. Both may prompt the user — we surface guidance
-// rather than pretending it is fully silent.
+// InstallGit installs git. On macOS this triggers the Xcode Command Line Tools
+// installer (a native GUI dialog). On Windows it downloads Git for Windows'
+// official portable "MinGit" archive straight from github.com and unpacks it
+// into our app-managed BinDir — the same no-package-manager approach as InstallGH.
+//
+// We deliberately do NOT use winget on Windows: in the no-console launcher a
+// winget "package already installed → trying to upgrade" prompt waits for
+// console input that never comes and hangs until the timeout. A direct download
+// needs no installer, no admin rights, and no user interaction.
 func (a *Actor) InstallGit(ctx context.Context, goos string) ActionResult {
 	cctx, cancel := context.WithTimeout(ctx, actionTimeout)
 	defer cancel()
@@ -58,12 +63,19 @@ func (a *Actor) InstallGit(ctx context.Context, goos string) ActionResult {
 		}
 		return ActionResult{OK: true, Message: "已触发 macOS 命令行工具安装。装好后点“重新检测”。"}
 	case "windows":
-		out, stderr, err := a.Run.Run(cctx, "winget", "install", "--id", "Git.Git", "-e", "--source", "winget",
-			"--accept-package-agreements", "--accept-source-agreements")
+		path, err := installGitWindows(cctx, a.BinDir, currentArch())
 		if err != nil {
-			return ActionResult{OK: false, Message: "自动安装 Git 失败，请手动安装。", Detail: fmtErr(err, stderr+"\n"+out)}
+			return ActionResult{
+				OK:      false,
+				Message: "自动下载 Git 失败。请确认能正常访问 github.com，然后点“重新检测 / 重试”。",
+				Detail:  err.Error(),
+			}
 		}
-		return ActionResult{OK: true, Message: "Git 安装完成。请点“重新检测”。", Detail: out}
+		return ActionResult{
+			OK:      true,
+			Message: "Git 已下载并就绪（无需安装其他软件）。请点“重新检测”。",
+			Detail:  "已安装到 " + path,
+		}
 	default:
 		return ActionResult{OK: false, Message: "请用系统包管理器安装 git 后重试。"}
 	}
