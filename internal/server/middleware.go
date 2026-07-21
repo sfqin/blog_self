@@ -3,6 +3,7 @@ package server
 import (
 	"log"
 	"net/http"
+	"runtime/debug"
 	"time"
 
 	"dev-home-blog/internal/auth"
@@ -15,6 +16,28 @@ const (
 	// CSRF token's freshness.
 	cookieTTL = 7 * 24 * time.Hour
 )
+
+// recoverPanic turns a handler panic into a logged HTTP 500 instead of letting
+// net/http silently drop the connection. A dropped connection surfaces in the
+// browser as a bare "TypeError: Failed to fetch" with nothing in the log, which
+// makes such bugs nearly impossible to diagnose from a user's machine. With this
+// wrapper every panic is written (with stack) to the server log the launcher
+// captures, and the page gets a readable message instead of a mystery failure.
+func (s *Server) recoverPanic(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if rec := recover(); rec != nil {
+				log.Printf("panic serving %s %s: %v\n%s", r.Method, r.URL.Path, rec, debug.Stack())
+				// Best-effort error response. If the handler already wrote a
+				// header this is a no-op, but most panics happen before that.
+				w.Header().Set("Content-Type", "application/json; charset=utf-8")
+				w.WriteHeader(http.StatusInternalServerError)
+				_, _ = w.Write([]byte(`{"ok":false,"message":"服务器内部错误，请重试；若反复出现请把 server.log 发给维护者。"}`))
+			}
+		}()
+		next.ServeHTTP(w, r)
+	})
+}
 
 // logRequests logs method, path, status, and duration.
 func (s *Server) logRequests(next http.Handler) http.Handler {

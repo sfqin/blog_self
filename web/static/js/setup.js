@@ -13,21 +13,53 @@
   const csrf = document.getElementById("csrf").value;
   const os = document.querySelector(".setup-wrap").dataset.os;
 
+  // When the local server can't be reached, fetch() rejects with a TypeError
+  // ("Failed to fetch"). That is not an action-specific failure — the background
+  // server has stopped (long idle, or the computer slept) while this page stayed
+  // open. Show a single clear recovery instruction instead of the raw error.
+  const restartName = os === "darwin" ? "Start-Blog.app" : "Start-Blog.exe";
+  const SERVER_GONE_MSG =
+    "无法连接本地博客服务：它可能因长时间无操作或电脑休眠而自动停止了。" +
+    "请回到桌面重新双击 " + restartName + "，然后刷新本页面继续。";
+
+  // serverGoneError tags an error so callers can distinguish "server unreachable"
+  // from a normal action error and show SERVER_GONE_MSG.
+  function serverGoneError() {
+    const e = new Error(SERVER_GONE_MSG);
+    e.serverGone = true;
+    return e;
+  }
+
   // POST helper: sends form-encoded body with the CSRF token, returns JSON.
   async function post(path, params) {
     const body = new URLSearchParams(params || {});
     body.set("csrf_token", csrf);
-    const r = await fetch(path, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: body.toString(),
-    });
+    let r;
+    try {
+      r = await fetch(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body.toString(),
+      });
+    } catch (e) {
+      throw serverGoneError(); // network-level failure = server not reachable
+    }
     return r.json();
   }
 
   async function getStatus() {
     const r = await fetch("/setup/status", { headers: { "Cache-Control": "no-store" } });
     return r.json();
+  }
+
+  // Report an action failure: a server-unreachable error gets the clear recovery
+  // message; any other error keeps the action-specific prefix plus its detail.
+  function noteError(id, prefix, e) {
+    if (e && e.serverGone) {
+      note(id, "error", SERVER_GONE_MSG);
+    } else {
+      note(id, "error", prefix, String(e));
+    }
   }
 
   // --- loading-state helpers ------------------------------------------------
@@ -161,7 +193,7 @@
         const res = await post("/setup/install", { tool });
         note("env-note", res.ok ? "ok" : "error", res.message, res.detail);
       } catch (e) {
-        note("env-note", "error", "请求失败，请检查网络后重试。", String(e));
+        noteError("env-note", "请求失败，请检查网络后重试。", e);
       } finally {
         stopLoading(btn);
         await refresh();
@@ -222,7 +254,7 @@
         note("gh-note", "error", res.message, res.detail);
       }
     } catch (e) {
-      note("gh-note", "error", "启动登录失败，请重试。", String(e));
+      noteError("gh-note", "启动登录失败，请重试。", e);
     } finally {
       stopLoading(btn);
     }
@@ -257,7 +289,7 @@
       const res = await post("/setup/create-repo", { name });
       note("repo-note", res.ok ? "ok" : "error", res.message, res.detail);
     } catch (e) {
-      note("repo-note", "error", "创建仓库失败，请重试。", String(e));
+      noteError("repo-note", "创建仓库失败，请重试。", e);
     } finally {
       stopLoading(btn);
       await refresh();
@@ -282,7 +314,7 @@
         live.hidden = false;
       }
     } catch (e) {
-      note("pub-note", "error", "发布失败，请重试。", String(e));
+      noteError("pub-note", "发布失败，请重试。", e);
     } finally {
       stopLoading(btn);
     }

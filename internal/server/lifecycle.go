@@ -18,9 +18,14 @@ import (
 
 const (
 	// idleTimeout is how long the server keeps running after the last browser
-	// heartbeat. Browsers throttle background tabs, so this is generous enough
-	// to survive the user switching to the GitHub authorization page (~1 min).
-	idleTimeout = 75 * time.Second
+	// heartbeat. It must outlast the GitHub device-flow login: during that step
+	// the wizard sends the user to github.com, so the /setup tab is backgrounded
+	// and the browser throttles (or, on sleep, suspends) its heartbeat timer.
+	// A tight window here made the background server exit mid-login, so the next
+	// click hit a dead port and the browser showed a bare "Failed to fetch".
+	// Five minutes tolerates a real login detour while still auto-cleaning up
+	// shortly after every blog tab is closed.
+	idleTimeout = 5 * time.Minute
 	// watchdogTick is how often the idle watchdog checks the last heartbeat.
 	watchdogTick = 10 * time.Second
 	// heartbeatPath is pinged by heartbeat.js from every open blog page.
@@ -134,7 +139,7 @@ func (s *Server) Run() error {
 	s.writeRuntime(port)
 	defer os.Remove(s.runtimePath())
 
-	httpSrv := &http.Server{Handler: s.logRequests(s.gzipStatic(s.mux))}
+	httpSrv := &http.Server{Handler: s.recoverPanic(s.logRequests(s.gzipStatic(s.mux)))}
 
 	// Reason we stopped, for a friendlier log line.
 	stop := make(chan string, 1)
