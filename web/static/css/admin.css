@@ -268,3 +268,32 @@ button:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
 .pub-row .pub-k { color: var(--muted); width: 110px; flex-shrink: 0; }
 .pub-row .pub-v { color: var(--text); word-break: break-all; }
 .pub-row .pub-v a { color: var(--green); text-decoration: underline; }
+
+/* --- Live theme preview (theme_form.html) --- */
+.theme-preview {
+  margin-top: 26px; max-width: 860px;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--panel); overflow: hidden;
+}
+.theme-preview-bar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 12px; border-bottom: 1px solid var(--line);
+  background: var(--bg); font-family: var(--font-mono); font-size: 12px;
+}
+.tpb-dots { display: inline-flex; gap: 6px; flex: none; }
+.tpb-dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+.tpb-dots i:nth-child(1) { background: #f87171; }
+.tpb-dots i:nth-child(2) { background: var(--amber); }
+.tpb-dots i:nth-child(3) { background: var(--green); }
+.tpb-url { color: var(--muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tpb-open { color: var(--green); text-decoration: none; flex: none; }
+.tpb-open:hover { text-decoration: underline; }
+
+/* The stage clips the scaled-down iframe; its height is set live by JS to match
+   the scaled render so no dead space or overflow shows. */
+.theme-preview-stage { position: relative; width: 100%; overflow: hidden; background: #000; }
+.theme-preview-stage iframe {
+  border: 0; transform-origin: top left; display: block;
+  pointer-events: none;   /* preview only — clicks/scroll stay in the admin page */
+}
+

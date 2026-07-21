@@ -23,6 +23,13 @@ type Profile struct {
 // StackTags splits the comma-separated stack into trimmed tags.
 func (p Profile) StackTags() []string { return splitTags(p.Stack) }
 
+// ValidTheme reports whether code is a single uppercase theme letter (A–Z).
+// Used to sanitize the admin theme picker's live-preview query param so it can
+// only ever select a real /static/css/themes/<code>.css file.
+func ValidTheme(code string) bool {
+	return len(code) == 1 && code[0] >= 'A' && code[0] <= 'Z'
+}
+
 // Experience is one entry in the career timeline.
 type Experience struct {
 	ID          int64

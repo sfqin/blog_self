@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"dev-home-blog/internal/models"
 	"dev-home-blog/internal/store"
 )
 
@@ -39,6 +40,12 @@ func (s *Server) handleHome(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		s.serverError(w, "profile", err)
 		return
+	}
+	// Live theme preview: the admin theme picker embeds this page in an iframe
+	// with ?preview_theme=X to show a theme WITHOUT saving it. This only rewrites
+	// the in-memory Profile.Theme for this one render — nothing is persisted.
+	if pv := r.URL.Query().Get("preview_theme"); pv != "" && models.ValidTheme(pv) {
+		profile.Theme = pv
 	}
 	exps, err := s.store.Experiences()
 	if err != nil {

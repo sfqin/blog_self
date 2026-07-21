@@ -1,11 +1,11 @@
 {{template "admin_head" .}}
 <h1>theme — 站点主题</h1>
 {{with .Data}}
-<form method="post" action="/admin/theme">
+<form method="post" action="/admin/theme" id="theme-form">
   <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
   <div class="field">
     <label>site theme 全站主题</label>
-    <select name="theme">
+    <select name="theme" id="theme-select">
       <option value="A"{{if eq .Theme "A"}} selected{{end}}>A · Editorial Noir 编辑黑</option>
       <option value="B"{{if eq .Theme "B"}} selected{{end}}>B · Kinetic Brutalist 动态野兽派</option>
       <option value="C"{{if eq .Theme "C"}} selected{{end}}>C · Interactive Spatial 空间交互</option>
@@ -33,12 +33,61 @@
       <option value="Y"{{if eq .Theme "Y"}} selected{{end}}>Y · Pixel 像素</option>
       <option value="Z"{{if eq .Theme "Z"}} selected{{end}}>Z · Kinetic Type 动态字体</option>
     </select>
-    <div class="hint">切换全站访客可见的视觉主题；后台页面始终保持 F · 复古终端。保存后打开预览查看效果。</div>
+    <div class="hint">选择后下方即时预览效果（不会保存）；点 <b>save</b> 后才真正应用到全站访客。后台页面始终保持 F · 复古终端。</div>
   </div>
   <div class="actions-bar">
     <button class="btn-primary" type="submit">save</button>
     <a class="btn-ghost" style="text-decoration:none" href="/" target="_blank">preview site ↗</a>
   </div>
 </form>
+
+<div class="theme-preview" id="theme-preview">
+  <div class="theme-preview-bar">
+    <span class="tpb-dots"><i></i><i></i><i></i></span>
+    <code class="tpb-url" id="tp-url">/?preview_theme={{.Theme}}</code>
+    <a class="tpb-open" id="tp-open" href="/?preview_theme={{.Theme}}" target="_blank">在新标签打开 ↗</a>
+  </div>
+  <div class="theme-preview-stage" id="tp-stage">
+    <iframe id="tp-frame" title="主题实时预览" src="/?preview_theme={{.Theme}}" loading="lazy" scrolling="no"></iframe>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var sel   = document.getElementById("theme-select");
+  var frame = document.getElementById("tp-frame");
+  var stage = document.getElementById("tp-stage");
+  var url   = document.getElementById("tp-url");
+  var open  = document.getElementById("tp-open");
+  if (!sel || !frame || !stage) return;
+
+  // Render the preview at a logical desktop viewport, then scale it down to fit
+  // the admin panel width so visitors' real (desktop-first) layout is faithful.
+  var W = 1280, H = 860;
+  function fit() {
+    var scale = stage.clientWidth / W;
+    frame.style.width = W + "px";
+    frame.style.height = H + "px";
+    frame.style.transform = "scale(" + scale + ")";
+    stage.style.height = (H * scale) + "px";
+  }
+
+  // Swap the previewed theme without saving. The home handler honors
+  // ?preview_theme=X for this render only (nothing is written to the DB).
+  function refresh() {
+    var t = sel.value || "F";
+    var href = "/?preview_theme=" + encodeURIComponent(t);
+    frame.src = href;
+    if (url) url.textContent = href;
+    if (open) open.setAttribute("href", href);
+  }
+
+  sel.addEventListener("change", refresh);
+  window.addEventListener("resize", fit);
+  frame.addEventListener("load", fit);
+  fit();
+})();
+</script>
 {{end}}
 {{template "admin_foot" .}}
