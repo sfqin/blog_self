@@ -203,7 +203,10 @@
   </div>
 </footer>
 
-<script>window.__BASE__ = "{{.Base}}";</script>
+<script>
+window.__BASE__ = "{{.Base}}";
+window.__GEO_VERSION__ = "{{assetver "/static/geo"}}";
+</script>
 <script src="{{.Base}}{{asset "/static/js/globe-core.js"}}" defer></script>
 <script src="{{.Base}}{{asset "/static/js/globe.js"}}" defer></script>
 <script src="{{.Base}}{{asset "/static/js/thoughts.js"}}" defer></script>

@@ -146,13 +146,25 @@ func Run(st *store.Store, rnd *render.Renderer, staticFS fs.FS, outDir, base str
 		return fmt.Errorf("copy static: %w", err)
 	}
 
-	// 5. A no-op .nojekyll marker in case the site is ever served by GitHub
+	// 5. Static-host cache rules for versioned Geo JSON.
+	if err := writeFile(filepath.Join(outDir, "_headers"), []byte(hostingHeaders(base))); err != nil {
+		return err
+	}
+
+	// 6. A no-op .nojekyll marker in case the site is ever served by GitHub
 	//    Pages (harmless for Cloudflare).
 	if err := writeFile(filepath.Join(outDir, ".nojekyll"), []byte{}); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func hostingHeaders(base string) string {
+	base = strings.TrimSuffix(base, "/")
+	return fmt.Sprintf(`%s/static/geo/*
+  Cache-Control: public, max-age=31536000, immutable
+`, base)
 }
 
 // resetDir removes and recreates dir so stale files never linger between runs.

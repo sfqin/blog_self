@@ -12,7 +12,9 @@ func (s *Server) routes() {
 	// fix. For a local single-user app the assets are tiny and served from
 	// memory, so we tell the browser to always revalidate (no-cache). This makes
 	// edits show up on the next refresh instead of being silently cached.
-	s.mux.Handle("GET /static/", noCache(http.StripPrefix("/static/", http.FileServer(http.FS(s.static)))))
+	staticHandler := http.StripPrefix("/static/", http.FileServer(http.FS(s.static)))
+	s.mux.Handle("GET /static/geo/", cacheImmutable(staticHandler))
+	s.mux.Handle("GET /static/", noCache(staticHandler))
 
 	// Liveness heartbeat: every open blog page pings this (heartbeat.js). When
 	// pings stop (all tabs closed), the idle watchdog shuts the server down.
@@ -81,6 +83,13 @@ func (s *Server) registerCRUD(name string) {
 func noCache(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-cache, must-revalidate")
+		next.ServeHTTP(w, r)
+	})
+}
+
+func cacheImmutable(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 		next.ServeHTTP(w, r)
 	})
 }

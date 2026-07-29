@@ -7,7 +7,9 @@ import (
 	"encoding/hex"
 	"fmt"
 	"html/template"
+	"io"
 	"io/fs"
+	"strings"
 	"time"
 
 	"github.com/yuin/goldmark"
@@ -70,6 +72,7 @@ func funcMap(r *Renderer) template.FuncMap {
 		"year":     func() int { return time.Now().Year() },
 		"now":      func() string { return time.Now().Format("2006-01-02 15:04:05") },
 		"asset":    r.asset,
+		"assetver": r.assetVersion,
 	}
 }
 
@@ -83,6 +86,10 @@ func (r *Renderer) asset(p string) string {
 	return p
 }
 
+func (r *Renderer) assetVersion(path string) string {
+	return r.assetVer[path]
+}
+
 // buildAssetVersions walks staticFS and maps "/static/<path>" to a short hash
 // of the file's bytes. A nil FS yields an empty map (asset() becomes a no-op).
 func buildAssetVersions(staticFS fs.FS) map[string]string {
@@ -90,6 +97,8 @@ func buildAssetVersions(staticFS fs.FS) map[string]string {
 	if staticFS == nil {
 		return m
 	}
+	geoHash := sha256.New()
+	geoFiles := 0
 	_ = fs.WalkDir(staticFS, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
 			return nil
@@ -100,8 +109,17 @@ func buildAssetVersions(staticFS fs.FS) map[string]string {
 		}
 		sum := sha256.Sum256(b)
 		m["/static/"+path] = hex.EncodeToString(sum[:])[:10]
+		if strings.HasPrefix(path, "geo/") {
+			_, _ = io.WriteString(geoHash, path)
+			_, _ = geoHash.Write([]byte{0})
+			_, _ = geoHash.Write(b)
+			_, _ = geoHash.Write([]byte{0})
+			geoFiles++
+		}
 		return nil
 	})
+	if geoFiles > 0 {
+		m["/static/geo"] = hex.EncodeToString(geoHash.Sum(nil))[:10]
+	}
 	return m
 }
-

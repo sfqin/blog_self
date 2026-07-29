@@ -23,6 +23,7 @@
   // domain root (Cloudflare / EdgeOne); set to e.g. "/repo" via window.__BASE__
   // when hosted under a sub-path (Gitee Pages: user.gitee.io/repo/).
   var BASE = (window.__BASE__ || "").replace(/\/$/, "");
+  var GEO_VERSION = window.__GEO_VERSION__ || "";
 
   // ---- theme colors — read live from crt.css tokens so the globe follows the
   // admin-selected site theme. Reads once at init (no live switching); falls back
@@ -612,13 +613,19 @@
   // ============================================================
   // Data loading
   // ============================================================
+  function versionedDataURL(url) {
+    if (GEO_VERSION && url.indexOf("/static/geo/") === 0) {
+      url += (url.indexOf("?") >= 0 ? "&" : "?") + "v=" + encodeURIComponent(GEO_VERSION);
+    }
+    return BASE && url.charAt(0) === "/" ? BASE + url : url;
+  }
+
   function loadJSON(url) {
-    // Prepend BASE for absolute paths so the same build works at a domain
-    // root or under a sub-path.
-    if (BASE && url.charAt(0) === "/") url = BASE + url;
-    return fetch(url).then(function (r) {
-      if (!r.ok) throw new Error(r.status + " " + url);
-      return r.json();
+    var requestURL = versionedDataURL(url);
+    var isGeo = url.indexOf("/static/geo/") === 0;
+    return fetch(requestURL, { cache: isGeo ? "force-cache" : "default" }).then(function (response) {
+      if (!response.ok) throw new Error(response.status + " " + requestURL);
+      return response.json();
     });
   }
 
