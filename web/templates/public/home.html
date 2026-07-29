@@ -153,6 +153,7 @@
       <canvas id="globe-canvas" width="440" height="440"></canvas>
     </div>
     <div class="globe-stats" id="globe-stats"></div>
+    <div id="globe-notes" class="globe-notes" style="display:none"></div>
     <div id="globe-moment-links" class="globe-moment-links" style="display:none"></div>
   </div>
 </section>
@@ -202,6 +203,7 @@
 </footer>
 
 <script>window.__BASE__ = "{{.Base}}";</script>
+<script src="{{.Base}}{{asset "/static/js/globe-core.js"}}" defer></script>
 <script src="{{.Base}}{{asset "/static/js/globe.js"}}" defer></script>
 <script src="{{.Base}}{{asset "/static/js/thoughts.js"}}" defer></script>
 <script src="{{.Base}}{{asset "/static/js/moments.js"}}" defer></script>

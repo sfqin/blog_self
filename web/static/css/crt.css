@@ -359,6 +359,37 @@ h1, h2, h3 { font-family: var(--font-display); color: var(--text); }
 .globe-back-btn:active { transform: scale(0.96); }
 .globe-hint { color: var(--muted); font-size: 12px; margin-top: 10px; }
 .globe-stats { color: var(--amber); font-size: 13px; margin-top: 8px; }
+.globe-notes {
+  margin: 14px auto 0;
+  width: 100%;
+  max-width: 440px;
+  text-align: left;
+  background: rgba(var(--overlay-rgb), 0.55);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--green);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 12px;
+  animation: gml-in 0.22s ease-out;
+}
+.globe-notes .gn-head {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding-bottom: 7px;
+  border-bottom: 1px dashed var(--line);
+}
+.globe-notes .gn-item {
+  display: grid;
+  grid-template-columns: minmax(72px, auto) 1fr;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px dashed var(--line);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+.globe-notes .gn-item:last-child { border-bottom: 0; }
+.globe-notes .gn-city { color: var(--amber); }
+.globe-notes .gn-text { color: var(--text); white-space: pre-wrap; }
 /* Linked-瞬间 panel shown when a clicked city/province links to moments. Framed
    as a compact card so multiple rows read cleanly on a phone. Each row is a link
    the user taps to jump into the feed (no auto-jump). */

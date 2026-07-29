@@ -33,6 +33,18 @@
     return result;
   }
 
+  function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, function (char) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      }[char];
+    });
+  }
+
   function selectionContent(footprints, view) {
     if (!view || !view.selected) return { notes: [], momentIds: [] };
     if (view.layer === "globe") {
@@ -110,6 +122,7 @@
   }
 
   return {
+    escapeHTML: escapeHTML,
     selectionContent: selectionContent,
     createTapTracker: createTapTracker,
     snapshotView: snapshotView,

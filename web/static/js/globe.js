@@ -13,6 +13,11 @@
   var canvas = document.getElementById("globe-canvas");
   if (!canvas) return;
   var ctx = canvas.getContext("2d");
+  var Core = window.GlobeCore;
+  if (!Core) {
+    console.error("GlobeCore is missing");
+    return;
+  }
 
   // Base path prefix for all data fetches. Empty when the site is served at a
   // domain root (Cloudflare / EdgeOne); set to e.g. "/repo" via window.__BASE__
@@ -71,7 +76,7 @@
     raf: null,
     regionData: null,    // loaded country/city geojson-ish {view,regions}
     hover: null,         // region under the cursor (desktop hover highlight)
-    selected: null,      // region pinned by a click/tap (drives the 瞬间 list)
+    selected: null,      // country/region pinned by a click/tap (drives content panels)
     // Region-layer (country/city) pan & zoom for touch/wheel. zoom=1 fits view.
     rv: { zoom: 1, panx: 0, pany: 0 },
   };
@@ -267,7 +272,8 @@
       if (!meta) return;
       var p = project(meta.c[0], meta.c[1]);
       if (!p.visible) return;
-      var pulse = 4 + Math.sin(t) * 1.6;
+      var isSelected = state.layer === "globe" && state.selected === fp.code;
+      var pulse = isSelected ? 7 : 4 + Math.sin(t) * 1.6;
       ctx.save();
       ctx.beginPath();
       ctx.arc(p.x, p.y, pulse + 3, 0, Math.PI * 2);
@@ -275,13 +281,13 @@
       ctx.fill();
       ctx.beginPath();
       ctx.arc(p.x, p.y, pulse, 0, Math.PI * 2);
-      ctx.fillStyle = C.amber;
-      ctx.shadowColor = C.amber;
+      ctx.fillStyle = isSelected ? C.green : C.amber;
+      ctx.shadowColor = isSelected ? C.green : C.amber;
       ctx.shadowBlur = 12;
       ctx.fill();
       ctx.restore();
       // Country code label.
-      ctx.fillStyle = C.amber;
+      ctx.fillStyle = isSelected ? C.green : C.amber;
       ctx.font = "11px 'IBM Plex Mono', monospace";
       ctx.fillText(fp.code, p.x + pulse + 4, p.y + 3);
     });
@@ -407,7 +413,7 @@
 
       // City layer: mark cities linked to a moment with an amber dot, so it's
       // discoverable that tapping them reveals the 瞬间 links below the globe.
-      if (state.layer === "city" && visited && regionMomentIds(reg.name).length) {
+      if (state.layer === "city" && visited && contentForTarget(reg.name).momentIds.length) {
         var c = largestPolyCentroid(reg.polys);
         if (c) {
           var mx = tx(c[0]), my = ty(c[1]);
@@ -423,30 +429,14 @@
       }
     });
 
-    // Bottom label — the hovered region (desktop) or the pinned one (mobile);
-    // on the city layer, append the visited city's note.
+    // Bottom label — the hovered region (desktop) or the pinned one (mobile).
+    // Full notes are rendered below the canvas, where every matching row fits.
     var labelName = state.hover || state.selected;
     if (labelName) {
       var label = dispName(labelName);
-      var note = cityNote(labelName);
       ctx.font = "12px 'IBM Plex Mono', monospace";
-      if (note) {
-        // Draw a translucent backdrop so the note stays readable over the map.
-        var full = label + " — " + note;
-        var tw = ctx.measureText(full).width;
-        ctx.save();
-        ctx.fillStyle = C.overlay;
-        ctx.fillRect(8, size - 28, Math.min(tw + 16, size - 16), 22);
-        ctx.restore();
-        ctx.fillStyle = C.amber;
-        ctx.fillText(label, 12, size - 12);
-        var lw = ctx.measureText(label + " — ").width;
-        ctx.fillStyle = C.text;
-        ctx.fillText("— " + note, 12 + ctx.measureText(label + " ").width, size - 12);
-      } else {
-        ctx.fillStyle = C.text;
-        ctx.fillText(label, 12, size - 12);
-      }
+      ctx.fillStyle = C.text;
+      ctx.fillText(label, 12, size - 12);
     }
   }
 
@@ -483,46 +473,41 @@
     return set;
   }
 
-  // Note for a visited city in the current province layer (empty if none).
-  function cityNote(cityName) {
-    if (state.layer !== "city" || !state.country || !state.province) return "";
-    var fp = state.footprints.find(function (f) { return f.code === state.country.code; });
-    if (!fp) return "";
-    var prov = fp.provinces.find(function (p) { return p.name === state.province.name; });
-    if (!prov) return "";
-    var city = prov.cities.find(function (c) { return c.name === cityName; });
-    return city && city.note ? city.note : "";
-  }
-
-  // Linked moment ids for a region at the current layer.
-  //   city layer    → the visited city's own links.
-  //   country layer → union of every linked moment across the province's cities.
-  // The same city can appear in multiple footprint rows, so links are unioned.
-  function regionMomentIds(name) {
-    if (!name || !state.country) return [];
-    var fp = state.footprints.find(function (f) { return f.code === state.country.code; });
-    if (!fp) return [];
-    if (state.layer === "city" && state.province) {
-      var prov = fp.provinces.find(function (p) { return p.name === state.province.name; });
-      return prov ? unionCityMoments(prov.cities, name) : [];
-    }
-    if (state.layer === "country") {
-      var prov2 = fp.provinces.find(function (p) { return p.name === name; });
-      return prov2 ? unionCityMoments(prov2.cities, null) : [];
-    }
-    return [];
-  }
-
-  // Union the momentIds of the given cities. When cityName is set, restrict to
-  // rows for that city; when null, aggregate the whole list (province level).
-  function unionCityMoments(cities, cityName) {
-    var out = [], seen = {};
-    cities.forEach(function (c) {
-      if (cityName && c.name !== cityName) return;
-      if (!c.momentIds) return;
-      c.momentIds.forEach(function (id) { if (!seen[id]) { seen[id] = 1; out.push(id); } });
+  function contentForTarget(key) {
+    return Core.selectionContent(state.footprints, {
+      layer: state.layer,
+      country: state.country,
+      province: state.province,
+      selected: key,
     });
-    return out;
+  }
+
+  function selectedContent() {
+    return contentForTarget(state.selected);
+  }
+
+  function updateSelectionPanels() {
+    var content = selectedContent();
+    updateNotes(content.notes);
+    updateMomentLinks(content.momentIds);
+  }
+
+  function updateNotes(notes) {
+    var box = document.getElementById("globe-notes");
+    if (!box) return;
+    if (!notes.length) {
+      box.style.display = "none";
+      box.innerHTML = "";
+      return;
+    }
+    var html = '<div class="gn-head">足迹笔记 ' + notes.length + " 条</div>";
+    notes.forEach(function (item) {
+      html += '<div class="gn-item"><span class="gn-city">' +
+        Core.escapeHTML(item.city) + '</span><span class="gn-text">' +
+        Core.escapeHTML(item.note) + "</span></div>";
+    });
+    box.innerHTML = html;
+    box.style.display = "block";
   }
 
   // Scroll to a moment in the feed and flash it so the jump is obvious.
@@ -557,12 +542,9 @@
   // Selection is sticky: a click pins it, so it survives the mouse moving away.
   // Rather than jumping immediately, we render one clickable row per moment and
   // let the user choose which to open (their explicit request).
-  function updateMomentLinks() {
+  function updateMomentLinks(ids) {
     var box = document.getElementById("globe-moment-links");
     if (!box) return;
-    var sel = state.selected;
-    var ids = sel && (state.layer === "city" || state.layer === "country")
-      ? regionMomentIds(sel) : [];
     if (!ids.length) { box.style.display = "none"; box.innerHTML = ""; return; }
     // No place label here — the breadcrumb and canvas label already show where
     // we are (footprint carries the location), so the panel only needs the count.
@@ -792,7 +774,7 @@
       } else stats.textContent = "";
     }
     applyTouchAction();   // keep canvas gesture mode in sync with the layer (P4)
-    updateMomentLinks();  // hide/refresh the linked-瞬间 list for this layer
+    updateSelectionPanels();
   }
   function currentCountryFp() {
     return state.footprints.find(function (f) { return f.code === state.country.code; }) ||
@@ -864,6 +846,13 @@
 
   var MIN_ZOOM = 1, MAX_ZOOM = 6;
   var GLOBE_MIN = 1, GLOBE_MAX = 3;
+  var tapTracker = Core.createTapTracker(360);
+  var gestureEpoch = 0;
+
+  function cancelTapSequence() {
+    gestureEpoch++;
+    tapTracker.cancel();
+  }
 
   // Zoom the whole globe (magnify the sphere in place). Keeps the center fixed;
   // simplest sensible behavior for a rotating globe. Rebuilds R from RBASE.
@@ -910,14 +899,18 @@
   }
 
   var downPt = null, moved = false, panLast = null, pinch = null, mvPt = null;
+  var ignoreMouseUntil = 0;
 
   function onDown(e) {
+    if (e.touches || e.changedTouches) ignoreMouseUntil = Date.now() + 700;
+    else if (Date.now() < ignoreMouseUntil) return;
     if (e.touches && e.touches.length === 2) {
       // Two fingers: pinch-zoom. On the globe we scale the sphere; on region
       // maps we zoom+pan (handled in onMove by the layer check).
       pinch = { dist: touchDist(e), mid: touchMid(e) };
       state.dragging = false;
       moved = true;               // a pinch is never a tap
+      cancelTapSequence();
       return;
     }
     downPt = pointer(e);
@@ -955,7 +948,10 @@
     }
     var p = pointer(e);
     mvPt = p;
-    if (downPt && (Math.abs(p.x - downPt.x) > 4 || Math.abs(p.y - downPt.y) > 4)) moved = true;
+    if (downPt && !moved && (Math.abs(p.x - downPt.x) > 4 || Math.abs(p.y - downPt.y) > 4)) {
+      moved = true;
+      cancelTapSequence();
+    }
     if (state.layer === "globe" && state.dragging && state.lastPt) {
       var dx = p.x - state.lastPt.x, dy = p.y - state.lastPt.y;
       state.rot.y -= dx * 0.006;                 // P2: inverted → globe follows finger
@@ -986,7 +982,7 @@
         if (name !== state.hover) {
           state.hover = name;
           var linkable = reg && ((reg.drill && state.layer === "country") ||
-            ((state.layer === "city" || state.layer === "country") && regionMomentIds(name).length));
+            contentForTarget(name).momentIds.length);
           canvas.style.cursor = linkable ? "pointer" : "default";
           // Warm just this province's city file on hover, so the drill-in feels
           // instant without firing a request for every province up front.
@@ -998,6 +994,15 @@
   }
 
   function onUp(e) {
+    if (!e.changedTouches && !e.touches && Date.now() < ignoreMouseUntil) return;
+    if (e.type === "touchcancel") {
+      downPt = null;
+      panLast = null;
+      pinch = null;
+      state.dragging = false;
+      cancelTapSequence();
+      return;
+    }
     // End of a pinch.
     if (pinch && (!e.touches || e.touches.length < 2)) {
       pinch = null;
@@ -1030,27 +1035,52 @@
     if (!downPt) return;
     var p = downPt;
     downPt = null;
+
+    function selectTarget(key) {
+      state.selected = key;
+      if (state.layer === "globe") drawGlobe();
+      else drawRegions();
+      updateSelectionPanels();
+    }
+
+    function registerTargetTap(layer, key) {
+      selectTarget(key);
+      return tapTracker.register(layer, key, Date.now(), gestureEpoch);
+    }
+
     if (state.layer === "globe") {
       var fp = pickCountry(p.x, p.y);
-      if (fp) goCountry(fp);
+      if (!fp) {
+        selectTarget(null);
+        tapTracker.cancel();
+      } else if (registerTargetTap("globe", fp.code)) {
+        drillCountry(fp);
+      } else {
+        warmCountryLegacy(fp);
+      }
     } else if (state.layer === "country") {
       var reg2 = pickRegion(p.x, p.y);
-      if (reg2 && reg2.drill) { goCity(reg2); return; }
-      // Non-drillable province: pin it. If it has linked moments, the 瞬间 list
-      // shows below the globe (no auto-jump); clicking empty space clears it.
-      state.selected = reg2 ? reg2.name : null;
-      drawRegions();
-      updateMomentLinks();
+      if (!reg2) {
+        selectTarget(null);
+        tapTracker.cancel();
+      } else if (registerTargetTap("country", reg2.name) && reg2.drill) {
+        drillCity(reg2);
+      } else if (reg2.drill) {
+        warmDrill(reg2);
+      }
     } else if (state.layer === "city") {
       var creg = pickRegion(p.x, p.y);
-      // A tap PINS the city; its linked 瞬间 show as a clickable list below the
-      // globe. The user then picks which moment to open (their explicit request
-      // — no immediate jump). Tapping empty space clears the selection.
-      state.selected = creg ? creg.name : null;
-      drawRegions();
-      updateMomentLinks();
+      selectTarget(creg ? creg.name : null);
+      tapTracker.cancel();
     }
   }
+
+  function warmCountryLegacy(fp) {
+    return fetchRegion("/static/geo/regions/" + fp.code + ".json").catch(function () {});
+  }
+
+  function drillCountry(fp) { goCountry(fp); }
+  function drillCity(region) { goCity(region); }
 
   // Go up exactly one level (city → country → globe).
   function goBack() {
@@ -1067,9 +1097,10 @@
   canvas.addEventListener("touchend", onUp);
   canvas.addEventListener("touchcancel", onUp);
 
-  // Desktop: wheel to zoom (globe or region maps), double-click to reset zoom.
+  // Desktop: wheel to zoom the globe or region maps.
   canvas.addEventListener("wheel", function (e) {
     e.preventDefault();
+    cancelTapSequence();
     if (state.layer === "globe") {
       setGlobeZoom(state.gz * (e.deltaY < 0 ? 1.12 : 1 / 1.12));
       return;
@@ -1077,10 +1108,6 @@
     var rect = canvas.getBoundingClientRect();
     setZoom(state.rv.zoom * (e.deltaY < 0 ? 1.12 : 1 / 1.12), e.clientX - rect.left, e.clientY - rect.top);
   }, { passive: false });
-  canvas.addEventListener("dblclick", function () {
-    if (state.layer === "globe") { if (state.gz > 1.01) setGlobeZoom(1); return; }
-    if (state.rv.zoom > 1.01) { resetView(); applyTouchAction(); drawRegions(); }
-  });
 
   // ============================================================
   // Boot

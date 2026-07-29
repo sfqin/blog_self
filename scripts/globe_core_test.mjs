@@ -62,6 +62,20 @@ assert.deepEqual(
   "城市保留同名城市的全部记录",
 );
 
+assert.deepEqual(
+  Core.selectionContent(footprints, {
+    layer: "country",
+    selected: null,
+    country: { code: "CN" },
+    province: null,
+  }),
+  { notes: [], momentIds: [] },
+);
+assert.equal(
+  Core.escapeHTML(`<img src=x onerror="boom">&`),
+  "&lt;img src=x onerror=&quot;boom&quot;&gt;&amp;",
+);
+
 const taps = Core.createTapTracker(360);
 
 assert.equal(taps.register("globe", "CN", 1000, 0), false);
