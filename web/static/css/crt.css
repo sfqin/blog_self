@@ -357,6 +357,23 @@ h1, h2, h3 { font-family: var(--font-display); color: var(--text); }
 }
 .globe-back-btn:hover { background: rgba(var(--accent-2-rgb), 0.18); }
 .globe-back-btn:active { transform: scale(0.96); }
+.globe-load-status {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  z-index: 4;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 32px);
+  padding: 7px 10px;
+  color: var(--text);
+  background: rgba(var(--overlay-rgb), 0.9);
+  border: 1px solid var(--amber);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.globe-load-status.is-error { color: var(--amber); }
 .globe-hint { color: var(--muted); font-size: 12px; margin-top: 10px; }
 .globe-stats { color: var(--amber); font-size: 13px; margin-top: 8px; }
 .globe-notes {

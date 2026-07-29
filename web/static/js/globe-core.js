@@ -121,11 +121,29 @@
     return state;
   }
 
+  function createHistory() {
+    var stack = [];
+    return {
+      push: function (state) { stack.push(snapshotView(state)); },
+      pop: function () { return stack.length ? stack.pop() : null; },
+      popTo: function (layer) {
+        while (stack.length) {
+          var snap = stack.pop();
+          if (snap.layer === layer) return snap;
+        }
+        return null;
+      },
+      size: function () { return stack.length; },
+      clear: function () { stack.length = 0; },
+    };
+  }
+
   return {
     escapeHTML: escapeHTML,
     selectionContent: selectionContent,
     createTapTracker: createTapTracker,
     snapshotView: snapshotView,
     restoreView: restoreView,
+    createHistory: createHistory,
   };
 });

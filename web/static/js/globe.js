@@ -644,38 +644,58 @@
   // ============================================================
   // Navigation between layers
   // ============================================================
-  function goGlobe() {
-    state.layer = "globe";
-    state.country = null;
-    state.province = null;
-    state.regionData = null;
-    state.hover = null;
-    state.selected = null;
-    setGlobeZoom(1);     // open the globe fitted
-    resetView();
-    updateChrome();
-    startLoop();
-    scrollToTop();
+  var history = Core.createHistory();
+  var navigationToken = 0;
+  var pendingNavigation = null;
+
+  function setLoadMessage(message, isError) {
+    var box = document.getElementById("globe-load-status");
+    if (!box) return;
+    box.textContent = message;
+    box.classList.toggle("is-error", !!isError);
+    box.hidden = false;
   }
 
-  function goCountry(fp) {
+  function clearLoadMessage() {
+    var box = document.getElementById("globe-load-status");
+    if (!box) return;
+    box.hidden = true;
+    box.textContent = "";
+    box.classList.remove("is-error");
+  }
+
+  function cancelPendingNavigation(nextLayer, nextKey) {
+    if (!pendingNavigation) return;
+    if (pendingNavigation.layer === nextLayer && pendingNavigation.key === nextKey) return;
+    navigationToken++;
+    pendingNavigation = null;
+    clearLoadMessage();
+  }
+
+  function applyCountry(fp, data) {
     state.layer = "country";
     state.country = { code: fp.code, name: fp.name || fp.code };
     state.province = null;
-    state.regionData = null;
+    state.regionData = data;
     state.hover = null;
     state.selected = null;
-    resetView();
-    updateChrome();
+    state.rv = { zoom: 1, panx: 0, pany: 0 };
     stopLoop();
+    updateChrome();
     drawRegions();
-    fetchRegion("/static/geo/regions/" + fp.code + ".json")
-      .then(function (d) {
-        state.regionData = d;
-        drawRegions();
-        prefetchDrills(fp.code, d);   // warm the cache for likely next taps
-      })
-      .catch(function () { renderError("该国家版图数据缺失"); });
+    prefetchDrills(fp.code, data);
+    scrollToTop();
+  }
+
+  function applyCity(region, key, data) {
+    state.layer = "city";
+    state.province = { name: region.name, key: key };
+    state.regionData = data;
+    state.hover = null;
+    state.selected = null;
+    state.rv = { zoom: 1, panx: 0, pany: 0 };
+    updateChrome();
+    drawRegions();
     scrollToTop();
   }
 
@@ -702,22 +722,72 @@
     });
   }
 
-  function goCity(reg) {
-    if (!reg.drill) return;
-    var key = drillKey(reg);
-    if (!key) return;
-    state.layer = "city";
-    state.province = { name: reg.name, key: key };
-    state.regionData = null;
-    state.hover = null;
-    state.selected = null;
-    resetView();
+  function drillCountry(fp) {
+    var token = ++navigationToken;
+    pendingNavigation = { layer: "globe", key: fp.code };
+    setLoadMessage("正在加载下一级地图…");
+    return fetchRegion("/static/geo/regions/" + fp.code + ".json").then(function (data) {
+      if (token !== navigationToken || state.selected !== fp.code) return;
+      history.push(state);
+      pendingNavigation = null;
+      clearLoadMessage();
+      applyCountry(fp, data);
+    }).catch(function () {
+      if (token === navigationToken) {
+        pendingNavigation = null;
+        setLoadMessage("加载失败，双击重试", true);
+      }
+    });
+  }
+
+  function drillCity(region) {
+    if (!region.drill) return Promise.resolve();
+    var key = drillKey(region);
+    if (!key) return Promise.resolve();
+    var token = ++navigationToken;
+    pendingNavigation = { layer: "country", key: region.name };
+    setLoadMessage("正在加载下一级地图…");
+    var url = "/static/geo/regions/" + state.country.code + "/" + key + ".json";
+    return fetchRegion(url).then(function (data) {
+      if (token !== navigationToken || state.selected !== region.name) return;
+      history.push(state);
+      pendingNavigation = null;
+      clearLoadMessage();
+      applyCity(region, key, data);
+    }).catch(function () {
+      if (token === navigationToken) {
+        pendingNavigation = null;
+        setLoadMessage("加载失败，双击重试", true);
+      }
+    });
+  }
+
+  function restoreSnapshot(snap) {
+    if (!snap) return;
+    navigationToken++;
+    pendingNavigation = null;
+    Core.restoreView(state, snap);
+    clearLoadMessage();
     updateChrome();
-    drawRegions();
-    fetchRegion("/static/geo/regions/" + state.country.code + "/" + key + ".json")
-      .then(function (d) { state.regionData = d; drawRegions(); })
-      .catch(function () { renderError("该地区城市数据缺失"); });
+    applyTouchAction();
+    R = RBASE * state.gz;
+    if (state.layer === "globe") {
+      startLoop();
+      drawGlobe();
+    } else {
+      stopLoop();
+      drawRegions();
+    }
     scrollToTop();
+  }
+
+  function goBack() {
+    restoreSnapshot(history.pop());
+  }
+
+  function goBackTo(layer) {
+    if (state.layer === layer) return;
+    restoreSnapshot(history.popTo(layer));
   }
 
   function renderError(msg) {
@@ -745,8 +815,7 @@
       bc.innerHTML = parts.join('<span class="sep">/</span>');
       bc.querySelectorAll("[data-nav]").forEach(function (a) {
         a.addEventListener("click", function () {
-          if (a.getAttribute("data-nav") === "globe") goGlobe();
-          else if (a.getAttribute("data-nav") === "country") goCountry(currentCountryFp());
+          goBackTo(a.getAttribute("data-nav"));
         });
       });
     }
@@ -760,10 +829,7 @@
           ? "← 返回 " + state.country.code
           : "← 返回地球";
       }
-      back.onclick = function () {
-        if (state.layer === "city") goCountry(currentCountryFp());
-        else goGlobe();
-      };
+      back.onclick = goBack;
     }
     if (stats) {
       if (state.layer === "globe") {
@@ -775,10 +841,6 @@
     }
     applyTouchAction();   // keep canvas gesture mode in sync with the layer (P4)
     updateSelectionPanels();
-  }
-  function currentCountryFp() {
-    return state.footprints.find(function (f) { return f.code === state.country.code; }) ||
-      { code: state.country.code, name: state.country.name, provinces: [] };
   }
   function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]; }); }
 
@@ -1037,6 +1099,7 @@
     downPt = null;
 
     function selectTarget(key) {
+      cancelPendingNavigation(state.layer, key);
       state.selected = key;
       if (state.layer === "globe") drawGlobe();
       else drawRegions();
@@ -1079,15 +1142,6 @@
     return fetchRegion("/static/geo/regions/" + fp.code + ".json").catch(function () {});
   }
 
-  function drillCountry(fp) { goCountry(fp); }
-  function drillCity(region) { goCity(region); }
-
-  // Go up exactly one level (city → country → globe).
-  function goBack() {
-    if (state.layer === "city") goCountry(currentCountryFp());
-    else if (state.layer === "country") goGlobe();
-  }
-
   canvas.addEventListener("mousedown", onDown);
   window.addEventListener("mousemove", function (e) { if (state.dragging || state.layer !== "globe") onMove(e); });
   window.addEventListener("mouseup", onUp);
@@ -1108,6 +1162,42 @@
     var rect = canvas.getBoundingClientRect();
     setZoom(state.rv.zoom * (e.deltaY < 0 ? 1.12 : 1 / 1.12), e.clientX - rect.left, e.clientY - rect.top);
   }, { passive: false });
+
+  if (window.__GLOBE_TEST__) {
+    window.__globeDebug = {
+      ready: function () { return !!world; },
+      state: function () { return Core.snapshotView(state); },
+      historySize: function () { return history.size(); },
+      goBack: goBack,
+      pause: stopLoop,
+      focusCountry: function (code) {
+        if (!world || !world.countries[code]) return false;
+        stopLoop();
+        state.rot.y = world.countries[code].c[0] * Math.PI / 180;
+        state.vel = { x: 0, y: 0 };
+        drawGlobe();
+        return true;
+      },
+      countryPoint: function (code) {
+        var fp = state.footprints.find(function (item) { return item.code === code; });
+        if (!fp || !world || !world.countries[code]) return null;
+        var center = world.countries[code].c;
+        var point = project(center[0], center[1]);
+        return point.visible ? { x: point.x, y: point.y } : null;
+      },
+      regionPoint: function (name) {
+        if (!state.regionData) return null;
+        var region = state.regionData.regions.find(function (item) { return item.name === name; });
+        var center = region && largestPolyCentroid(region.polys);
+        if (!center) return null;
+        var transform = regionTransform();
+        return {
+          x: transform.ox + center[0] * transform.scale,
+          y: transform.oy + center[1] * transform.scale,
+        };
+      },
+    };
+  }
 
   // ============================================================
   // Boot

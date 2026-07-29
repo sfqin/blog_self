@@ -107,4 +107,36 @@ assert.equal(source.selected, "广东省");
 assert.equal(source.regionData.id, "cn-map");
 assert.notEqual(source.rv, snap.rv, "恢复时复制可变对象");
 
+const nav = Core.createHistory();
+const globe = {
+  layer: "globe",
+  country: null,
+  province: null,
+  regionData: null,
+  selected: "CN",
+  hover: null,
+  rot: { x: -0.2, y: 2.1 },
+  vel: { x: 0, y: 0 },
+  gz: 2.3,
+  rv: { zoom: 1, panx: 0, pany: 0 },
+};
+const province = {
+  ...globe,
+  layer: "country",
+  country: { code: "CN", name: "中国" },
+  regionData: { id: "cn" },
+  selected: "广东省",
+  rv: { zoom: 3.5, panx: 91, pany: -42 },
+};
+
+nav.push(globe);
+nav.push(province);
+const restoredProvince = nav.pop();
+assert.equal(restoredProvince.selected, "广东省");
+assert.deepEqual(restoredProvince.rv, { zoom: 3.5, panx: 91, pany: -42 });
+const restoredGlobe = nav.popTo("globe");
+assert.equal(restoredGlobe.selected, "CN");
+assert.equal(restoredGlobe.gz, 2.3);
+assert.equal(nav.size(), 0);
+
 console.log("ALL GLOBE CORE TESTS PASSED");
