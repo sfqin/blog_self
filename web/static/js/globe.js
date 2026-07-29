@@ -1234,6 +1234,33 @@
       historySize: function () { return history.size(); },
       goBack: goBack,
       pause: stopLoop,
+      setRegionView: function (view) {
+        if (state.layer === "globe") return false;
+        cancelTapSequence();
+        state.rv = {
+          zoom: Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, view.zoom)),
+          panx: view.panx,
+          pany: view.pany,
+        };
+        clampPan();
+        applyTouchAction();
+        drawRegions();
+        return true;
+      },
+      zoomToRegion: function (name, zoom) {
+        if (state.layer === "globe" || !state.regionData) return false;
+        var region = state.regionData.regions.find(function (item) { return item.name === name; });
+        var center = region && largestPolyCentroid(region.polys);
+        if (!center) return false;
+        var transform = regionTransform();
+        cancelTapSequence();
+        setZoom(
+          zoom,
+          transform.ox + center[0] * transform.scale,
+          transform.oy + center[1] * transform.scale
+        );
+        return true;
+      },
       focusCountry: function (code) {
         if (!world || !world.countries[code]) return false;
         stopLoop();

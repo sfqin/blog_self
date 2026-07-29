@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node globe_core_test.mjs && node globe_logic_test.mjs",
+    "test:browser": "node globe_test.mjs"
   },
   "keywords": [],
   "author": "",
