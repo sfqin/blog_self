@@ -634,11 +634,24 @@
   // Reset region pan/zoom (called on every layer change so each map opens fitted).
   function resetView() { state.rv = { zoom: 1, panx: 0, pany: 0 }; }
 
-  // Prefetch cache for region JSON so a second visit (and prefetched drills) are instant.
-  var regionCache = {};
-  function fetchRegion(url) {
-    if (regionCache[url]) return Promise.resolve(regionCache[url]);
-    return loadJSON(url).then(function (d) { regionCache[url] = d; return d; });
+  var mapLoader = Core.createMapLoader(loadJSON, 2);
+
+  function countryMapURL(code) {
+    return "/static/geo/regions/" + code + ".json";
+  }
+
+  function cityMapURL(countryCode, region) {
+    var key = drillKey(region);
+    return key ? "/static/geo/regions/" + countryCode + "/" + key + ".json" : null;
+  }
+
+  function loadCountryMap(fp, urgent) {
+    var url = countryMapURL(fp.code);
+    return urgent ? mapLoader.load(url) : mapLoader.prefetch(url, 20);
+  }
+
+  function warmCountry(fp) {
+    return mapLoader.prefetch(countryMapURL(fp.code), 50).catch(function () {});
   }
 
   // ============================================================
@@ -701,12 +714,11 @@
 
   // Warm one province's city JSON into the cache (used on hover and for the
   // small visited-set prefetch). No-op if already cached or not drillable.
-  function warmDrill(reg) {
-    if (!reg || !reg.drill) return;
-    var key = drillKey(reg);
-    if (!key || !state.country) return;
-    var url = "/static/geo/regions/" + state.country.code + "/" + key + ".json";
-    if (!regionCache[url]) fetchRegion(url).catch(function () {});
+  function warmDrill(region, priority) {
+    if (!region || !region.drill || !state.country) return Promise.resolve(null);
+    var url = cityMapURL(state.country.code, region);
+    if (!url) return Promise.resolve(null);
+    return mapLoader.prefetch(url, priority || 10).catch(function () {});
   }
 
   // Prefetch only the city files the user is most likely to open next: the
@@ -718,15 +730,64 @@
     if (!data || !data.regions) return;
     var visited = currentVisitedSet();
     data.regions.forEach(function (reg) {
-      if (reg.drill && visited.has(reg.name)) warmDrill(reg);
+      if (reg.drill && visited.has(reg.name)) warmDrill(reg, 10);
     });
   }
+
+  function idle(callback) {
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(callback, { timeout: 1500 });
+    } else {
+      window.setTimeout(callback, 200);
+    }
+  }
+
+  function prefetchPaused() {
+    var connection = navigator.connection || {};
+    return document.hidden || navigator.onLine === false || connection.saveData === true;
+  }
+
+  function syncPrefetchPause() {
+    mapLoader.setPaused(prefetchPaused());
+  }
+
+  function startBackgroundWarmup() {
+    syncPrefetchPause();
+    idle(function () {
+      state.footprints.forEach(function (fp) {
+        loadCountryMap(fp, false).then(function (data) {
+          var visitedNames = new Set((fp.provinces || []).map(function (province) {
+            return province.name;
+          }));
+          var visited = [];
+          var rest = [];
+          (data.regions || []).forEach(function (region) {
+            if (!region.drill) return;
+            (visitedNames.has(region.name) ? visited : rest).push({
+              countryCode: fp.code,
+              region: region,
+            });
+          });
+          visited.concat(rest).forEach(function (item, index) {
+            var url = cityMapURL(item.countryCode, item.region);
+            if (url) {
+              mapLoader.prefetch(url, index < visited.length ? 10 : 1).catch(function () {});
+            }
+          });
+        }).catch(function () {});
+      });
+    });
+  }
+
+  document.addEventListener("visibilitychange", syncPrefetchPause);
+  window.addEventListener("online", syncPrefetchPause);
+  window.addEventListener("offline", syncPrefetchPause);
 
   function drillCountry(fp) {
     var token = ++navigationToken;
     pendingNavigation = { layer: "globe", key: fp.code };
     setLoadMessage("正在加载下一级地图…");
-    return fetchRegion("/static/geo/regions/" + fp.code + ".json").then(function (data) {
+    return loadCountryMap(fp, true).then(function (data) {
       if (token !== navigationToken || state.selected !== fp.code) return;
       history.push(state);
       pendingNavigation = null;
@@ -747,8 +808,8 @@
     var token = ++navigationToken;
     pendingNavigation = { layer: "country", key: region.name };
     setLoadMessage("正在加载下一级地图…");
-    var url = "/static/geo/regions/" + state.country.code + "/" + key + ".json";
-    return fetchRegion(url).then(function (data) {
+    var url = cityMapURL(state.country.code, region);
+    return mapLoader.load(url).then(function (data) {
       if (token !== navigationToken || state.selected !== region.name) return;
       history.push(state);
       pendingNavigation = null;
@@ -1048,7 +1109,7 @@
           canvas.style.cursor = linkable ? "pointer" : "default";
           // Warm just this province's city file on hover, so the drill-in feels
           // instant without firing a request for every province up front.
-          if (reg && reg.drill && state.layer === "country") warmDrill(reg);
+          if (reg && reg.drill && state.layer === "country") warmDrill(reg, 50);
           drawRegions();   // hover highlight; the 瞬间 list is pinned by click, not hover
         }
       }
@@ -1119,7 +1180,7 @@
       } else if (registerTargetTap("globe", fp.code)) {
         drillCountry(fp);
       } else {
-        warmCountryLegacy(fp);
+        warmCountry(fp);
       }
     } else if (state.layer === "country") {
       var reg2 = pickRegion(p.x, p.y);
@@ -1129,17 +1190,13 @@
       } else if (registerTargetTap("country", reg2.name) && reg2.drill) {
         drillCity(reg2);
       } else if (reg2.drill) {
-        warmDrill(reg2);
+        warmDrill(reg2, 50);
       }
     } else if (state.layer === "city") {
       var creg = pickRegion(p.x, p.y);
       selectTarget(creg ? creg.name : null);
       tapTracker.cancel();
     }
-  }
-
-  function warmCountryLegacy(fp) {
-    return fetchRegion("/static/geo/regions/" + fp.code + ".json").catch(function () {});
   }
 
   canvas.addEventListener("mousedown", onDown);
@@ -1215,7 +1272,11 @@
     world = res[0];
     state.footprints = res[1] || [];
     updateChrome();
-    startLoop();
+    drawGlobe();
+    requestAnimationFrame(function () {
+      startLoop();
+      startBackgroundWarmup();
+    });
   }).catch(function (err) {
     renderError("地球数据加载失败");
     console.error(err);

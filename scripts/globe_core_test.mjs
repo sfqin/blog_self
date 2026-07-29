@@ -139,4 +139,63 @@ assert.equal(restoredGlobe.selected, "CN");
 assert.equal(restoredGlobe.gz, 2.3);
 assert.equal(nav.size(), 0);
 
+function deferred() {
+  let resolve;
+  let reject;
+  const promise = new Promise(function (res, rej) {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+}
+
+const calls = [];
+const gates = new Map();
+function fakeFetch(url) {
+  calls.push(url);
+  const gate = deferred();
+  gates.set(url, gate);
+  return gate.promise;
+}
+
+const loader = Core.createMapLoader(fakeFetch, 2);
+const a1 = loader.prefetch("A", 10);
+const a2 = loader.load("A");
+const b = loader.prefetch("B", 10);
+const c = loader.prefetch("C", 10);
+
+assert.equal(a1, a2, "相同 URL 复用同一个 Promise");
+await Promise.resolve();
+assert.deepEqual(calls, ["A", "B"], "并发上限为 2");
+gates.get("A").resolve({ id: "A" });
+assert.equal((await a1).id, "A");
+await Promise.resolve();
+assert.deepEqual(calls, ["A", "B", "C"]);
+
+gates.get("B").reject(new Error("network"));
+await assert.rejects(b);
+const retry = loader.load("B");
+assert.notEqual(retry, b, "失败后允许重试");
+gates.get("C").resolve({ id: "C" });
+assert.equal((await c).id, "C");
+await Promise.resolve();
+assert.deepEqual(calls, ["A", "B", "C", "B"]);
+gates.get("B").resolve({ id: "B retry" });
+assert.equal((await retry).id, "B retry");
+
+const pausedCalls = [];
+const pausedLoader = Core.createMapLoader(function (url) {
+  pausedCalls.push(url);
+  return Promise.resolve({ id: url });
+}, 2);
+pausedLoader.setPaused(true);
+const background = pausedLoader.prefetch("background", 1);
+await Promise.resolve();
+assert.deepEqual(pausedCalls, []);
+await pausedLoader.load("urgent");
+assert.deepEqual(pausedCalls, ["urgent"]);
+pausedLoader.setPaused(false);
+await background;
+assert.deepEqual(pausedCalls, ["urgent", "background"]);
+
 console.log("ALL GLOBE CORE TESTS PASSED");

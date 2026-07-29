@@ -138,6 +138,87 @@
     };
   }
 
+  function createMapLoader(fetchJSON, maxConcurrent) {
+    var active = 0;
+    var paused = false;
+    var entries = Object.create(null);
+    var queue = [];
+    var limit = Math.max(1, maxConcurrent || 1);
+
+    function run(entry) {
+      entry.status = "pending";
+      active++;
+      Promise.resolve().then(function () {
+        return fetchJSON(entry.url);
+      }).then(function (data) {
+        entry.status = "fulfilled";
+        entry.data = data;
+        active--;
+        pump();
+        entry.resolve(data);
+      }, function (error) {
+        delete entries[entry.url];
+        active--;
+        pump();
+        entry.reject(error);
+      });
+    }
+
+    function pump() {
+      queue.sort(function (a, b) { return b.priority - a.priority; });
+      while (active < limit) {
+        var index = queue.findIndex(function (entry) {
+          return !paused || !entry.background;
+        });
+        if (index < 0) return;
+        run(queue.splice(index, 1)[0]);
+      }
+    }
+
+    function request(url, priority, background) {
+      var existing = entries[url];
+      if (existing) {
+        if (existing.status === "fulfilled") return Promise.resolve(existing.data);
+        if (!background) existing.background = false;
+        existing.priority = Math.max(existing.priority, priority);
+        pump();
+        return existing.promise;
+      }
+      var resolve;
+      var reject;
+      var promise = new Promise(function (res, rej) {
+        resolve = res;
+        reject = rej;
+      });
+      var entry = {
+        url: url,
+        priority: priority,
+        background: background,
+        status: "queued",
+        promise: promise,
+        resolve: resolve,
+        reject: reject,
+      };
+      entries[url] = entry;
+      queue.push(entry);
+      pump();
+      return promise;
+    }
+
+    return {
+      load: function (url) { return request(url, 100, false); },
+      prefetch: function (url, priority) { return request(url, priority || 1, true); },
+      setPaused: function (value) {
+        paused = !!value;
+        pump();
+      },
+      peek: function (url) {
+        var entry = entries[url];
+        return entry && entry.status === "fulfilled" ? entry.data : null;
+      },
+    };
+  }
+
   return {
     escapeHTML: escapeHTML,
     selectionContent: selectionContent,
@@ -145,5 +226,6 @@
     snapshotView: snapshotView,
     restoreView: restoreView,
     createHistory: createHistory,
+    createMapLoader: createMapLoader,
   };
 });
