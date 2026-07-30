@@ -1,0 +1,16 @@
+/* Theme Y · Pixel — dark indigo CRT, 8-bit palette, Press Start 2P + VT323. */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+:root[data-theme="Y"] {
+  --bg: #1a1c2c; --panel: #232640; --panel-2: #2e3255;
+  --text: #f4f4f4; --muted: #8b8fb0; --accent: #ffcd75; --accent-2: #38b6ff; --line: #3a3f66;
+  --glow: 0 0 6px rgba(255,205,117,0.4);
+  --accent-rgb: 255,205,117; --accent-2-rgb: 56,182,255;
+  --bg-rgb: 26,28,44; --panel-rgb: 35,38,64; --overlay-rgb: 20,22,36; --scrim-rgb: 10,11,18; --shadow-rgb: 0,0,0;
+  --font-display: "Press Start 2P", system-ui, monospace;
+  --font-body: "VT323", ui-monospace, monospace;
+  --font-mono: "VT323", ui-monospace, monospace;
+  --cmd-prefix: "> "; --brand-suffix: "_"; --cmd-color: var(--accent);
+  --globe-ocean1: #232640; --globe-ocean2: #1a1c2c; --globe-land: #38507a;
+  --globe-land-line: #ffcd75; --globe-border: #38b6ff;
+  --globe-region: rgba(255,205,117,0.18); --globe-region-line: #38b6ff;
+}

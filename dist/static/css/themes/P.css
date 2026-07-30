@@ -1,0 +1,16 @@
+/* Theme P · Minimal — bone ground, near-black text, one muted brick accent, mono. */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
+:root[data-theme="P"] {
+  --bg: #f4f1ea; --panel: #faf8f2; --panel-2: #ebe7dc;
+  --text: #1a1a1a; --muted: #8a8578; --accent: #b5432c; --accent-2: #1a1a1a; --line: #ddd8cc;
+  --glow: none;
+  --accent-rgb: 181,67,44; --accent-2-rgb: 26,26,26;
+  --bg-rgb: 244,241,234; --panel-rgb: 250,248,242; --overlay-rgb: 26,26,26; --scrim-rgb: 26,26,26; --shadow-rgb: 26,26,26;
+  --font-display: "JetBrains Mono", ui-monospace, monospace;
+  --font-body: "JetBrains Mono", ui-monospace, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #ebe7dc; --globe-ocean2: #f4f1ea; --globe-land: #d8d2c4;
+  --globe-land-line: #1a1a1a; --globe-border: #b5432c;
+  --globe-region: rgba(181,67,44,0.14); --globe-region-line: #8a8578;
+}

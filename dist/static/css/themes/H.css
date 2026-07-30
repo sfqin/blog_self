@@ -1,0 +1,16 @@
+/* Theme H · Y2K — deep purple-black, chrome cyan + magenta, techno display. */
+@import url('https://fonts.googleapis.com/css2?family=Michroma&family=Orbitron:wght@400;500;700&display=swap');
+:root[data-theme="H"] {
+  --bg: #0a0612; --panel: #150a26; --panel-2: #1e1036;
+  --text: #ece2ff; --muted: #8878a8; --accent: #22d3ee; --accent-2: #ff2ecd; --line: #2a1a48;
+  --glow: 0 0 12px rgba(34,211,238,0.55);
+  --accent-rgb: 34,211,238; --accent-2-rgb: 255,46,205;
+  --bg-rgb: 10,6,18; --panel-rgb: 21,10,38; --overlay-rgb: 14,8,28; --scrim-rgb: 5,3,10; --shadow-rgb: 0,0,0;
+  --font-display: "Michroma", "Orbitron", system-ui, sans-serif;
+  --font-body: "Orbitron", system-ui, sans-serif;
+  --font-mono: "Orbitron", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #1a0e36; --globe-ocean2: #0a0612; --globe-land: #2a1a52;
+  --globe-land-line: #4a2a80; --globe-border: #22d3ee;
+  --globe-region: rgba(255,46,205,0.2); --globe-region-line: #7a3aa0;
+}

@@ -1,0 +1,16 @@
+/* Theme L · Luxury — near-black, champagne gold, high-contrast Didone serif. */
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&family=Cormorant:ital,wght@0,400;0,500;1,400&display=swap');
+:root[data-theme="L"] {
+  --bg: #14110d; --panel: #1d1913; --panel-2: #26211a;
+  --text: #f0ead9; --muted: #9a8f78; --accent: #c9a24a; --accent-2: #e6cf94; --line: #322b20;
+  --glow: 0 0 10px rgba(201,162,74,0.35);
+  --accent-rgb: 201,162,74; --accent-2-rgb: 230,207,148;
+  --bg-rgb: 20,17,13; --panel-rgb: 29,25,19; --overlay-rgb: 26,21,14; --scrim-rgb: 10,8,5; --shadow-rgb: 0,0,0;
+  --font-display: "Bodoni Moda", Georgia, serif;
+  --font-body: "Cormorant", Georgia, serif;
+  --font-mono: "Cormorant", ui-monospace, serif;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #241d12; --globe-ocean2: #14110d; --globe-land: #3a3020;
+  --globe-land-line: #5c4a2c; --globe-border: #c9a24a;
+  --globe-region: rgba(201,162,74,0.2); --globe-region-line: #8a723a;
+}

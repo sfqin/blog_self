@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="F">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>旅行者 — dev@home</title>
+<meta name="description" content="试图用有限的时间，给这个混乱的世界打个还算优雅的补丁。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/crt.css?v=30aead2fb3">
+<link rel="stylesheet" href="/static/css/themes/F.css?v=6a3802d0be">
+</head>
+<body>
+<div class="crt-scanlines"></div>
+<div class="crt-vignette"></div>
+
+<nav class="nav">
+  <div class="container">
+    <span class="brand">dev@home</span>
+    <span class="spacer"></span>
+    <div class="search-box">
+      <input type="text" id="site-search" autocomplete="off" spellcheck="false" placeholder="搜索…  /  聚焦" aria-label="搜索站点内容">
+      <div class="search-results" id="search-results"></div>
+    </div>
+    <a class="link" href="#about">whoami</a>
+    <a class="link" href="#experience">经历</a>
+    <a class="link" href="#thoughts">思考</a>
+    <a class="link" href="#projects">项目</a>
+    <a class="link" href="#notes">笔记</a>
+    <a class="link" href="#footprint">足迹</a>
+    <a class="link" href="#moments">瞬间</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <div class="cmd">ssh dev@home --connect</div>
+    <h1 class="name">旅行者</h1>
+    <div class="role">专职打螺丝</div>
+    <p class="tagline">试图用有限的时间，给这个混乱的世界打个还算优雅的补丁。<span class="cursor"></span></p>
+    <div class="actions">
+      <a class="btn" href="https://github.com/sfqin" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn amber" href="mailto:sfqincsu@163.com">Email</a>
+      <a class="btn" href="#footprint">./modules/footprint</a>
+    </div>
+  </div>
+</header>
+
+
+<section id="about">
+  <div class="container">
+    <div class="cmd">cat about.md</div>
+    
+      <div class="article"><h3>$ whoami</h3>
+<ul>
+<li>白天：把复杂的事情拆开、理顺、再拼回去</li>
+<li>跑步 / 健身：给自己刷一点确定的进度条</li>
+<li>游戏 / 捣鼓电脑：换个地方继续解决问题</li>
+<li>阶段性阅读：进度条经常卡在 30%</li>
+<li>轻微下厨：能吃，不保证好吃</li>
+</ul>
+<blockquote>
+<p>世界是个巨大的草台班子，我只是想让手里这块搭得稳一点。</p>
+</blockquote>
+</div>
+    
+    
+    <div class="tags">
+      <span class="tag green">吃喝玩乐样样喜欢</span>
+    </div>
+    
+    <p class="note-row"><span class="date">location</span><span>广东</span></p>
+  </div>
+</section>
+
+
+<section id="experience">
+  <div class="container">
+    <div class="cmd">tail -f experience.log</div>
+    
+      
+      <div class="log-entry">
+        <div class="period">2080.05 - 至今</div>
+        <div><span class="company">heartbeat</span> <span class="role">— 螺丝钉工</span></div>
+        <div>不一定打螺丝，偶尔帮螺丝分一下类。</div>
+      </div>
+      
+      <div class="log-entry">
+        <div class="period">2078.07-2080.05</div>
+        <div><span class="company">penguin</span> <span class="role">— 螺丝钉少年</span></div>
+        <div>脚踏实地，异想天开。每天精益求精打螺丝。</div>
+      </div>
+      
+      <div class="log-entry">
+        <div class="period">2076.10 - 2077.4</div>
+        <div><span class="company">bear</span> <span class="role">— 外门杂役弟子</span></div>
+        <div>负责帮公司打广告</div>
+      </div>
+      
+    
+  </div>
+</section>
+
+
+<section id="thoughts">
+  <div class="container">
+    <div class="cmd">less thoughts/</div>
+    
+      <p class="empty">// 暂无思考（/admin/thoughts）</p>
+    
+  </div>
+</section>
+
+
+<section id="projects">
+  <div class="container">
+    <div class="cmd">ls projects/</div>
+    
+      <p class="empty">// 暂无项目（/admin/projects）</p>
+    
+  </div>
+</section>
+
+
+<section id="notes">
+  <div class="container">
+    <div class="cmd">ls -lt notes/</div>
+    
+      <p class="empty">// 暂无文章（/admin/posts）</p>
+    
+  </div>
+</section>
+
+
+<section id="footprint">
+  <div class="container">
+    <div class="cmd">./modules/footprint --render</div>
+    <div class="globe-breadcrumb" id="globe-breadcrumb">~/globe</div>
+    <div class="globe-stage">
+      <button id="globe-cd-up" class="globe-back-btn" style="display:none" aria-label="返回上一级">← 返回上一级</button>
+      <canvas id="globe-canvas" width="440" height="440"></canvas>
+      <div id="globe-load-status" class="globe-load-status" hidden role="status"></div>
+    </div>
+    <div class="globe-stats" id="globe-stats"></div>
+    <div id="globe-notes" class="globe-notes" style="display:none"></div>
+    <div id="globe-moment-links" class="globe-moment-links" style="display:none"></div>
+  </div>
+</section>
+
+
+<section id="moments">
+  <div class="container">
+    <div class="cmd">feh moments/*</div>
+    
+      <p class="empty">// 暂无瞬间（/admin/moments）</p>
+    
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="cmd">echo "© 2026 旅行者 — built with Go · self-hosted · no trackers"</div>
+  </div>
+</footer>
+
+<script>
+window.__BASE__ = "";
+window.__GEO_VERSION__ = "c878f587da";
+</script>
+<script src="/static/js/globe-core.js?v=98cb1b98b2" defer></script>
+<script src="/static/js/globe.js?v=a5b19199f5" defer></script>
+<script src="/static/js/thoughts.js?v=d071577aaf" defer></script>
+<script src="/static/js/moments.js?v=0653dde1d4" defer></script>
+<script src="/static/js/search.js?v=cf153467cb" defer></script>
+
+</body>
+</html>
