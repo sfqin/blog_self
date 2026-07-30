@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/css/crt.css?v=30aead2fb3">
+<link rel="stylesheet" href="/static/css/crt.css?v=65614421fb">
 <link rel="stylesheet" href="/static/css/themes/F.css?v=6a3802d0be">
 </head>
 <body>
@@ -138,7 +138,10 @@
     <div class="cmd">./modules/footprint --render</div>
     <div class="globe-breadcrumb" id="globe-breadcrumb">~/globe</div>
     <div class="globe-stage">
-      <button id="globe-cd-up" class="globe-back-btn" style="display:none" aria-label="返回上一级">← 返回上一级</button>
+      <div class="globe-controls">
+        <button id="globe-cd-up" class="globe-back-btn" style="display:none" aria-label="返回上一级">← 返回上一级</button>
+        <span id="globe-drill-hint" class="globe-drill-hint" role="note">双击进入下一级</span>
+      </div>
       <canvas id="globe-canvas" width="440" height="440"></canvas>
       <div id="globe-load-status" class="globe-load-status" hidden role="status"></div>
     </div>
@@ -169,7 +172,7 @@ window.__BASE__ = "";
 window.__GEO_VERSION__ = "c878f587da";
 </script>
 <script src="/static/js/globe-core.js?v=98cb1b98b2" defer></script>
-<script src="/static/js/globe.js?v=a5b19199f5" defer></script>
+<script src="/static/js/globe.js?v=7a87d87101" defer></script>
 <script src="/static/js/thoughts.js?v=d071577aaf" defer></script>
 <script src="/static/js/moments.js?v=0653dde1d4" defer></script>
 <script src="/static/js/search.js?v=cf153467cb" defer></script>

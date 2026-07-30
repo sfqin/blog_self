@@ -149,7 +149,10 @@
     <div class="cmd">./modules/footprint --render</div>
     <div class="globe-breadcrumb" id="globe-breadcrumb">~/globe</div>
     <div class="globe-stage">
-      <button id="globe-cd-up" class="globe-back-btn" style="display:none" aria-label="返回上一级">← 返回上一级</button>
+      <div class="globe-controls">
+        <button id="globe-cd-up" class="globe-back-btn" style="display:none" aria-label="返回上一级">← 返回上一级</button>
+        <span id="globe-drill-hint" class="globe-drill-hint" role="note">双击进入下一级</span>
+      </div>
       <canvas id="globe-canvas" width="440" height="440"></canvas>
       <div id="globe-load-status" class="globe-load-status" hidden role="status"></div>
     </div>

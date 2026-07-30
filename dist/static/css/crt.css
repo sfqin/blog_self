@@ -346,8 +346,11 @@ h1, h2, h3 { font-family: var(--font-display); color: var(--text); }
 #globe-canvas:active { cursor: grabbing; }
 /* Stage wraps the canvas so the back button can float in its top-left corner. */
 .globe-stage { position: relative; display: inline-block; }
-.globe-back-btn {
+.globe-controls {
   position: absolute; top: 8px; left: 8px; z-index: 3;
+  display: flex; align-items: center; gap: 8px;
+}
+.globe-back-btn {
   font-family: var(--font-mono); font-size: 13px;
   color: var(--amber); background: rgba(var(--overlay-rgb), 0.82);
   border: 1px solid var(--amber); border-radius: 6px;
@@ -357,6 +360,14 @@ h1, h2, h3 { font-family: var(--font-display); color: var(--text); }
 }
 .globe-back-btn:hover { background: rgba(var(--accent-2-rgb), 0.18); }
 .globe-back-btn:active { transform: scale(0.96); }
+.globe-drill-hint {
+  display: inline-flex; align-items: center;
+  min-height: 29px; padding: 4px 9px;
+  color: var(--muted); background: rgba(var(--overlay-rgb), 0.7);
+  border: 1px solid var(--line); border-radius: 6px;
+  font-family: var(--font-mono); font-size: 12px;
+  white-space: nowrap; pointer-events: none;
+}
 .globe-load-status {
   position: absolute;
   left: 50%;

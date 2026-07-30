@@ -101,6 +101,13 @@ try {
     window.__globeDebug?.ready() && window.__globeIdleCallbacks.length > 0
   );
   assert.deepEqual(
+    await page.$eval("#globe-drill-hint", (element) => ({
+      text: element.textContent.trim(),
+      visible: getComputedStyle(element).display !== "none",
+    })),
+    { text: "双击进入下一级", visible: true },
+  );
+  assert.deepEqual(
     requests.filter((path) => path.includes("/regions/")),
     [],
     "首屏绘制前不应请求省市地图",
@@ -137,6 +144,10 @@ try {
   await sleep(400);
   await doubleTap(page, countryPoint);
   await page.waitForFunction(() => window.__globeDebug.state().layer === "country");
+  assert.equal(
+    await page.$eval("#globe-drill-hint", (element) => getComputedStyle(element).display !== "none"),
+    true,
+  );
 
   const provincePoint = await canvasPoint(page, "region", "广东省");
   assert.ok(provincePoint, "无法定位广东省");
@@ -158,6 +169,10 @@ try {
   assert.ok(zoomedProvincePoint, "放大后无法定位广东省");
   await doubleTap(page, zoomedProvincePoint);
   await page.waitForFunction(() => window.__globeDebug.state().layer === "city");
+  assert.equal(
+    await page.$eval("#globe-drill-hint", (element) => getComputedStyle(element).display === "none"),
+    true,
+  );
 
   const cityPoint = await canvasPoint(page, "region", "深圳市");
   assert.ok(cityPoint, "无法定位深圳市");
@@ -174,6 +189,10 @@ try {
   assert.deepEqual(after.rv, before.rv);
   assert.equal(after.selected, before.selected);
   assert.equal(await page.$eval("#globe-notes", (element) => element.style.display), "block");
+  assert.equal(
+    await page.$eval("#globe-drill-hint", (element) => getComputedStyle(element).display !== "none"),
+    true,
+  );
 
   await page.evaluate(() =>
     window.__globeDebug.setRegionView({ zoom: 1, panx: 0, pany: 0 })

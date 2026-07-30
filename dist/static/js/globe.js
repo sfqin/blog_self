@@ -875,6 +875,7 @@
   function updateChrome() {
     var bc = document.getElementById("globe-breadcrumb");
     var back = document.getElementById("globe-cd-up");
+    var hint = document.getElementById("globe-drill-hint");
     var stats = document.getElementById("globe-stats");
     var parts = ['<a data-nav="globe">~/globe</a>'];
     if (state.country) parts.push('<a data-nav="country">' + esc(state.country.code) + "</a>");
@@ -898,6 +899,9 @@
           : "← 返回地球";
       }
       back.onclick = goBack;
+    }
+    if (hint) {
+      hint.style.display = state.layer === "city" ? "none" : "inline-flex";
     }
     if (stats) {
       if (state.layer === "globe") {
