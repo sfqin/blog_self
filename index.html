@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>旅行者 — dev@home</title>
-<meta name="description" content="试图用有限的时间，给这个混乱的世界打个还算优雅的补丁。">
+<title>流浪 — dev@home</title>
+<meta name="description" content="祸兮福所倚,福兮祸所伏">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -36,12 +36,12 @@
 <header class="hero">
   <div class="container">
     <div class="cmd">ssh dev@home --connect</div>
-    <h1 class="name">旅行者</h1>
-    <div class="role">专职打螺丝</div>
-    <p class="tagline">试图用有限的时间，给这个混乱的世界打个还算优雅的补丁。<span class="cursor"></span></p>
+    <h1 class="name">流浪</h1>
+    <div class="role">高级工程师</div>
+    <p class="tagline">祸兮福所倚,福兮祸所伏<span class="cursor"></span></p>
     <div class="actions">
       <a class="btn" href="https://github.com/sfqin" target="_blank" rel="noopener">GitHub</a>
-      <a class="btn amber" href="mailto:sfqincsu@163.com">Email</a>
+      
       <a class="btn" href="#footprint">./modules/footprint</a>
     </div>
   </div>
@@ -52,25 +52,15 @@
   <div class="container">
     <div class="cmd">cat about.md</div>
     
-      <div class="article"><h3>$ whoami</h3>
-<ul>
-<li>白天：把复杂的事情拆开、理顺、再拼回去</li>
-<li>跑步 / 健身：给自己刷一点确定的进度条</li>
-<li>游戏 / 捣鼓电脑：换个地方继续解决问题</li>
-<li>阶段性阅读：进度条经常卡在 30%</li>
-<li>轻微下厨：能吃，不保证好吃</li>
-</ul>
-<blockquote>
-<p>世界是个巨大的草台班子，我只是想让手里这块搭得稳一点。</p>
-</blockquote>
+      <div class="article"><p>就是高级工程师</p>
 </div>
     
     
     <div class="tags">
-      <span class="tag green">吃喝玩乐样样喜欢</span>
+      <span class="tag green">Go，Java，MySQL，mq，rpc ...</span>
     </div>
     
-    <p class="note-row"><span class="date">location</span><span>广东</span></p>
+    <p class="note-row"><span class="date">location</span><span>Guangdong Province China</span></p>
   </div>
 </section>
 
@@ -81,21 +71,27 @@
     
       
       <div class="log-entry">
-        <div class="period">2080.05 - 至今</div>
-        <div><span class="company">heartbeat</span> <span class="role">— 螺丝钉工</span></div>
-        <div>不一定打螺丝，偶尔帮螺丝分一下类。</div>
+        <div class="period">2020.06-至今</div>
+        <div><span class="company">zj</span> <span class="role">— software engineer</span></div>
+        <div>懂一点的小白</div>
       </div>
       
       <div class="log-entry">
-        <div class="period">2078.07-2080.05</div>
-        <div><span class="company">penguin</span> <span class="role">— 螺丝钉少年</span></div>
-        <div>脚踏实地，异想天开。每天精益求精打螺丝。</div>
+        <div class="period">2018.07-2020.05</div>
+        <div><span class="company">tx</span> <span class="role">— software engineer</span></div>
+        <div>小白一枚</div>
       </div>
       
       <div class="log-entry">
-        <div class="period">2076.10 - 2077.4</div>
-        <div><span class="company">bear</span> <span class="role">— 外门杂役弟子</span></div>
-        <div>负责帮公司打广告</div>
+        <div class="period">2023 — 至今</div>
+        <div><span class="company">终端实验室</span> <span class="role">— 资深后端工程师</span></div>
+        <div>带领平台团队构建高吞吐的 Go 服务。通过把热点路径改写为无锁队列，将 p99 延迟降低了 40%。</div>
+      </div>
+      
+      <div class="log-entry">
+        <div class="period">2020 — 2023</div>
+        <div><span class="company">云atlas</span> <span class="role">— 高级软件工程师</span></div>
+        <div>构建多租户计费流水线（Go &#43; Postgres &#43; Kafka），负责日均 30 亿事件接入层的 on-call。</div>
       </div>
       
     
@@ -107,7 +103,54 @@
   <div class="container">
     <div class="cmd">less thoughts/</div>
     
-      <p class="empty">// 暂无思考（/admin/thoughts）</p>
+      
+      <div class="thought">
+        <div class="thought-body">写了这么多年后端,我越来越觉得&#34;技术债&#34;这个词被误用了。大多数人把它当成一句道德指控——谁写了烂代码,谁就欠了债,迟早要还。但真正在一线做过大型重构的人都知道,技术债更像是一种&#34;融资&#34;:你用未来的确定性,换取今天的交付速度。问题从来不是&#34;要不要借债&#34;,而是&#34;借了之后有没有在还,利率是不是失控了&#34;。
+
+第一类债是主动的、清醒的。为了赶一个明确的窗口期,你决定先硬编码几个配置、跳过一部分边界测试、用一张宽表扛住早期的查询。你知道它丑,你甚至在代码里写了 TODO 和 issue 链接。这类债是健康的,因为它是被记账的——只要业务活下来了,你回头就能连本带利还上。真正危险的是第二类:无意识的债。团队里没人知道某个模块为什么这么写,当初拍板的人早已离职,文档停留在两年前,每次改动都像在拆一颗不知道还有没有电的雷。这种债不产生利息,它直接产生恐惧,而恐惧会让整个团队丧失重构的勇气。
+
+我带团队时定过一条规矩:任何一次&#34;我们先这样,以后再优化&#34;的决定,都必须落到一个有 owner、有截止时间的条目上。没有 owner 的技术债不叫债,叫遗产;没有截止时间的优化不叫计划,叫许愿。这条规矩执行下来最大的收获,不是我们还掉了多少债,而是团队开始诚实地面对&#34;我们到底在拿什么换什么&#34;。很多时候讨论到一半会发现,那个所谓的窗口期根本不存在,是我们自己臆想出来的压力。
+
+还债的时机也很讲究。新手工程师喜欢挑一个风和日丽的下午,专门开一个&#34;重构分支&#34;,然后花两周把整个模块推倒重来。这几乎总是灾难:重构分支跟主干越漂越远,合并时冲突堆积如山,期间线上还在改 bug,最后要么放弃要么带着一堆没验证的改动硬着头皮上线。我更信奉&#34;顺路重构&#34;——每次因为需求碰到那块脏代码,就顺手把它擦干净一点点。加一个测试、抽一个函数、给一个变量改个人话名字。单次改动小到 code review 五分钟能过,风险可控,而且它绑定在真实需求上,不需要单独向老板申请预算。半年下来,那些最常被改动的热点区域自然会变干净,而那些从来没人碰的冷角落——说明它也没那么重要,可以继续躺着。
+
+衡量技术债还有个反直觉的点:不是所有债都值得还。有些代码丑陋但稳定,三年没出过问题,输入输出边界清晰,那它就是一个黑盒,你该做的是给它包一层清晰的接口然后永远别打开它。把有限的重构精力花在这种地方,纯属用工程师的洁癖消耗公司的钱。真正该还的债,是那些&#34;改动频繁 &#43; 质量低下&#34;同时成立的模块——它们既是 bug 的温床,又是迭代速度的瓶颈,ROI 最高。我习惯用 git log 拉出过去半年改动最频繁的文件,再交叉对比缺陷率,排在前面的就是重构清单,其余的一律不碰。
+
+最后一点,也是我踩了很多年坑才想明白的:技术债的本质是沟通债。绝大多数烂代码不是因为工程师水平不行,而是因为写它的人和用它的人之间、当时的团队和现在的团队之间,信息没有传递到位。所以对抗技术债最划算的投资,往往不是重写代码,而是补一份让下一个人五分钟能读懂&#34;为什么这么设计&#34;的文档,是在关键决策点留下一段 commit message 解释权衡,是让新人 onboarding 时有人能讲清楚系统的历史包袱从何而来。代码会过时,但&#34;为什么&#34;几乎永远有价值。等哪天你发现自己在给一段三年前的代码写解释时,依然认同当初的取舍,那才说明你当年借的那笔债,利率是划算的。</div>
+        <button class="thought-toggle" type="button" hidden>展开 ▾</button>
+        <div class="meta">[工程] 2026-07-14</div>
+      </div>
+      
+      <div class="thought">
+        <div class="thought-body">工作十年，我越来越相信：一个工程师的成长曲线，不是由他「能写多复杂的代码」决定的，而是由他「敢删多少代码」决定的。刚入行时，我们用增加来证明自己——加功能、加抽象、加配置项、加一层又一层的间接。那时最怕别人觉得方案太简单。后来才慢慢明白，简单不是能力的下限，而是上限：你要先把一个问题真正理解透，才有底气把它压缩成一段读起来平平无奇、却恰好覆盖所有边界的代码。真正难的从来不是把系统做大，而是在它长大之后，还能一刀刀把不再需要的部分削掉，让它保持一个人脑能装得下的形状。所以现在做 code review，我最欣赏的一类改动，是那种 diff 里删除远多于新增、功能却一点没少的提交——它背后往往是一次真正想清楚了的重构。
+</div>
+        <button class="thought-toggle" type="button" hidden>展开 ▾</button>
+        <div class="meta">[职业] 2026-07-11</div>
+      </div>
+      
+      <div class="thought">
+        <div class="thought-body">最好的抽象，是你平时根本注意不到它，直到某天你要改动它——而那一刻，它恰好就在你会去找的地方。</div>
+        <button class="thought-toggle" type="button" hidden>展开 ▾</button>
+        <div class="meta">[工程] 2026-07-01</div>
+      </div>
+      
+      <div class="thought">
+        <div class="thought-body">命令行参数胜过环境变量：它会出现在 --help 里、出现在你的 shell 历史里，也出现在半年后别人贴出来的 bug 报告里。</div>
+        <button class="thought-toggle" type="button" hidden>展开 ▾</button>
+        <div class="meta">[工具] 2026-06-18</div>
+      </div>
+      
+      <div class="thought">
+        <div class="thought-body">确定性回放把我的 flaky 测试变成了无聊的测试。而无聊的测试，才是你真正信得过的测试。</div>
+        <button class="thought-toggle" type="button" hidden>展开 ▾</button>
+        <div class="meta">[测试] 2026-05-30</div>
+      </div>
+      
+      <div class="thought">
+        <div class="thought-body">先交付纵向切片。一条能端到端跑通的细路径，胜过一份只在文档里跑得通的宏大计划。</div>
+        <button class="thought-toggle" type="button" hidden>展开 ▾</button>
+        <div class="meta">[产品] 2026-05-12</div>
+      </div>
+      
     
   </div>
 </section>
@@ -117,7 +160,60 @@
   <div class="container">
     <div class="cmd">ls projects/</div>
     
-      <p class="empty">// 暂无项目（/admin/projects）</p>
+      <div class="grid">
+        
+        <div class="card">
+          <div class="name"><a href="https://github.com/sfqin/chronicle-engine" target="_blank" rel="noopener">chronicle-engine</a></div>
+          <div class="desc">一个面向文字冒险与叙事游戏的确定性剧情引擎。核心思路是把「内容」「引擎」「AI 叙述」三层彻底解耦：内容层用声明式脚本定义所有可能的节点、分支与后果；引擎层是唯一能修改世界状态（WorldState）的地方，所有改动都走事务，支持检查点（Checkpoint）与回溯；AI 层只负责解析玩家的自由输入并做文本润色，绝不允许直接写状态。为了保证「同样的操作必然得到同样的结果」，随机性不是全局的，而是从每个动作的签名派生出子随机流，因此存档回放、并发模拟、单元测试都能得到逐字节一致的输出。附带一个 story-checker 脚本，可在 CI 里自动检查泄露的占位符 ID、走不通的死路、以及不满足确定性的分支。
+</div>
+          <div class="meta">
+            <span>Go</span>
+            <span class="star">231</span>
+            <span>MIT</span>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="name"><a href="https://github.com/sfqin/blog" target="_blank" rel="noopener">dev-home-blog</a></div>
+          <div class="desc">自托管的复古 CRT 风格个人博客，带本地管理后台，可静态导出到多个免费 CDN。</div>
+          <div class="meta">
+            <span>Go</span>
+            <span class="star">42</span>
+            <span>MIT</span>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="name"><a href="https://github.com/sfqin/globe-canvas" target="_blank" rel="noopener">globe-canvas</a></div>
+          <div class="desc">零依赖的交互式 3D 足迹地球仪，基于 Canvas 2D 绘制，可下钻到省与城市。</div>
+          <div class="meta">
+            <span>JavaScript</span>
+            <span class="star">128</span>
+            <span>MIT</span>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="name"><a href="https://github.com/sfqin/seededrandom" target="_blank" rel="noopener">seededrandom</a></div>
+          <div class="desc">用于仿真与游戏引擎的确定性、可回放随机数生成器，可从动作签名派生子随机流。</div>
+          <div class="meta">
+            <span>Go</span>
+            <span class="star">17</span>
+            <span>Apache-2.0</span>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="name"><a href="https://github.com/sfqin/dotfiles" target="_blank" rel="noopener">dotfiles</a></div>
+          <div class="desc">我的终端配置：zsh &#43; tmux &#43; neovim，为绿字黑底的 CRT 风格调校。</div>
+          <div class="meta">
+            <span>Shell</span>
+            <span class="star">63</span>
+            <span>Unlicense</span>
+          </div>
+        </div>
+        
+      </div>
     
   </div>
 </section>
@@ -127,7 +223,31 @@
   <div class="container">
     <div class="cmd">ls -lt notes/</div>
     
-      <p class="empty">// 暂无文章（/admin/posts）</p>
+      
+      <div class="note-row">
+        <span class="date">2026-07-12</span>
+        <a class="title" href="/blog_self/posts/build-local-admin-static-blog">从零做一个本地后台&#43;静态发布的博客</a>
+        <span class="tags-inline"><span class="tag-chip">#架构</span><span class="tag-chip">#Go</span><span class="tag-chip">#静态站点</span><span class="tag-chip">#CDN</span><span class="tag-chip">#SQLite</span></span>
+      </div>
+      
+      <div class="note-row">
+        <span class="date">2026-07-05</span>
+        <a class="title" href="/blog_self/posts/chasing-the-p99">追查 p99：延迟究竟藏在哪里</a>
+        <span class="tags-inline"><span class="tag-chip">#Go</span><span class="tag-chip">#性能</span><span class="tag-chip">#延迟</span></span>
+      </div>
+      
+      <div class="note-row">
+        <span class="date">2026-06-20</span>
+        <a class="title" href="/blog_self/posts/rewrote-parser-three-times">同一个解析器，我重写了三遍</a>
+        <span class="tags-inline"><span class="tag-chip">#解析</span><span class="tag-chip">#正则</span><span class="tag-chip">#Go</span></span>
+      </div>
+      
+      <div class="note-row">
+        <span class="date">2026-06-02</span>
+        <a class="title" href="/blog_self/posts/free-hosting-china-abroad">国内外都能访问的免费托管方案</a>
+        <span class="tags-inline"><span class="tag-chip">#托管</span><span class="tag-chip">#CDN</span><span class="tag-chip">#静态站点</span></span>
+      </div>
+      
     
   </div>
 </section>
@@ -156,14 +276,90 @@
   <div class="container">
     <div class="cmd">feh moments/*</div>
     
-      <p class="empty">// 暂无瞬间（/admin/moments）</p>
+      <div class="moments">
+        
+        <article class="moment" id="moment-4">
+          <div class="moment-meta">
+            <span class="moment-place">成都</span>
+            <span class="moment-date">2026-07-14</span>
+          </div>
+          <div class="moment-caption">今天把「瞬间」这个板块上线了。以后想随手记点生活、贴几张照片，就往这儿丢。给自己留个不那么“正经”的角落。</div>
+          
+        </article>
+        
+        <article class="moment" id="moment-5">
+          <div class="moment-meta">
+            <span class="moment-place">旅行 · 影像</span>
+            <span class="moment-date">2026-07-13</span>
+          </div>
+          <div class="moment-caption">旅途的一段影像。把这次的风景剪成了短片——路上遇到的人、拐角的光、以及那些没来得及说出口的感受，都在这几分钟里了。
+
+（这是一条 B 站视频，直接嵌在页面里播放，国内外都能看。）</div>
+          
+          <div class="moment-media" data-count="1">
+            
+            
+              <div class="moment-item moment-embed">
+                <div class="moment-embed-frame"><iframe src="https://www.bilibili.com/blackboard/html5mobileplayer.html?bvid=BV1A5TK6CECk&amp;page=1&amp;high_quality=1&amp;danmaku=0&amp;as_wide=1" loading="lazy" allow="fullscreen; encrypted-media; picture-in-picture" allowfullscreen scrolling="no" frameborder="0" referrerpolicy="no-referrer"></iframe></div>
+                <a class="moment-embed-open" href="https://www.bilibili.com/video/BV1A5TK6CECk" target="_blank" rel="noopener">在 B 站打开 ↗</a>
+              </div>
+            
+            
+          </div>
+          
+        </article>
+        
+        <article class="moment" id="moment-6">
+          <div class="moment-meta">
+            <span class="moment-place">山间 · 徒步</span>
+            <span class="moment-date">2026-07-12</span>
+          </div>
+          <div class="moment-caption">周末爬到半山腰，云正好压在山脊上。三张随手拍，没怎么修——留个记性，也留个念想。</div>
+          
+          <div class="moment-media" data-count="3">
+            
+            
+              <img class="moment-item" src="https://picsum.photos/id/1018/1200/800" alt="" loading="lazy" data-full="https://picsum.photos/id/1018/1200/800">
+            
+            
+            
+              <img class="moment-item" src="https://picsum.photos/id/1039/1200/800" alt="" loading="lazy" data-full="https://picsum.photos/id/1039/1200/800">
+            
+            
+            
+              <img class="moment-item" src="https://picsum.photos/id/1036/1200/800" alt="" loading="lazy" data-full="https://picsum.photos/id/1036/1200/800">
+            
+            
+          </div>
+          
+        </article>
+        
+        <article class="moment" id="moment-2">
+          <div class="moment-meta">
+            <span class="moment-place">成都 · 家</span>
+            <span class="moment-date">2026-07-11</span>
+          </div>
+          <div class="moment-caption">深夜改完最后一个 bug，泡了杯茶坐在阳台。城市的灯一半熄了，风是凉的。写代码这些年，最舒服的时刻反而是这种什么都不做、只是发会儿呆的空隙。</div>
+          
+        </article>
+        
+        <article class="moment" id="moment-3">
+          <div class="moment-meta">
+            <span class="moment-place">马来西亚 · 吉隆坡</span>
+            <span class="moment-date">2026-07-05</span>
+          </div>
+          <div class="moment-caption">第一次一个人去吉隆坡出差。落地已是傍晚，机场到市区的车上，热带的湿热扑面而来，路边全是没见过的树。晚上在小摊吃了碗叻沙，辣得冒汗，但很满足。</div>
+          
+        </article>
+        
+      </div>
     
   </div>
 </section>
 
 <footer>
   <div class="container">
-    <div class="cmd">echo "© 2026 旅行者 — built with Go · self-hosted · no trackers"</div>
+    <div class="cmd">echo "© 2026 流浪 — built with Go · self-hosted · no trackers"</div>
   </div>
 </footer>
 
