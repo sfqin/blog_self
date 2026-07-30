@@ -1,0 +1,16 @@
+/* Theme Q · Blueprint — deep blueprint blue, cyan grid lines, technical mono. */
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+:root[data-theme="Q"] {
+  --bg: #0a1f3c; --panel: #0e2a4f; --panel-2: #123560;
+  --text: #dce9f7; --muted: #6f8fb5; --accent: #7fd4ff; --accent-2: #ffd27f; --line: #1e4472;
+  --glow: 0 0 8px rgba(127,212,255,0.4);
+  --accent-rgb: 127,212,255; --accent-2-rgb: 255,210,127;
+  --bg-rgb: 10,31,60; --panel-rgb: 14,42,79; --overlay-rgb: 8,24,48; --scrim-rgb: 4,12,24; --shadow-rgb: 0,0,0;
+  --font-display: "Archivo", system-ui, sans-serif;
+  --font-body: "Space Mono", ui-monospace, monospace;
+  --font-mono: "Space Mono", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #0e2a4f; --globe-ocean2: #0a1f3c; --globe-land: #163a68;
+  --globe-land-line: #2f5f9a; --globe-border: #7fd4ff;
+  --globe-region: rgba(127,212,255,0.16); --globe-region-line: #2f5f9a;
+}

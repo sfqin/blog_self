@@ -1,0 +1,16 @@
+/* Theme K · Memphis — cream ground, playful multicolor, rounded geometric sans. */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap');
+:root[data-theme="K"] {
+  --bg: #fdf6ec; --panel: #ffffff; --panel-2: #ffe9d6;
+  --text: #1c1a2e; --muted: #7a7690; --accent: #ff5470; --accent-2: #ffce00; --line: #1c1a2e;
+  --glow: none;
+  --accent-rgb: 255,84,112; --accent-2-rgb: 255,206,0;
+  --bg-rgb: 253,246,236; --panel-rgb: 255,255,255; --overlay-rgb: 28,26,46; --scrim-rgb: 28,26,46; --shadow-rgb: 28,26,46;
+  --font-display: "Fredoka", system-ui, sans-serif;
+  --font-body: "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "Space Grotesk", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #d6f0ff; --globe-ocean2: #fdf6ec; --globe-land: #ffe0b0;
+  --globe-land-line: #ff5470; --globe-border: #00c2b8;
+  --globe-region: rgba(255,84,112,0.18); --globe-region-line: #00c2b8;
+}

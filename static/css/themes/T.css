@@ -1,0 +1,16 @@
+/* Theme T · Art Deco — deep emerald-black, gold linework, elegant Cinzel caps. */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant:ital,wght@0,400;0,500;1,400&display=swap');
+:root[data-theme="T"] {
+  --bg: #04100d; --panel: #0a1c17; --panel-2: #102821;
+  --text: #ece0c4; --muted: #8a9a86; --accent: #d4af37; --accent-2: #4fb896; --line: #1c342c;
+  --glow: 0 0 10px rgba(212,175,55,0.4);
+  --accent-rgb: 212,175,55; --accent-2-rgb: 79,184,150;
+  --bg-rgb: 4,16,13; --panel-rgb: 10,28,23; --overlay-rgb: 6,20,16; --scrim-rgb: 2,8,6; --shadow-rgb: 0,0,0;
+  --font-display: "Cinzel", Georgia, serif;
+  --font-body: "Cormorant", Georgia, serif;
+  --font-mono: "Cormorant", ui-monospace, serif;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #0a201a; --globe-ocean2: #04100d; --globe-land: #123329;
+  --globe-land-line: #d4af37; --globe-border: #d4af37;
+  --globe-region: rgba(212,175,55,0.18); --globe-region-line: #4fb896;
+}

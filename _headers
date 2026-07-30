@@ -1,0 +1,2 @@
+/blog_self/static/geo/*
+  Cache-Control: public, max-age=31536000, immutable

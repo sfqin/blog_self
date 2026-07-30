@@ -1,0 +1,16 @@
+/* Theme B · Kinetic Brutalist — paper ground, black ink, hard edges, no glow. */
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;700&family=Archivo:wght@400;600;800&display=swap');
+:root[data-theme="B"] {
+  --bg: #f4f1e9; --panel: #ffffff; --panel-2: #eae5d8;
+  --text: #111111; --muted: #6b6558; --accent: #111111; --accent-2: #e63212; --line: #111111;
+  --glow: none;
+  --accent-rgb: 17,17,17; --accent-2-rgb: 230,50,18;
+  --bg-rgb: 244,241,233; --panel-rgb: 255,255,255; --overlay-rgb: 17,17,17; --scrim-rgb: 17,17,17; --shadow-rgb: 17,17,17;
+  --font-display: "Archivo Black", "Archivo", system-ui, sans-serif;
+  --font-body: "Archivo", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--text);
+  --globe-ocean1: #eae5d8; --globe-ocean2: #f4f1e9; --globe-land: #d8d0be;
+  --globe-land-line: #111111; --globe-border: #111111;
+  --globe-region: rgba(230,50,18,0.14); --globe-region-line: #111111;
+}

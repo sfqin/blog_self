@@ -1,0 +1,16 @@
+/* Theme M · Data-viz — dark slate dashboard, neon green + cyan, mono numerals. */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap');
+:root[data-theme="M"] {
+  --bg: #0b1016; --panel: #121a24; --panel-2: #182230;
+  --text: #d6e4ee; --muted: #6a8199; --accent: #3ef2a0; --accent-2: #38bdf8; --line: #1e2a38;
+  --glow: 0 0 10px rgba(62,242,160,0.4);
+  --accent-rgb: 62,242,160; --accent-2-rgb: 56,189,248;
+  --bg-rgb: 11,16,22; --panel-rgb: 18,26,36; --overlay-rgb: 10,16,24; --scrim-rgb: 4,7,11; --shadow-rgb: 0,0,0;
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-body: "IBM Plex Mono", ui-monospace, monospace;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #10202a; --globe-ocean2: #0b1016; --globe-land: #16303a;
+  --globe-land-line: #1f5566; --globe-border: #3ef2a0;
+  --globe-region: rgba(56,189,248,0.16); --globe-region-line: #2a6b7a;
+}

@@ -24,14 +24,11 @@
   var initProv = form.getAttribute("data-prov") || "";
   var initCity = form.getAttribute("data-city") || "";
 
-  // Mirror of globe.js CN_ADCODE + provinceKey so city files resolve identically.
-  var CN_ADCODE = {
-    "北京市": "110000", "湖南省": "430000", "广东省": "440000",
-    "浙江省": "330000", "四川省": "510000", "江苏省": "320000",
-  };
-  function provinceKey(code, name) {
-    if (code === "CN") return CN_ADCODE[name] || null;
-    return name.replace(/\s+/g, "_"); // JP/MY use English ADM1 name
+  // City-file key for a province, from the geo region's own key (CN → adcode;
+  // JP/MY/SG → ADM1 name). Mirrors globe.js drillKey() so files resolve
+  // identically. The key is stashed on each <option> as data-key at load time.
+  function drillKey(regionKey) {
+    return regionKey ? String(regionKey).replace(/\s+/g, "_") : null;
   }
 
   function opt(value, label) {
@@ -63,8 +60,13 @@
     loadJSON("/static/geo/regions/" + code + ".json").then(function (d) {
       (d.regions || []).forEach(function (r) {
         if (!r.name) return;
-        var o = opt(r.name, r.name + (r.drill ? "  ▸" : ""));
+        // Foreign regions carry a Chinese label (zh); show "中文 · English" so a
+        // beginner recognizes the place in both languages. The stored value stays
+        // r.name (the key the globe matches on). CN names are already Chinese.
+        var label = r.zh ? r.zh + " · " + r.name : r.name;
+        var o = opt(r.name, label + (r.drill ? "  ▸" : ""));
         o.setAttribute("data-drill", r.drill ? "1" : "");
+        o.setAttribute("data-key", r.key || "");
         provSel.appendChild(o);
       });
       provSel.disabled = false;
@@ -89,14 +91,16 @@
       cityHint.textContent = "该省/州暂无城市数据，将只记录到省/州级别。";
       return;
     }
-    var key = provinceKey(code, selected.value);
+    var key = drillKey(selected.getAttribute("data-key"));
     if (!key) {
       cityHint.textContent = "该省/州暂无城市数据，将只记录到省/州级别。";
       return;
     }
     loadJSON("/static/geo/regions/" + code + "/" + key + ".json").then(function (d) {
       (d.regions || []).forEach(function (r) {
-        if (r.name) citySel.appendChild(opt(r.name, r.name));
+        // Same bilingual "中文 · English" label as provinces where a Chinese name
+        // is known; stored value stays r.name (what the globe matches on).
+        if (r.name) citySel.appendChild(opt(r.name, r.zh ? r.zh + " · " + r.name : r.name));
       });
       citySel.disabled = false;
       if (preCity) citySel.value = preCity;

@@ -1,0 +1,16 @@
+/* Theme S · Synthwave — night purple, neon pink + cyan sunset, retro display. */
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Monoton&family=Chakra+Petch:wght@400;500;700&display=swap');
+:root[data-theme="S"] {
+  --bg: #150522; --panel: #22093a; --panel-2: #2e0f4e;
+  --text: #ffe6ff; --muted: #a678c0; --accent: #ff2e97; --accent-2: #2ee6ff; --line: #3a1560;
+  --glow: 0 0 14px rgba(255,46,151,0.55);
+  --accent-rgb: 255,46,151; --accent-2-rgb: 46,230,255;
+  --bg-rgb: 21,5,34; --panel-rgb: 34,9,58; --overlay-rgb: 16,4,28; --scrim-rgb: 8,2,14; --shadow-rgb: 0,0,0;
+  --font-display: "Monoton", "Audiowide", system-ui, sans-serif;
+  --font-body: "Chakra Petch", system-ui, sans-serif;
+  --font-mono: "Chakra Petch", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #2a0a48; --globe-ocean2: #150522; --globe-land: #3e1266;
+  --globe-land-line: #ff2e97; --globe-border: #2ee6ff;
+  --globe-region: rgba(255,46,151,0.2); --globe-region-line: #2ee6ff;
+}

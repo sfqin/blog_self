@@ -1,0 +1,16 @@
+/* Theme G · Swiss — off-white ground, black grid, single red accent, tight sans. */
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap');
+:root[data-theme="G"] {
+  --bg: #f4f1ea; --panel: #ffffff; --panel-2: #e9e5da;
+  --text: #111111; --muted: #6b6b6b; --accent: #e63212; --accent-2: #111111; --line: #d8d3c6;
+  --glow: none;
+  --accent-rgb: 230,50,18; --accent-2-rgb: 17,17,17;
+  --bg-rgb: 244,241,234; --panel-rgb: 255,255,255; --overlay-rgb: 17,17,17; --scrim-rgb: 17,17,17; --shadow-rgb: 17,17,17;
+  --font-display: "Anton", "Archivo", system-ui, sans-serif;
+  --font-body: "Archivo", system-ui, sans-serif;
+  --font-mono: "Archivo", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #e9e5da; --globe-ocean2: #f4f1ea; --globe-land: #d3cdbe;
+  --globe-land-line: #111111; --globe-border: #e63212;
+  --globe-region: rgba(230,50,18,0.14); --globe-region-line: #111111;
+}

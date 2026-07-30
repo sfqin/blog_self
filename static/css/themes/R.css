@@ -1,0 +1,16 @@
+/* Theme R · Clay — soft lavender ground, rounded 3D clay panels, pastel accents. */
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700&family=Quicksand:wght@400;500;600&display=swap');
+:root[data-theme="R"] {
+  --bg: #e9e4f2; --panel: #f3eefb; --panel-2: #ddd4ee;
+  --text: #3a3357; --muted: #8a83a8; --accent: #8b6df5; --accent-2: #f58bb0; --line: #d0c6e6;
+  --glow: none;
+  --accent-rgb: 139,109,245; --accent-2-rgb: 245,139,176;
+  --bg-rgb: 233,228,242; --panel-rgb: 243,238,251; --overlay-rgb: 58,51,87; --scrim-rgb: 58,51,87; --shadow-rgb: 180,168,208;
+  --font-display: "Baloo 2", system-ui, sans-serif;
+  --font-body: "Quicksand", system-ui, sans-serif;
+  --font-mono: "Quicksand", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #ddd4ee; --globe-ocean2: #e9e4f2; --globe-land: #c9bce4;
+  --globe-land-line: #8b6df5; --globe-border: #8b6df5;
+  --globe-region: rgba(139,109,245,0.18); --globe-region-line: #8a83a8;
+}

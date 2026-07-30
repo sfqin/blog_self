@@ -1,17 +1,53 @@
-/* dev@home — Retro Terminal / CRT theme
-   Design tokens follow PRD §3.2. */
+/* dev@home — base / structural stylesheet + theme token contract.
+   This file holds ALL layout & component rules and the DEFAULT palette
+   (theme F · Retro Terminal). Alternate themes live in themes/<CODE>.css and
+   only override the :root tokens below via a `:root[data-theme="X"]` block.
+   Every theme MUST define the token contract in this :root; anything a theme
+   omits falls back to the F values here. Admin pages load only this file and
+   therefore always render as F (they carry no data-theme attribute). */
 :root {
+  /* ===== Core palette (F · Retro Terminal — also the universal fallback) ===== */
   --bg: #0a0e0a;
   --panel: #0d140d;
   --panel-2: #0f1a0f;
-  --green: #4ade80;
-  --amber: #fbbf24;
   --text: #c8f5d3;
   --muted: #5a7d63;
+  --accent: #4ade80;
+  --accent-2: #fbbf24;
   --line: #1c2a1c;
   --glow: 0 0 8px rgba(74, 222, 128, 0.45);
-  --font-display: "Space Grotesk", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* ===== RGB channels — for rgba() surfaces that must follow the theme ===== */
+  --accent-rgb: 74, 222, 128;
+  --accent-2-rgb: 251, 191, 36;
+  --bg-rgb: 10, 14, 10;
+  --panel-rgb: 13, 20, 13;
+  --overlay-rgb: 6, 19, 9;   /* floating chrome (back-btn, moment links, lightbox) */
+  --scrim-rgb: 3, 8, 4;      /* fullscreen lightbox dim                            */
+  --shadow-rgb: 0, 0, 0;     /* drop shadows                                       */
+
+  /* ===== Fonts (3-font contract) ===== */
+  --font-display: "Space Grotesk", system-ui, sans-serif;                 /* headings / hero */
+  --font-body: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace; /* body / UI      */
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace; /* code / chrome  */
+
+  /* ===== Decorative toggles (F opts into the terminal flourishes) ===== */
+  --cmd-prefix: "$ ";        /* section-header prefix; "" for non-terminal themes */
+  --brand-suffix: "~";       /* nav brand suffix;      "" for non-terminal themes */
+  --cmd-color: var(--accent);/* section-header text colour                        */
+
+  /* ===== Globe canvas palette (read by globe.js via getComputedStyle) ===== */
+  --globe-ocean1: #0e2a1a;
+  --globe-ocean2: #061309;
+  --globe-land: #123a24;
+  --globe-land-line: #1f5c3a;
+  --globe-border: #2a6b45;
+  --globe-region: rgba(30, 60, 40, 0.55);
+  --globe-region-line: #2a6b45;
+
+  /* ===== Legacy aliases (keep admin.css & existing rules working) ===== */
+  --green: var(--accent);
+  --amber: var(--accent-2);
 }
 
 * { box-sizing: border-box; }
@@ -28,14 +64,19 @@ body {
   overflow-x: hidden;
 }
 
-/* --- CRT overlays: scanlines + vignette + flicker (PRD §3.3) --- */
+/* --- CRT overlays: scanlines + vignette + flicker (PRD §3.3) ---
+   These terminal flourishes belong to theme F only. They are hidden by default
+   and re-enabled under [data-theme="F"] so alternate themes stay clean. */
 .crt-scanlines,
 .crt-vignette {
   pointer-events: none;
   position: fixed;
   inset: 0;
   z-index: 9999;
+  display: none;
 }
+[data-theme="F"] .crt-scanlines,
+[data-theme="F"] .crt-vignette { display: block; }
 .crt-scanlines {
   background: repeating-linear-gradient(
     to bottom,
@@ -74,12 +115,12 @@ section { padding: 56px 0; border-bottom: 1px solid var(--line); }
 /* Command-line section headers: $ command */
 .cmd {
   font-family: var(--font-mono);
-  color: var(--green);
+  color: var(--cmd-color);
   font-size: clamp(15px, 2vw, 19px);
   margin: 0 0 22px;
   text-shadow: var(--glow);
 }
-.cmd::before { content: "$ "; color: var(--amber); }
+.cmd::before { content: var(--cmd-prefix, ""); color: var(--amber); }
 
 h1, h2, h3 { font-family: var(--font-display); color: var(--text); }
 
@@ -88,13 +129,13 @@ h1, h2, h3 { font-family: var(--font-display); color: var(--text); }
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(10, 14, 10, 0.72);
+  background: rgba(var(--bg-rgb), 0.72);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--line);
 }
 .nav .container { display: flex; align-items: center; gap: 18px; height: 52px; flex-wrap: wrap; }
 .nav .brand { color: var(--green); font-weight: 600; }
-.nav .brand::after { content: "~"; color: var(--muted); margin-left: 4px; }
+.nav .brand::after { content: var(--brand-suffix, ""); color: var(--muted); margin-left: 4px; }
 .nav a.link { color: var(--muted); font-size: 13px; }
 .nav a.link:hover { color: var(--green); }
 .nav .spacer { flex: 1; }
@@ -125,7 +166,7 @@ h1, h2, h3 { font-family: var(--font-display); color: var(--text); }
   background: var(--panel-2);
   border: 1px solid var(--line);
   border-radius: 6px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 24px rgba(var(--shadow-rgb), 0.5);
   z-index: 200;
   padding: 4px;
 }
@@ -139,7 +180,7 @@ h1, h2, h3 { font-family: var(--font-display); color: var(--text); }
   font-size: 13px;
 }
 .search-results .sr-item:hover,
-.search-results .sr-item.active { background: rgba(74, 222, 128, 0.1); }
+.search-results .sr-item.active { background: rgba(var(--accent-rgb), 0.1); }
 .search-results .sr-badge {
   flex-shrink: 0;
   font-size: 10px;
@@ -173,7 +214,7 @@ h1, h2, h3 { font-family: var(--font-display); color: var(--text); }
   cursor: pointer;
   transition: all 0.15s;
 }
-.btn:hover { background: rgba(74, 222, 128, 0.12); box-shadow: var(--glow); }
+.btn:hover { background: rgba(var(--accent-rgb), 0.12); box-shadow: var(--glow); }
 .btn.amber { border-color: var(--amber); color: var(--amber); }
 
 /* --- Tags / chips --- */
@@ -186,7 +227,7 @@ h1, h2, h3 { font-family: var(--font-display); color: var(--text); }
   padding: 3px 10px;
   border-radius: 3px;
 }
-.tag.green { color: var(--green); border-color: rgba(74,222,128,0.4); }
+.tag.green { color: var(--green); border-color: rgba(var(--accent-rgb), 0.4); }
 
 /* --- Experience log timeline --- */
 .log-entry {
@@ -246,15 +287,15 @@ h1, h2, h3 { font-family: var(--font-display); color: var(--text); }
   font-family: var(--font-mono);
   font-size: 13px;
   color: var(--amber);
-  background: rgba(6, 19, 9, 0.9);
+  background: rgba(var(--overlay-rgb), 0.9);
   border: 1px solid var(--amber);
   border-radius: 8px;
   padding: 9px 14px;
   cursor: pointer;
-  box-shadow: 0 0 14px rgba(251, 191, 36, 0.4);
+  box-shadow: 0 0 14px rgba(var(--accent-2-rgb), 0.4);
   -webkit-tap-highlight-color: transparent;
 }
-.thought-collapse-float:hover { background: rgba(251, 191, 36, 0.18); }
+.thought-collapse-float:hover { background: rgba(var(--accent-2-rgb), 0.18); }
 .thought-collapse-float:active { transform: scale(0.96); }
 
 /* --- Project grid --- */
@@ -266,7 +307,7 @@ h1, h2, h3 { font-family: var(--font-display); color: var(--text); }
   padding: 16px;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
-.card:hover { border-color: rgba(74,222,128,0.5); box-shadow: var(--glow); }
+.card:hover { border-color: rgba(var(--accent-rgb), 0.5); box-shadow: var(--glow); }
 .card .name { color: var(--green); font-weight: 600; font-size: 16px; }
 .card .desc { color: var(--text); font-size: 13px; margin: 8px 0; }
 .card .meta { color: var(--muted); font-size: 12px; display: flex; gap: 14px; flex-wrap: wrap; }
@@ -305,25 +346,84 @@ h1, h2, h3 { font-family: var(--font-display); color: var(--text); }
 #globe-canvas:active { cursor: grabbing; }
 /* Stage wraps the canvas so the back button can float in its top-left corner. */
 .globe-stage { position: relative; display: inline-block; }
-.globe-back-btn {
+.globe-controls {
   position: absolute; top: 8px; left: 8px; z-index: 3;
+  display: flex; align-items: center; gap: 8px;
+}
+.globe-back-btn {
   font-family: var(--font-mono); font-size: 13px;
-  color: var(--amber); background: rgba(6,19,9,0.82);
+  color: var(--amber); background: rgba(var(--overlay-rgb), 0.82);
   border: 1px solid var(--amber); border-radius: 6px;
   padding: 6px 12px; cursor: pointer;
-  box-shadow: 0 0 12px rgba(251,191,36,0.35);
+  box-shadow: 0 0 12px rgba(var(--accent-2-rgb), 0.35);
   -webkit-tap-highlight-color: transparent;
 }
-.globe-back-btn:hover { background: rgba(251,191,36,0.18); }
+.globe-back-btn:hover { background: rgba(var(--accent-2-rgb), 0.18); }
 .globe-back-btn:active { transform: scale(0.96); }
+.globe-drill-hint {
+  display: inline-flex; align-items: center;
+  min-height: 29px; padding: 4px 9px;
+  color: var(--muted); background: rgba(var(--overlay-rgb), 0.7);
+  border: 1px solid var(--line); border-radius: 6px;
+  font-family: var(--font-mono); font-size: 12px;
+  white-space: nowrap; pointer-events: none;
+}
+.globe-load-status {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  z-index: 4;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 32px);
+  padding: 7px 10px;
+  color: var(--text);
+  background: rgba(var(--overlay-rgb), 0.9);
+  border: 1px solid var(--amber);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.globe-load-status.is-error { color: var(--amber); }
 .globe-hint { color: var(--muted); font-size: 12px; margin-top: 10px; }
 .globe-stats { color: var(--amber); font-size: 13px; margin-top: 8px; }
+.globe-notes {
+  margin: 14px auto 0;
+  width: 100%;
+  max-width: 440px;
+  text-align: left;
+  background: rgba(var(--overlay-rgb), 0.55);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--green);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 12px;
+  animation: gml-in 0.22s ease-out;
+}
+.globe-notes .gn-head {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding-bottom: 7px;
+  border-bottom: 1px dashed var(--line);
+}
+.globe-notes .gn-item {
+  display: grid;
+  grid-template-columns: minmax(72px, auto) 1fr;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px dashed var(--line);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+.globe-notes .gn-item:last-child { border-bottom: 0; }
+.globe-notes .gn-city { color: var(--amber); }
+.globe-notes .gn-text { color: var(--text); white-space: pre-wrap; }
 /* Linked-瞬间 panel shown when a clicked city/province links to moments. Framed
    as a compact card so multiple rows read cleanly on a phone. Each row is a link
    the user taps to jump into the feed (no auto-jump). */
 .globe-moment-links {
   margin: 14px auto 0; width: 100%; max-width: 440px; text-align: left;
-  background: rgba(6,19,9,0.55);
+  background: rgba(var(--overlay-rgb), 0.55);
   border: 1px solid var(--line); border-left: 3px solid var(--amber);
   border-radius: 0 8px 8px 0; padding: 10px 12px;
   display: flex; flex-direction: column; gap: 7px;
@@ -338,7 +438,7 @@ h1, h2, h3 { font-family: var(--font-display); color: var(--text); }
 .globe-moment-links .gml-item {
   display: flex; align-items: center; gap: 8px;
   font-family: var(--font-mono); font-size: 13px; line-height: 1.4;
-  color: var(--text); background: rgba(13,20,13,0.7);
+  color: var(--text); background: rgba(var(--panel-rgb), 0.7);
   border: 1px solid var(--line); border-radius: 7px;
   padding: 9px 11px; cursor: pointer; text-decoration: none;
   -webkit-tap-highlight-color: transparent;
@@ -346,13 +446,13 @@ h1, h2, h3 { font-family: var(--font-display); color: var(--text); }
 }
 .globe-moment-links .gml-arrow { color: var(--amber); flex: none; }
 .globe-moment-links .gml-cap { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.globe-moment-links .gml-item:hover { border-color: var(--amber); background: rgba(251,191,36,0.1); color: var(--amber); }
+.globe-moment-links .gml-item:hover { border-color: var(--amber); background: rgba(var(--accent-2-rgb), 0.1); color: var(--amber); }
 .globe-moment-links .gml-item:active { transform: scale(0.99); }
 /* Brief highlight when the globe jumps you to a moment, so it's easy to spot. */
 @keyframes moment-flash {
-  0%   { box-shadow: 0 0 0 0 rgba(251,191,36,0.0); border-left-color: var(--green); }
-  20%  { box-shadow: 0 0 22px 2px rgba(251,191,36,0.55); border-left-color: var(--amber); }
-  100% { box-shadow: 0 0 0 0 rgba(251,191,36,0.0); border-left-color: var(--green); }
+  0%   { box-shadow: 0 0 0 0 rgba(var(--accent-2-rgb), 0.0); border-left-color: var(--green); }
+  20%  { box-shadow: 0 0 22px 2px rgba(var(--accent-2-rgb), 0.55); border-left-color: var(--amber); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--accent-2-rgb), 0.0); border-left-color: var(--green); }
 }
 .moment.moment-flash { animation: moment-flash 1.8s ease-out; }
 
@@ -398,7 +498,7 @@ h1, h2, h3 { font-family: var(--font-display); color: var(--text); }
 .moment-media:not([data-count="1"]) .moment-item { aspect-ratio: 1 / 1; object-fit: cover; }
 .moment-media[data-count="1"] .moment-item { max-height: 480px; object-fit: contain; }
 img.moment-item { cursor: zoom-in; transition: border-color 0.15s; }
-img.moment-item:hover { border-color: rgba(74,222,128,0.5); }
+img.moment-item:hover { border-color: rgba(var(--accent-rgb), 0.5); }
 /* Embedded players (Bilibili / YouTube) always take a full-width row: a 16:9
    frame with a small "open on site" fallback link BELOW it, so nothing ever
    overlaps the video controls. */
@@ -419,7 +519,7 @@ img.moment-item:hover { border-color: rgba(74,222,128,0.5); }
 .lightbox {
   position: fixed; inset: 0; z-index: 100;
   display: flex; align-items: center; justify-content: center;
-  background: rgba(3, 8, 4, 0.92);
+  background: rgba(var(--scrim-rgb), 0.92);
   -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
 }
 .lightbox[hidden] { display: none; }
@@ -435,7 +535,7 @@ body.lightbox-open { overflow: hidden; }
 }
 .lightbox-img {
   max-width: 92vw; max-height: 86vh; object-fit: contain;
-  border-radius: 4px; box-shadow: 0 0 30px rgba(74,222,128,0.25);
+  border-radius: 4px; box-shadow: 0 0 30px rgba(var(--accent-rgb), 0.25);
   user-select: none; -webkit-user-select: none; -webkit-user-drag: none;
 }
 /* Transient "reached the end" toast shown at the first/last image. */
@@ -443,7 +543,7 @@ body.lightbox-open { overflow: hidden; }
   position: absolute; left: 50%; bottom: 34px; transform: translateX(-50%);
   z-index: 3; pointer-events: none;
   font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em;
-  color: var(--amber); background: rgba(6,19,9,0.9);
+  color: var(--amber); background: rgba(var(--overlay-rgb), 0.9);
   border: 1px solid var(--amber); border-radius: 6px; padding: 6px 14px;
   opacity: 0; transition: opacity 0.2s ease;
 }
@@ -451,16 +551,16 @@ body.lightbox-open { overflow: hidden; }
 .lightbox-close {
   position: absolute; top: 16px; right: 16px; z-index: 2;
   font-family: var(--font-mono); font-size: 13px;
-  color: var(--amber); background: rgba(6,19,9,0.82);
+  color: var(--amber); background: rgba(var(--overlay-rgb), 0.82);
   border: 1px solid var(--amber); border-radius: 6px;
   padding: 6px 12px; cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-.lightbox-close:hover { background: rgba(251,191,36,0.18); }
+.lightbox-close:hover { background: rgba(var(--accent-2-rgb), 0.18); }
 .lightbox-nav {
   position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
   font-family: var(--font-mono); font-size: 28px; line-height: 1;
-  color: var(--green); background: rgba(6,19,9,0.7);
+  color: var(--green); background: rgba(var(--overlay-rgb), 0.7);
   border: 1px solid var(--line); border-radius: 8px;
   width: 44px; height: 56px; cursor: pointer;
   -webkit-tap-highlight-color: transparent;

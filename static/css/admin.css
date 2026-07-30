@@ -23,7 +23,7 @@
 .admin-side a .nav-en { display: block; font-family: var(--font-mono); }
 .admin-side a .nav-zh { display: block; font-size: 11px; color: var(--muted); margin-top: 1px; }
 .admin-side a:hover .nav-zh, .admin-side a.active .nav-zh { color: var(--green); opacity: 0.75; }
-.admin-side .logout { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 12px; }
+.admin-side .side-actions { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 12px; }
 
 .admin-main { flex: 1; padding: 28px 32px; max-width: 900px; }
 .admin-main h1 { color: var(--green); font-size: 22px; margin: 0 0 20px; }
@@ -139,3 +139,161 @@ td .muted { color: var(--muted); }
   .admin-side .brand { width: 100%; }
   .row2 { grid-template-columns: 1fr; }
 }
+
+/* --- First-run setup wizard (/setup) --- */
+.setup-wrap { max-width: 720px; margin: 6vh auto 12vh; padding: 0 22px; }
+.setup-head .cmd { color: var(--amber); }
+.setup-head h1 { color: var(--green); font-size: 26px; margin: 8px 0 6px; text-shadow: var(--glow); }
+.setup-head .muted { color: var(--muted); font-size: 13px; }
+
+.setup-rail {
+  list-style: none; padding: 0; margin: 24px 0 4px;
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.setup-rail li {
+  font-size: 11px; color: var(--muted);
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: 4px 12px;
+}
+.setup-rail li.done { color: var(--green); border-color: rgba(74,222,128,0.4); }
+
+.setup-step {
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--panel); padding: 20px 22px; margin-top: 18px;
+}
+.setup-step h2 { color: var(--green); font-size: 17px; margin: 0 0 6px; }
+.setup-step > .muted { color: var(--muted); font-size: 12px; margin: 0 0 14px; }
+.setup-step.locked { opacity: 0.55; }
+.setup-step code { color: var(--amber); background: var(--bg); padding: 1px 5px; border-radius: 3px; }
+
+.check {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; border: 1px solid var(--line);
+  border-radius: 6px; background: var(--bg); margin-bottom: 10px;
+}
+.check .dot {
+  flex: none; width: 22px; height: 22px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 13px;
+  border: 1px solid var(--line); color: var(--muted);
+}
+.check .dot-ok { color: var(--green); border-color: var(--green); box-shadow: var(--glow); }
+.check .dot-bad { color: #f87171; border-color: #f87171; }
+.check-body { flex: 1; }
+.check-body b { color: var(--text); }
+.check-detail { color: var(--muted); font-size: 12px; white-space: pre-wrap; margin-top: 3px; }
+
+/* Per-step result note: neutral / working / ok / error, with clear color. */
+.check-note {
+  font-size: 12px; margin-top: 10px; padding: 9px 12px;
+  border-radius: 6px; white-space: pre-wrap; display: none;
+  border: 1px solid var(--line); color: var(--muted); background: var(--bg);
+}
+.check-note.show { display: block; }
+.check-note.working { color: var(--amber); border-color: rgba(245,196,110,0.5); background: rgba(245,196,110,0.08); }
+.check-note.ok { color: var(--green); border-color: rgba(74,222,128,0.5); background: rgba(74,222,128,0.08); }
+.check-note.error { color: #f87171; border-color: rgba(248,113,113,0.5); background: rgba(248,113,113,0.08); }
+.check-note .spin { margin-right: 6px; }
+
+/* Spinner shown inside a button (and standalone) while an action runs. */
+.spin {
+  display: inline-block; width: 12px; height: 12px; vertical-align: -1px;
+  border: 2px solid currentColor; border-top-color: transparent;
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Loading state for any wizard button: dim, no pointer, show it is working. */
+.btn-primary.is-loading, .btn-ghost.is-loading {
+  opacity: 0.7; cursor: progress; pointer-events: none;
+}
+button:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+
+/* Pulse the status dot while its step is actively working. */
+.check .dot-working { color: var(--amber); border-color: var(--amber); animation: dotpulse 1s ease-in-out infinite; }
+@keyframes dotpulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+.setup-log {
+  background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
+  padding: 12px; color: var(--text); font-size: 12px; white-space: pre-wrap;
+  max-height: 240px; overflow: auto; margin-top: 12px;
+}
+.setup-live {
+  margin-top: 14px; padding: 12px 14px; border-radius: 6px;
+  background: rgba(74,222,128,0.1); border: 1px solid var(--green); color: var(--green);
+}
+.setup-live a { color: var(--green); text-decoration: underline; }
+
+/* One-time GitHub device code: shown big with a copy button. */
+.code-box {
+  margin-top: 14px; padding: 14px 16px; border-radius: 8px;
+  background: rgba(245,196,110,0.08); border: 1px solid rgba(245,196,110,0.5);
+}
+.code-box .code-label { color: var(--amber); font-size: 12px; margin-bottom: 8px; }
+.code-box .code-row { display: flex; align-items: center; gap: 12px; }
+.code-box .code-value {
+  font-family: "IBM Plex Mono", monospace; font-size: 30px; font-weight: 600;
+  letter-spacing: 4px; color: var(--green); text-shadow: var(--glow);
+  background: var(--bg); padding: 6px 14px; border-radius: 6px;
+  border: 1px solid var(--line); user-select: all;
+}
+.code-box .code-hint { margin-top: 10px; font-size: 12px; color: var(--muted); }
+.code-box .code-hint a { color: var(--amber); }
+
+/* --- Unsaved-changes guard modal (admin-guard.js) --- */
+.guard-modal {
+  position: fixed; inset: 0; z-index: 1000;
+  display: grid; place-items: center;
+  background: rgba(0,0,0,0.62); backdrop-filter: blur(2px);
+}
+.guard-modal[hidden] { display: none; }
+.guard-box {
+  width: min(440px, calc(100vw - 40px));
+  background: var(--panel); border: 1px solid var(--amber);
+  border-radius: 8px; padding: 22px 24px;
+  box-shadow: 0 0 0 1px rgba(245,196,110,0.15), 0 18px 50px rgba(0,0,0,0.5);
+}
+.guard-box .guard-title { color: var(--amber); font-size: 17px; font-weight: 600; margin-bottom: 10px; }
+.guard-box .guard-msg { color: var(--text); font-size: 13px; line-height: 1.7; }
+.guard-box .guard-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+/* --- Publish-online page (publish.html) --- */
+.pub-panel {
+  margin-top: 22px; max-width: 640px;
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: 8px; padding: 20px 22px;
+}
+.pub-panel-warn { border-color: rgba(245,196,110,0.5); background: rgba(245,196,110,0.06); }
+.pub-row { display: flex; gap: 12px; padding: 7px 0; font-size: 13px; border-bottom: 1px dashed var(--line); }
+.pub-row:last-of-type { border-bottom: 0; }
+.pub-row .pub-k { color: var(--muted); width: 110px; flex-shrink: 0; }
+.pub-row .pub-v { color: var(--text); word-break: break-all; }
+.pub-row .pub-v a { color: var(--green); text-decoration: underline; }
+
+/* --- Live theme preview (theme_form.html) --- */
+.theme-preview {
+  margin-top: 26px; max-width: 860px;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--panel); overflow: hidden;
+}
+.theme-preview-bar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 12px; border-bottom: 1px solid var(--line);
+  background: var(--bg); font-family: var(--font-mono); font-size: 12px;
+}
+.tpb-dots { display: inline-flex; gap: 6px; flex: none; }
+.tpb-dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+.tpb-dots i:nth-child(1) { background: #f87171; }
+.tpb-dots i:nth-child(2) { background: var(--amber); }
+.tpb-dots i:nth-child(3) { background: var(--green); }
+.tpb-url { color: var(--muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tpb-open { color: var(--green); text-decoration: none; flex: none; }
+.tpb-open:hover { text-decoration: underline; }
+
+/* The stage clips the scaled-down iframe; its height is set live by JS to match
+   the scaled render so no dead space or overflow shows. */
+.theme-preview-stage { position: relative; width: 100%; overflow: hidden; background: #000; }
+.theme-preview-stage iframe {
+  border: 0; transform-origin: top left; display: block;
+  pointer-events: none;   /* preview only — clicks/scroll stay in the admin page */
+}
+

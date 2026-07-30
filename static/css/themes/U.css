@@ -1,0 +1,16 @@
+/* Theme U · Comic — bright cream, bold ink outlines, primary pop colors, Bangers. */
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Bungee&display=swap');
+:root[data-theme="U"] {
+  --bg: #fdf3d8; --panel: #ffffff; --panel-2: #ffe27a;
+  --text: #16130c; --muted: #6a6350; --accent: #e5202e; --accent-2: #2062e5; --line: #16130c;
+  --glow: none;
+  --accent-rgb: 229,32,46; --accent-2-rgb: 32,98,229;
+  --bg-rgb: 253,243,216; --panel-rgb: 255,255,255; --overlay-rgb: 22,19,12; --scrim-rgb: 22,19,12; --shadow-rgb: 22,19,12;
+  --font-display: "Bungee", system-ui, sans-serif;
+  --font-body: "Bangers", "Comic Sans MS", cursive;
+  --font-mono: "Bangers", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #ffe27a; --globe-ocean2: #fdf3d8; --globe-land: #ffd23f;
+  --globe-land-line: #16130c; --globe-border: #e5202e;
+  --globe-region: rgba(32,98,229,0.16); --globe-region-line: #16130c;
+}

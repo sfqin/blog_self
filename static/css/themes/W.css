@@ -1,0 +1,16 @@
+/* Theme W · Topographic — warm stone ground, contour-line browns, map mono. */
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+:root[data-theme="W"] {
+  --bg: #e9e3d3; --panel: #f2ecdd; --panel-2: #ded5c0;
+  --text: #2e2a20; --muted: #857d68; --accent: #b5703a; --accent-2: #4a7a5c; --line: #cdc3ab;
+  --glow: none;
+  --accent-rgb: 181,112,58; --accent-2-rgb: 74,122,92;
+  --bg-rgb: 233,227,211; --panel-rgb: 242,236,221; --overlay-rgb: 46,42,32; --scrim-rgb: 46,42,32; --shadow-rgb: 46,42,32;
+  --font-display: "Archivo", system-ui, sans-serif;
+  --font-body: "Space Mono", ui-monospace, monospace;
+  --font-mono: "Space Mono", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #ded5c0; --globe-ocean2: #e9e3d3; --globe-land: #cabfa2;
+  --globe-land-line: #b5703a; --globe-border: #b5703a;
+  --globe-region: rgba(74,122,92,0.18); --globe-region-line: #857d68;
+}

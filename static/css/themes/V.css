@@ -1,0 +1,16 @@
+/* Theme V · Isometric — cool light ground, indigo/teal iso blocks, geometric sans. */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+:root[data-theme="V"] {
+  --bg: #eef0f7; --panel: #f7f8fc; --panel-2: #e0e4f0;
+  --text: #2a2f45; --muted: #7d8399; --accent: #5560e0; --accent-2: #2bb8a8; --line: #d2d7e6;
+  --glow: none;
+  --accent-rgb: 85,96,224; --accent-2-rgb: 43,184,168;
+  --bg-rgb: 238,240,247; --panel-rgb: 247,248,252; --overlay-rgb: 42,47,69; --scrim-rgb: 42,47,69; --shadow-rgb: 170,178,200;
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-body: "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "Space Grotesk", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #e0e4f0; --globe-ocean2: #eef0f7; --globe-land: #ccd2e6;
+  --globe-land-line: #5560e0; --globe-border: #5560e0;
+  --globe-region: rgba(85,96,224,0.16); --globe-region-line: #2bb8a8;
+}

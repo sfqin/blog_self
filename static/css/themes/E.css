@@ -1,0 +1,16 @@
+/* Theme E · 3D Bento — near-black canvas, soft rounded panels, cool indigo accent. */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Syne:wght@600;700;800&display=swap');
+:root[data-theme="E"] {
+  --bg: #08080a; --panel: #141418; --panel-2: #1c1c22;
+  --text: #f2f2f5; --muted: #8a8a96; --accent: #818cf8; --accent-2: #f472b6; --line: #26262e;
+  --glow: 0 0 12px rgba(129,140,248,0.35);
+  --accent-rgb: 129,140,248; --accent-2-rgb: 244,114,182;
+  --bg-rgb: 8,8,10; --panel-rgb: 20,20,24; --overlay-rgb: 12,12,16; --scrim-rgb: 4,4,6; --shadow-rgb: 0,0,0;
+  --font-display: "Syne", system-ui, sans-serif;
+  --font-body: "Manrope", system-ui, sans-serif;
+  --font-mono: "Manrope", ui-monospace, monospace;
+  --cmd-prefix: ""; --brand-suffix: ""; --cmd-color: var(--accent);
+  --globe-ocean1: #16161e; --globe-ocean2: #08080a; --globe-land: #26263a;
+  --globe-land-line: #3a3a5c; --globe-border: #818cf8;
+  --globe-region: rgba(129,140,248,0.18); --globe-region-line: #4a4a80;
+}
