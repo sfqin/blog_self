@@ -28,10 +28,10 @@ Download and extract the complete archive from [GitHub Releases](https://github.
 
 | System | Archive | Launcher |
 | --- | --- | --- |
-| macOS, Apple Silicon / Intel | `Blog-macOS.zip` | `Start-Blog.app`; fallback: `Start-Blog.command` |
-| Windows x64 | `Blog-Windows.zip` | `Start-Blog.exe`; troubleshooting: `Start-Blog-console.bat` |
+| macOS 11+, Apple Silicon / Intel | [Blog-macOS.zip](https://github.com/sfqin/blog_self/releases/download/v1.3.0/Blog-macOS.zip) | `Start-Blog.app`; fallback: `Start-Blog.command` |
+| Windows 10+ x64 | [Blog-Windows.zip](https://github.com/sfqin/blog_self/releases/download/v1.3.0/Blog-Windows.zip) | `Start-Blog.exe`; troubleshooting: `Start-Blog-console.bat` |
 
-**Version note: this README describes master. The published v1.2.0 packages predate the Starry Night Voyage redesign. To use the new design now, run from source or [build the client packages](#development-and-packaging). Updating master does not automatically update GitHub Releases.**
+**Latest release: [v1.3.0 · Starry Night Voyage](https://github.com/sfqin/blog_self/releases/tag/v1.3.0)** includes constellation navigation, the footprint globe, and night/paper reading modes. Client archives are published separately; updating master does not update an installed client.
 
 1. Launch the client and open `/setup`. If you plan to publish to GitHub, follow the prompts to install Git / GitHub CLI and authorize GitHub in your browser.
 2. Create your own repository or connect one you can publish to. The wizard creates public repositories for GitHub Pages.
@@ -53,7 +53,7 @@ On Windows, after verifying the source, choose **More info → Run anyway** in S
 
 </details>
 
-Client data lives in `dev-home-blog/blog.db` under your user home directory, outside the application package. After replacing the client package, restart it to keep using that data. In the current source, local mode exits roughly five minutes after all blog pages stop sending heartbeats; launch it again when needed.
+Client data lives in `dev-home-blog/blog.db` under your user home directory, outside the application package. After replacing the client package, restart it to keep using that data. The client exits roughly five minutes after all blog pages stop sending heartbeats; launch it again when needed.
 
 ## Writing option 2: run the web admin locally
 
@@ -287,6 +287,7 @@ Templates, CSS, JavaScript, fonts, and maps are embedded in one executable with 
 go build -o ./blogbin .
 go test ./...
 go vet ./...
+python3 scripts/package_release_test.py  # macOS launcher architecture regression
 npm ci --prefix scripts       # Node.js is only for browser tests/map tooling
 npm test --prefix scripts
 
@@ -294,7 +295,7 @@ npm test --prefix scripts
 ./scripts/package-release.sh
 ```
 
-The archives are `dist-release/Blog-macOS.zip` and `dist-release/Blog-Windows.zip`. A maintainer must upload them to GitHub Releases separately. Launcher sources live in `packaging/`, `cmd/windows-launcher/`, and the root startup scripts.
+The archives are `dist-release/Blog-macOS.zip` and `dist-release/Blog-Windows.zip`, with checksums in `dist-release/SHA256SUMS.txt`. A maintainer must upload them to GitHub Releases separately. Launcher sources live in `packaging/`, `cmd/windows-launcher/`, and the root startup scripts.
 
 | Path | Purpose |
 | --- | --- |

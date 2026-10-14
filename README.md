@@ -30,10 +30,10 @@
 
 | 系统 | 下载文件 | 启动入口 |
 | --- | --- | --- |
-| macOS（Apple Silicon / Intel） | `Blog-macOS.zip` | `Start-Blog.app`；备用入口为 `Start-Blog.command` |
-| Windows x64 | `Blog-Windows.zip` | `Start-Blog.exe`；排错入口为 `Start-Blog-console.bat` |
+| macOS 11+（Apple Silicon / Intel） | [Blog-macOS.zip](https://github.com/sfqin/blog_self/releases/download/v1.3.0/Blog-macOS.zip) | `Start-Blog.app`；备用入口为 `Start-Blog.command` |
+| Windows 10+ x64 | [Blog-Windows.zip](https://github.com/sfqin/blog_self/releases/download/v1.3.0/Blog-Windows.zip) | `Start-Blog.exe`；排错入口为 `Start-Blog-console.bat` |
 
-**版本说明：本 README 描述 master 的能力。当前已发布的 v1.2.0 安装包早于「星夜远行」重构；要立即使用新版界面，请使用下方源码启动方式，或[自行打包客户端](#开发与打包)。更新 master 不会自动更新 Releases 安装包。**
+**最新版：[v1.3.0 · 星夜远行客户端](https://github.com/sfqin/blog_self/releases/tag/v1.3.0)**，已包含星座导航、足迹地球与夜间 / 纸色阅读界面。安装包由维护者单独发布，更新 master 不会自动更新已下载的客户端。
 
 双击启动后，按以下顺序操作：
 
@@ -57,7 +57,7 @@ Windows：确认来源后，在 SmartScreen 中选择「更多信息 → 仍要�
 
 </details>
 
-客户端默认把数据放在用户主目录的 `dev-home-blog/blog.db`，不在安装包里。升级安装包后，重新启动程序即可继续使用原来的数据。当前源码的本地模式会在所有博客页面停止发送心跳约 5 分钟后退出；之后重新启动即可。
+客户端默认把数据放在用户主目录的 `dev-home-blog/blog.db`，不在安装包里。升级安装包后，重新启动程序即可继续使用原来的数据。客户端会在所有博客页面停止发送心跳约 5 分钟后退出；之后重新启动即可。
 
 ## 写作方式二：本地部署网页后台
 
@@ -297,6 +297,7 @@ sqlite3 "file:$HOME/dev-home-blog/blog.db?mode=ro" ".backup '$BACKUP_FILE'"
 go build -o ./blogbin .
 go test ./...
 go vet ./...
+python3 scripts/package_release_test.py  # macOS 启动器架构选择回归
 npm ci --prefix scripts       # 仅运行浏览器测试/地图工具时需要 Node.js
 npm test --prefix scripts
 
@@ -304,7 +305,7 @@ npm test --prefix scripts
 ./scripts/package-release.sh
 ```
 
-安装包输出为 `dist-release/Blog-macOS.zip` 与 `dist-release/Blog-Windows.zip`；它们需要维护者另行上传到 GitHub Releases。启动器源码位于 `packaging/`、`cmd/windows-launcher/` 及仓库根目录的启动脚本中。
+安装包输出为 `dist-release/Blog-macOS.zip` 与 `dist-release/Blog-Windows.zip`，校验文件为 `dist-release/SHA256SUMS.txt`；它们需要维护者另行上传到 GitHub Releases。启动器源码位于 `packaging/`、`cmd/windows-launcher/` 及仓库根目录的启动脚本中。
 
 | 路径 | 用途 |
 | --- | --- |

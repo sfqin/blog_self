@@ -11,7 +11,7 @@ REM     server HERE in this window so you can watch the progress/log text. That
 REM     window stays open on purpose — closing it stops the blog.
 REM
 REM The server keeps all content in %USERPROFILE%\dev-home-blog, picks its own
-REM port (auto-bumps if 8080 is busy), and shuts itself down about a minute after
+REM port (auto-bumps if 8080 is busy), and shuts itself down about five minutes after
 REM the last blog page is closed (heartbeat).
 setlocal enabledelayedexpansion
 cd /d "%~dp0"

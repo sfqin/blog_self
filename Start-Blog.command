@@ -7,7 +7,7 @@
 #
 # Like the .app, this is a *controller*: it starts the server DETACHED in the
 # background, so you can close this window right after and the blog keeps
-# running. The server picks its own port and shuts itself down about a minute
+# running. The server picks its own port and shuts itself down about five minutes
 # after you close the last blog page (heartbeat) — there is no Stop button.
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -19,8 +19,9 @@ echo ""
 
 # --- 1. locate a runnable program ------------------------------------------
 ARCH="$(uname -m)"   # arm64 (Apple Silicon) or x86_64 (Intel)
+case "$ARCH" in x86_64) ARCH=amd64 ;; esac
 BIN=""
-for cand in "bin/blog-macos-$ARCH" "bin/blog-macos-arm64" "bin/blog-macos-amd64" \
+for cand in "bin/blog-macos-$ARCH" \
             "Start-Blog.app/Contents/Resources/blog-macos-$ARCH"; do
   if [ -x "$cand" ]; then BIN="$(cd "$(dirname "$cand")" && pwd)/$(basename "$cand")"; break; fi
 done
@@ -48,7 +49,7 @@ running_pid() { [ -f "$RUNTIME" ] && sed -n 's/.*"pid"[ ]*:[ ]*\([0-9]*\).*/\1/p
 is_alive()    { curl -s -m 2 "$1/internal/ready" 2>/dev/null | grep -q '"ready"'; }
 
 start_detached() {
-  ( cd "$DATA" && ADDR=":8080" REPO_DIR="$DATA" DB_PATH="$DATA/blog.db" \
+  ( cd "$DATA" && ADDR="127.0.0.1:8080" REPO_DIR="$DATA" DB_PATH="$DATA/blog.db" \
       nohup "$BIN" serve >"$DATA/server.log" 2>&1 & )
 }
 open_when_ready() {
@@ -98,5 +99,5 @@ start_detached
 open_ui
 echo ""
 echo "✓ 博客已在后台运行。可以关闭此窗口。"
-echo "  关掉所有博客网页约 1 分钟后，它会自动停止。"
+echo "  关掉所有博客网页约 5 分钟后，它会自动停止。"
 echo "  想立刻用最新版：再次双击 Start，选择“重启”。"

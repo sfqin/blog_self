@@ -11,7 +11,7 @@
 #      no lingering app to "re-activate" — this fixes the old "double-click does
 #      nothing" bug), waits for it to report its port, and opens the browser.
 #
-# The server picks its own port and shuts itself down a minute after the last
+# The server picks its own port and shuts itself down five minutes after the last
 # blog page is closed (heartbeat), so there is no Stop button to press.
 #
 # All failures are shown as native dialogs via osascript, never terminal text.
@@ -33,9 +33,9 @@ LOADING="$RES/loading.html"
 
 # --- pick the binary for this Mac's architecture ---------------------------
 ARCH="$(/usr/bin/uname -m)"
+case "$ARCH" in x86_64) ARCH=amd64 ;; esac
 BIN=""
-for cand in "$RES/blog" "$RES/blog-macos-$ARCH" \
-            "$RES/blog-macos-arm64" "$RES/blog-macos-amd64"; do
+for cand in "$RES/blog-macos-$ARCH" "$RES/blog"; do
   if [ -x "$cand" ]; then BIN="$cand"; break; fi
 done
 [ -n "$BIN" ] || die "没有找到博客程序（Resources 里缺少 blog 可执行文件）。请向提供者索要完整安装包。"
@@ -62,7 +62,7 @@ start_detached() {
   # nohup + & fully detaches the server from this script, so the .app exits
   # immediately and the next double-click always re-runs this controller.
   cd "$DATA"
-  ADDR=":8080" REPO_DIR="$DATA" DB_PATH="$DATA/blog.db" \
+  ADDR="127.0.0.1:8080" REPO_DIR="$DATA" DB_PATH="$DATA/blog.db" \
     /usr/bin/nohup "$BIN" serve >"$DATA/server.log" 2>&1 &
   disown 2>/dev/null || true
 }

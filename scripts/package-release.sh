@@ -15,7 +15,7 @@
 #   Blog-macOS.zip                 Blog-Windows.zip   ← 可直接发送
 #
 # There is no Stop-Blog file: the server runs in the background, picks its own
-# port, and shuts itself down about a minute after the last blog page is closed
+# port, and shuts itself down about five minutes after the last blog page is closed
 # (a heartbeat from every open page keeps it alive). Re-running Start offers to
 # open or restart a running instance.
 #
@@ -87,46 +87,75 @@ cp "$ROOT/packaging/loading.html" "$WIN/loading.html"
 
 # --- 4. ultra-short per-platform pointer -----------------------------------
 cat > "$MAC/使用说明.txt" <<'TXT'
-欢迎使用 dev@home 博客！（苹果电脑 macOS 版）
+欢迎使用 blog_self「星夜远行」博客！（macOS 11 或更新版本，Apple Silicon / Intel）
 
 只需双击：  Start-Blog.app
-（若被系统拦截，改双击备用的 Start-Blog.command）
+请先解压整个安装包，不要只复制启动文件。
+若被系统拦截，确认来源后在“系统设置 → 隐私与安全性 → 仍要打开”中授权。
+备用入口为 Start-Blog.command，可以查看启动日志。
 
 之后浏览器会自动打开一个网页向导，跟着上面的按钮一步步点即可：
 装工具 → 连 GitHub → 建仓库 → 写文章 → 一键发布上线。
 
 关于停止：不用手动停。博客在后台运行，关掉所有博客网页后
-约 1 分钟它会自动停止。
+约 5 分钟它会自动停止。
 
-想立刻用最新版本：再次双击 Start-Blog.app，会弹出选择——
+升级时先下载并解压新安装包，再双击新包里的 Start-Blog.app，会弹出选择——
 “打开网页”继续用，或“重启”用最新版重新启动。
 
-你的全部内容保存在“主目录/dev-home-blog/blog.db”，只在本地，想备份就复制它。
+内容保存在“主目录/dev-home-blog/blog.db”，不在安装包里，升级会继续使用原数据。
+备份时先关闭所有博客网页并等待程序退出，再复制整个 dev-home-blog 文件夹。
+博客图片/视频使用外部链接，外部媒体文件需要单独备份。
+只在本地写作不需要 GitHub；发布时仅上传公开的静态页面，不上传数据库。
+
+新版下载与说明：https://github.com/sfqin/blog_self/releases
 TXT
 
 cat > "$WIN/README.txt" <<'TXT'
-欢迎使用 dev@home 博客！（Windows 版）
+欢迎使用 blog_self「星夜远行」博客！（Windows 10 或更新版本，x64）
 
 只需双击：  Start-Blog.exe
-（想看运行进度/排错，可双击 Start-Blog-console.bat，再按提示以 log 模式运行）
+请先解压整个安装包，不要只复制启动文件。
+排错时在命令提示符里运行 Start-Blog-console.bat log，可查看运行日志。
 
 之后浏览器会自动打开一个网页向导，跟着上面的按钮一步步点即可：
 装工具 → 连 GitHub → 建仓库 → 写文章 → 一键发布上线。
 
 关于停止：不用手动停。博客在后台运行，关掉所有博客网页后
-约 1 分钟它会自动停止。
+约 5 分钟它会自动停止。
 
-想立刻用最新版本：再次双击 Start-Blog.exe，会弹出选择——
+升级时先下载并解压新安装包，再双击新包里的 Start-Blog.exe，会弹出选择——
 “是”打开网页继续用，“否”用最新版重启。
 
-你的全部内容保存在“用户目录\dev-home-blog\blog.db”，只在本地，想备份就复制它。
+内容保存在“用户目录\dev-home-blog\blog.db”，不在安装包里，升级会继续使用原数据。
+备份时先关闭所有博客网页并等待程序退出，再复制整个 dev-home-blog 文件夹。
+博客图片/视频使用外部链接，外部媒体文件需要单独备份。
+只在本地写作不需要 GitHub；发布时仅上传公开的静态页面，不上传数据库。
+
+新版下载与说明：https://github.com/sfqin/blog_self/releases
 TXT
+
+# Include the license for embedded fonts and traceable build information.
+for package in "$MAC" "$WIN"; do
+  cp "$ROOT/web/static/fonts/OFL.txt" "$package/FONT-LICENSE.txt"
+  {
+    echo "Source: https://github.com/sfqin/blog_self"
+    echo "Commit: $(git rev-parse HEAD)"
+    echo "Toolchain: $(go version)"
+    if [ -n "$(git status --porcelain --untracked-files=normal)" ]; then
+      echo "Working tree: modified"
+    else
+      echo "Working tree: clean"
+    fi
+  } > "$package/BUILD-INFO.txt"
+done
 
 # --- 5. zip each platform up for easy sending ------------------------------
 # Exclude macOS junk (.DS_Store / AppleDouble) so a non-programmer never sees it.
 echo "== 打包 zip =="
 ( cd "$DIST" && zip -q -r -y "Blog-macOS.zip"   "Blog-macOS"   -x '*.DS_Store' -x '*/__MACOSX/*' )
 ( cd "$DIST" && zip -q -r -y "Blog-Windows.zip" "Blog-Windows" -x '*.DS_Store' -x '*/__MACOSX/*' )
+( cd "$DIST" && shasum -a 256 Blog-macOS.zip Blog-Windows.zip > SHA256SUMS.txt )
 
 echo ""
 echo ">> 完成！发布目录："
