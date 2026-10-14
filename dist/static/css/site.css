@@ -302,6 +302,8 @@ html.no-blur .site-nav.is-solid { background: var(--bg-1); -webkit-backdrop-filt
   opacity: .6;
 }
 .footer-copy { font: 400 11px/1.8 var(--font-mono); letter-spacing: .16em; color: var(--muted-2); }
+.footer-copy a { text-decoration: underline; text-decoration-color: var(--hairline); text-underline-offset: 3px; transition: color var(--t-fast), text-decoration-color var(--t-fast); }
+.footer-copy a:hover, .footer-copy a:focus-visible { color: var(--gold); text-decoration-color: currentColor; }
 
 /* ---------- reveal ---------- */
 html.js [data-reveal] {
