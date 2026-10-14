@@ -1,265 +1,328 @@
-# dev@home ——「星夜远行」个人博客
+# blog_self ·「星夜远行」个人博客
 
 **中文** · [English](README.en.md)
 
-一个「星夜远行」风格的个人主页博客：深夜星空、流金衬线大字，带一个可交互的 3D「足迹」地球。在本地后台写文章、传照片、标足迹，一键发布到网上，就能得到一个免费、全世界都能访问的个人网站。
+用 Markdown 写文章，用星座导航串起经历、项目、思考和瞬间，再用 3D 足迹地球记录走过的地方。支持在自己的电脑上写作，发布到 GitHub Pages、静态托管平台或自己的服务器。
 
-> 🔗 **在线 Demo**：<https://sfqin.github.io/blog_test/>（发布后的效果参考）
+[查看个人实例](https://sfqin.github.io/blog/) · [下载客户端](https://github.com/sfqin/blog_self/releases) · [反馈问题](https://github.com/sfqin/blog_self/issues)
 
----
+## 先选一种使用方式
 
-## 一、它能做什么 / 最终能得到什么
+**写作入口和网站部署位置是两件事。** 客户端、本地网页后台都把内容保存到 SQLite；访客可以访问导出的静态网站，也可以访问服务器上运行的动态网站。
 
-- ✅ 在**自己电脑的后台**里写博客：个人资料、经历、随想、项目、文章、足迹、瞬间，
-  **保存即时生效**，不用重新构建。
-- ✅ **一键发布上线**：把内容渲染成静态网页并推送到 GitHub，自动开启 GitHub Pages。
-- ✅ 得到一个**免费的公网地址**，形如 `https://你的用户名.github.io/blog/`，用手机、
-  电脑、发给朋友都能直接打开，**无需服务器、无需付费**。
-- ✅ 一个可交互的 **3D 地球**，展示你去过的城市（可下钻到 国家 → 省/州 → 城市）。
+| 你的需求 | 写作方式 | 网站部署方式 |
+| --- | --- | --- |
+| 不想配置开发环境 | 下载客户端，双击后在浏览器后台写作 | 后台一键发布到 GitHub Pages |
+| 想使用最新源码或修改界面 | 本地编译运行，在网页后台写作 | GitHub Pages / 导出到其他静态主机 |
+| 平时使用 VS Code、Typora、Obsidian | 在外部编辑器写 `.md`，再把正文粘贴到后台 | 保存后按所选部署方式发布 |
+| 已有服务器，想低成本维护 | 本地写作，导出静态文件 | Nginx 等静态文件服务 |
+| 想在服务器后台直接写，保存后立即上线 | 使用支持常驻运行与管理网关的个人实例 | Go 服务 + Nginx + systemd；见[动态部署说明](#动态部署个人实例) |
 
-**最终效果**：一个属于你自己的、星夜风格、带 3D 足迹地球的个人网站，长期免费在线。
+> **当前没有 Markdown 目录扫描或批量导入功能。** 把 `.md` 放进仓库，不会自动变成文章。下面会说明实际支持的写法、内容保存位置和发布步骤。
 
----
+## 写作方式一：直接使用客户端
 
-## 二、需要准备什么
+适合不想安装 Go 或操作终端的用户。客户端会在电脑上启动博客程序，并打开浏览器中的后台；它与源码运行使用的是同一套编辑界面。
 
-1. **一台电脑**（Windows 或苹果 macOS 都行）。
-2. **一个 GitHub 账号**（免费）。没有就去 <https://github.com> 用邮箱注册一个，用来免费托管你的网站。
+### 下载与启动
 
----
+到 [GitHub Releases](https://github.com/sfqin/blog_self/releases) 下载并解压完整安装包：
 
-## 三、怎么做
+| 系统 | 下载文件 | 启动入口 |
+| --- | --- | --- |
+| macOS（Apple Silicon / Intel） | `Blog-macOS.zip` | `Start-Blog.app`；备用入口为 `Start-Blog.command` |
+| Windows x64 | `Blog-Windows.zip` | `Start-Blog.exe`；排错入口为 `Start-Blog-console.bat` |
 
-全程不用打开终端敲命令，都在网页里点按钮。
+**版本说明：本 README 描述 master 的能力。当前已发布的 v1.2.0 安装包早于「星夜远行」重构；要立即使用新版界面，请使用下方源码启动方式，或[自行打包客户端](#开发与打包)。更新 master 不会自动更新 Releases 安装包。**
 
-### 第一步：下载客户端
+双击启动后，按以下顺序操作：
 
-到 [**发布页**](https://github.com/sfqin/blog_self/releases) 按自己的系统下载，双击即用、无需装任何环境：
+1. 打开向导 `/setup`。如果准备发布到 GitHub，按提示安装 Git / GitHub CLI，并完成 GitHub 浏览器授权。
+2. 创建自己的博客仓库，或关联自己有发布权限的仓库。向导默认创建公开仓库，用于 GitHub Pages。
+3. 进入 `/admin`，填写个人资料、经历、足迹等内容，在「文章」中新建文章。
+4. 填写标题、slug、日期、标签及 Markdown 正文。先不勾选 `published` 可以保存草稿；准备公开时勾选并保存。
+5. 打开本地首页预览，再到后台「发布上线」（`/admin/publish`）或向导 `/setup` 点击发布。等待 GitHub Pages 构建完成后访问公网地址。
 
-- 苹果电脑 macOS → `Blog-macOS.zip`，解压后双击 `Start-Blog.app`
-- Windows → `Blog-Windows.zip`，解压后双击 `Start-Blog.exe`
+只在本地写作、预览时，不需要 GitHub 账号。GitHub 授权用于建仓和发布，不是本地后台的登录账号。
 
-**macOS 首次打开被拦截怎么办？** 因为这个程序没有做 Apple 付费签名，第一次双击 `Start-Blog.app` 会被系统拦下，弹出下面这个「未打开 Start-Blog」的提示——这是正常现象，先点**「完成」**关掉它（不要点「移到废纸篓」）：
+<details>
+<summary>首次启动被系统拦截怎么办？</summary>
 
-<img src="fengxian.png" alt="macOS 首次打开被拦截" width="360">
+macOS：确认下载来源后，在 **系统设置 → 隐私与安全性 → 仍要打开** 中授权，再次启动应用。
 
-**解决办法：到隐私设置里授权。** 打开 **系统设置 → 隐私与安全性**，向下滚动到「安全性」一栏，会看到「已阻止 “Start-Blog” 以保护 Mac」，点它右边的**「仍要打开」**（按提示输入开机密码或用指纹确认）：
+<img src="fengxian.png" alt="macOS 首次打开提示" width="360">
+<img src="yinsi.png" alt="在隐私与安全性中授权打开" width="560">
 
-<img src="yinsi.png" alt="在隐私与安全性里点「仍要打开」" width="560">
+Windows：确认来源后，在 SmartScreen 中选择「更多信息 → 仍要运行」。
 
-授权后回到 `Start-Blog.app` **再次双击**，弹窗里点**「打开」**即可正常启动（以后打开都不会再被拦）。
+</details>
 
-> Windows 首次打开若被 SmartScreen 拦截：点「更多信息 → 仍要运行」。
-> 备用启动器：macOS 用 `Start-Blog.command`；Windows 用 `Start-Blog-console.bat`
-> （双击它会直接转交 `Start-Blog.exe`，不会卡窗口；想看运行日志就以 `log` 模式运行它）。
+客户端默认把数据放在用户主目录的 `dev-home-blog/blog.db`，不在安装包里。升级安装包后，重新启动程序即可继续使用原来的数据。当前源码的本地模式会在所有博客页面停止发送心跳约 5 分钟后退出；之后重新启动即可。
 
-### 第二步：启动，跟着网页向导从上往下点
+## 写作方式二：本地部署网页后台
 
-双击后浏览器会**自动打开**一个向导页。从上到下每一步都有状态灯：
-**✓ 绿色**=没问题，**✗ 红色**=点旁边的按钮处理。
+适合需要最新 master、使用 Linux，或准备修改代码的用户。需要 **Go 1.23+**；克隆源码需要 Git，发布到 GitHub Pages 还需要 GitHub CLI（`gh`）。普通运行不需要 Node.js、MySQL 或独立的前端构建服务。
 
-| 步骤 | 做什么 |
-|------|--------|
-| **① 环境检测** | 检查 Git 和 GitHub CLI 两个小工具。显示 ✗ 就点按钮，程序会**自动下载安装**（macOS 弹系统对话框点「安装」；GitHub CLI 直接从官网下载）。 |
-| **② 连接 GitHub** | 点「用浏览器登录 GitHub」，按提示完成授权即可。 |
-| **③ 创建仓库** | 给博客起个名字（默认 `blog`，会成为网址的一部分）。仓库固定创建为**公开（Public）**——GitHub Pages 免费版只能发布公开仓库。 |
-| **④ 写文章 / 本地预览** | 进入后台 `/admin`（**无需登录、没有密码，直接打开**），填资料、经历、项目、文章、足迹、瞬间；**保存后点「本地预览首页」查看效果**。 |
-| **⑤ 一键发布上线（公网访问）** | 回到向导页点 **🚀 一键发布上线**。等 1～2 分钟，页面显示你的**网站地址**（`https://你的用户名.github.io/blog/`），点开就是你的博客！ |
-
-### 以后怎么用
-
-**双击启动器 → 后台写/改内容并本地预览 → 打开 `/setup` 点一键发布**。不发布，改动只在本地；发布后，全世界都能看到。
-
----
-
-## 四、博客的特色与模块
-
-**前台（`/`，访客看到的页面）**
-- **个人资料**、**职业经历**、**随想**、**项目**、**最新文章**
-- **3D 足迹地球**：拖拽旋转、缩放、下钻到 国家 → 省/州 → 城市；随真实时间显示昼夜
-  光照；手机支持双指缩放与拖动。已内置 **5 个国家**的可下钻数据，且外国地名**中英双语**：
-  中国（全省 + 港澳台，34 个省级可下钻）、日本、马来西亚、新加坡、泰国。
-- **瞬间信息流**：图片 / 短视频 / 纯文字日记
-- **全站模糊搜索**
-
-**文章页（`/posts/{slug}`）**：Markdown 自动渲染为网页，可一键切换夜间 / 纸页阅读模式。
-
-**公开站设计「星夜远行」**：首页和文章页只有这一套设计，不提供主题切换。
-- 深夜星空背景，流金衬线大字配金色细线；字体自托管，不依赖 Google Fonts。
-- **星座导航**：首屏是一组星座，每颗亮星对应一个章节；滚动后桌面端停靠为右侧星轨，
-  手机端变为底部星点栏，同时充当章节导航和阅读进度。没有内容的章节显示为暗星。
-- **足迹地球**在第三章「足迹」：单击选中、双击下钻，显示从出发地起飞的航线和足迹统计。
-- **文章阅读模式**：不透明阅读面板，夜间 / 纸页一键切换，选择会被记住。
-- 每个动效都能降级：在「减少动态效果」、触屏或禁用 JS 时，内容仍能完整阅读。
-- 后台（`/admin`）保持原来的复古终端风，不受影响。
-
-**后台（`/admin`，无需登录）**：对每一块内容增删改，保存即写入本地数据库，前台下次
-加载即生效。后台只在你自己电脑上运行，所以不设密码、打开即用。
-
-| 版块 | 说明 |
-|------|------|
-| **资料 Profile** | 名字、标题、slogan、关于（Markdown）、技术栈标签、GitHub、邮箱、位置 |
-| **经历 Experiences** | 职业时间线，可排序 |
-| **随想 Thoughts** | 短观点卡片，带主题和日期 |
-| **项目 Projects** | 名称、描述、语言、星标、License、链接，可排序 |
-| **文章 Posts** | Markdown 文章；勾选 `published` 才会上线，草稿不外泄 |
-| **足迹 Footprints** | 一条 = 一座去过的城市（国家 → 省/州 → 城市联动选择），可写备注、关联多条瞬间 |
-| **瞬间 Moments** | 图片 / 短视频 / 纯文字动态 |
-
-**关于媒体**：站点本身**不托管图片/视频**，而是引用外部 URL（推荐图片放 Cloudflare R2
-等对象存储），因此无体积限制、加载快。B 站 / YouTube 链接粘普通观看页即可自动内嵌播放。
-
-**安全**：后台无登录、无密码（本机单人使用）；表单仍有 CSRF 双提交 Cookie 防护。
-如果你选择把它部署成**公网动态站**（见下文），`/admin` 是公开可写的——请在反向代理
-层自行加访问控制（如 Caddy `basicauth`），或仅用静态发布模式。
-
----
-
-## 五、未来展望 & 联系方式
-
-- 更多国家的足迹数据、更多内容模块，也在路上。
-
-有问题、建议或想一起完善，欢迎联系： **sfqincsu@163.com**
-
----
-
-## 进阶：开发者 / 技术参考
-
-上面是「小白双击即用」的路线。如果你会命令行，也可以直接用源码运行、或部署成动态站点。
-
-### 快速开始（源码运行，需 Go 1.23+）
+### macOS / Linux
 
 ```bash
+git clone https://github.com/sfqin/blog_self.git
+cd blog_self
 go build -o ./blogbin .
-./blogbin serve
-# → 监听 :8080；后台 http://localhost:8080/admin （无需登录，直接打开）
+
+DATA_DIR="$HOME/dev-home-blog"
+mkdir -p "$DATA_DIR"
+ADDR=127.0.0.1:8080 \
+  DB_PATH="$DATA_DIR/blog.db" \
+  REPO_DIR="$DATA_DIR" \
+  ./blogbin serve
 ```
 
-整个前端（HTML 模板、CSS、JS、地理数据）通过 `//go:embed` 编译进**一个可执行文件**，
-部署就是拷一个二进制。
+保持终端运行，打开：
+
+| 地址 | 用途 |
+| --- | --- |
+| `http://localhost:8080/` | 本地预览首页 |
+| `http://localhost:8080/admin` | 编辑所有内容 |
+| `http://localhost:8080/setup` | 首次配置 GitHub / 发布 |
+| `http://localhost:8080/admin/publish` | 后续发布到 GitHub Pages |
+
+如果 8080 被占用，程序会尝试后续端口，以启动日志中的实际地址为准。
+
+这里显式指定 `DB_PATH`，因此可以继续使用客户端的数据；`REPO_DIR` 指向自己的发布工作目录，避免把下载源码时的上游仓库误当成发布目标。两个入口不要同时编辑同一份数据库。
+
+<details>
+<summary>Windows PowerShell 启动命令</summary>
+
+```powershell
+git clone https://github.com/sfqin/blog_self.git
+cd blog_self
+go build -o blogbin.exe .
+
+$dataDir = Join-Path $env:USERPROFILE "dev-home-blog"
+New-Item -ItemType Directory -Force $dataDir | Out-Null
+$env:ADDR = "127.0.0.1:8080"
+$env:DB_PATH = Join-Path $dataDir "blog.db"
+$env:REPO_DIR = $dataDir
+.\blogbin.exe serve
+```
+
+</details>
+
+本地后台没有独立账号密码，上面的命令将服务绑定到本机回环地址。公网编辑应使用已配置鉴权的管理入口，不能直接把本地 `/admin`、`/setup` 暴露到公网。
+
+## 写作方式三：用自己的 Markdown 编辑器
+
+可以先在 VS Code、Typora、Obsidian 等工具中写好文章。例如，你可以自己创建：
+
+```text
+~/my-writing/
+└── my-first-post.md
+```
+
+这个目录由你管理，**不是程序约定的导入目录**。当前的录入步骤是：
+
+1. 在编辑器中完成 Markdown 正文。
+2. 打开博客后台的「文章 → 新建」，把正文粘贴到 `body 正文（Markdown）`。
+3. 在表单中单独填写标题、slug、日期和标签。文件名与 YAML front matter 不会被自动解析为这些字段。
+4. 预览正文，勾选 `published` 并保存；如果使用静态托管，再执行一次发布。
+
+例如，表单标题填「我的第一篇博客」，slug 填 `my-first-post`，正文可以是：
+
+```markdown
+## 今天开始记录
+
+这里是正文，可以写 **重点**、列表、引用和代码块。
+
+![旅途照片](https://example.com/photo.jpg)
+```
+
+动态站文章地址为 `/posts/my-first-post`；静态导出文件为 `posts/my-first-post.html`，模板会生成对应的静态链接。
+
+项目支持 Markdown 标题、列表、代码块、引用和表格。图片、视频使用外部 URL；需要先放到自己管理的图床或对象存储中，项目没有内置图片/视频上传存储服务。
+
+### 为什么不直接放到 `posts/` 或 `web/`？
+
+| 位置 | 实际作用 |
+| --- | --- |
+| `blog.db` 中的 `posts` 表 | 文章数据来源，Markdown 正文保存在 `body_md` 字段 |
+| `web/templates/public/post.html` | 所有文章共用的页面模板，不是某一篇文章 |
+| `web/static/` | CSS、JavaScript、字体和地图等程序资源 |
+| 导出目录中的 `posts/*.html` | 自动生成的公开页面，下次导出会重建 |
+| 任意自建的 `.md` 目录 | 个人写作素材；当前不会被程序自动读取 |
+
+因此，不要通过修改生成的 HTML 来维护文章，也不需要直接修改 SQLite 表。日常内容编辑使用后台即可。
+
+## 部署方式一：GitHub Pages
+
+**推荐用于“本地写作，免费公开访问”。** GitHub Pages 只托管导出的 HTML、CSS、JavaScript、地图与公开内容，不运行 Go 服务，也不提供写作后台。
+
+1. 用客户端或本地源码方式启动后台。
+2. 在 `/setup` 完成 GitHub 授权，并确认发布目标是自己的仓库。
+3. 编辑内容后点击「发布上线」。程序会导出当前数据库中的公开内容，并推送到目标仓库的 `gh-pages` 分支。
+4. 若没有自动启用 Pages，到仓库 **Settings → Pages**，选择 **Deploy from a branch → gh-pages → /(root)**。
+5. 等待 GitHub 的 Pages 构建完成，访问 `https://你的用户名.github.io/仓库名/`。
+
+**日常流程：修改内容 → 保存 → 本地预览 → 再次发布。** 只勾选 `published` 是把文章设为可公开状态，不等于已经更新 GitHub Pages。未发布的草稿不进入导出结果。
+
+`master` 保存源码，`gh-pages` 保存生成的网站；更新其中一个分支不会自动更新另一个。数据库也不会上传到 Pages。通过向导发布时，仓库名决定 URL 子路径，推荐使用普通项目仓库，例如 `blog`。
+
+### 命令行导出与发布脚本
+
+只生成静态文件、不推送 GitHub：
+
+```bash
+# 在已编译出 blogbin 的源码目录运行；/blog 要与目标仓库名对应。
+DB_PATH="$HOME/dev-home-blog/blog.db" BASE_URL=/blog \
+  ./blogbin export "$HOME/blog-export"
+```
+
+`export` 会清空并重建指定输出目录。该目录只用于生成文件，不要选数据库目录或写作素材目录。
+
+仓库还保留了进阶发布脚本，执行前先确认当前仓库与 remote：
+
+| 脚本 | blog_self 上游中的行为 |
+| --- | --- |
+| `scripts/publish.sh` | 生成根路径 `dist/`，提交并推送当前源码分支 |
+| `scripts/publish-all.sh` | 更新并推送 `dist/`，再发布 `gh-pages`；配置了 Gitee remote 时还可能推送 Gitee |
+| 后台「发布上线」 | 只向目标仓库的 `gh-pages` 推送静态站，不提交源码修改 |
+
+`SKIP_GITEE=1` 可让上游多平台脚本跳过 Gitee，`SUBPATH=/仓库名` 控制子路径。**只需要 GitHub Pages 时，优先使用后台发布。** 个人实例 `s_blog` 的同名脚本已经调整过，不会向 master 提交 `dist/`，具体以该仓库说明为准。
+
+## 部署方式二：其他静态托管或自己的 Nginx
+
+适合已有域名、Cloudflare Pages、EdgeOne Pages 或自建服务器的情况。浏览器访问生成的网站，服务器无需安装 Go 或 SQLite。
+
+### 1. 导出根路径网站
+
+```bash
+DB_PATH="$HOME/dev-home-blog/blog.db" BASE_URL= \
+  ./blogbin export "$HOME/blog-export"
+```
+
+输出结构如下：
+
+```text
+blog-export/
+├── index.html
+├── posts/               # 已发布文章的 HTML
+├── api/footprints       # 足迹数据
+├── api/search           # 公开内容搜索索引
+└── static/              # 样式、脚本、字体、地图
+```
+
+域名根路径如 `https://example.com/` 使用空 `BASE_URL`；子路径如 `https://example.com/blog/` 使用 `BASE_URL=/blog`。否则样式、脚本和文章链接可能指向错误的位置。
+
+### 2. 交给静态主机
+
+- **Cloudflare Pages / EdgeOne Pages**：上传导出目录的内容，或让平台部署你自己发布仓库中的静态产物。产物已在本地生成，平台无需运行 Go 或安装 npm 依赖。
+- **Nginx**：把产物同步到单独的网站目录，再配置站点根目录。例如目标服务器已准备好 `/var/www/my-blog/` 和对应写权限时：
+
+```bash
+rsync -av --delete "$HOME/blog-export/" blog@your-server:/var/www/my-blog/
+```
+
+`--delete` 用于同步删除已撤回的文章；目标目录必须专门用于该静态站，不能混放数据库或其他应用文件。
+
+Nginx 静态路由示例（域名、TLS 证书按自己的服务器配置）：
+
+```nginx
+server {
+    listen 80;
+    server_name blog.example.com;
+    root /var/www/my-blog;
+    index index.html;
+
+    location / {
+        try_files $uri $uri.html $uri/ =404;
+    }
+}
+```
+
+每次修改内容后重新导出、同步即可。这里仅上传公开产物，**不把 `blog.db` 放进网站根目录**。
+
+## 动态部署：个人实例
+
+动态站由 Go 服务直接读取服务器上的 SQLite。通过服务器管理后台保存内容后，刷新公网页面即可看到更新，不需要静态导出；GitHub Pages 不会跟着自动更新。
+
+需要区分两个仓库当前的能力：
+
+| 仓库 | 定位 | 动态服务差异 |
+| --- | --- | --- |
+| [blog_self](https://github.com/sfqin/blog_self) | 开源上游模板 | 本地运行模式含约 5 分钟无心跳退出机制；当前不读取 `SERVER_MODE` |
+| [blog](https://github.com/sfqin/blog)（本地目录名 `s_blog`） | 作者的个人实例 | 支持 `SERVER_MODE=1` 常驻运行，以及受鉴权保护的 Ops 管理网关 |
+
+**上游模板用于自建服务器时，优先采用前面的静态部署方式。** 仓库中的 `Caddyfile`、`s_blog.service` 和 `scripts/deploy.sh` 是早期部署参考，不包含个人实例现用的常驻与管理网关配置，不能直接当作当前生产部署方案。
+
+如果维护的是个人实例，参阅其[自建服务器部署与写作说明](https://github.com/sfqin/blog/blob/master/docs/self-hosted.md)：其中列出了编译上传、systemd 配置、后台入口、数据目录、版本更新与回滚方式。该实例包含作者自己的站点配置，复用时应替换为自己的配置。
+
+## 内容保存在哪里，如何备份？
+
+| 启动方式 | 内容数据库 |
+| --- | --- |
+| macOS 客户端 | `/Users/你的用户名/dev-home-blog/blog.db` |
+| Windows 客户端 | `C:\Users\你的用户名\dev-home-blog\blog.db` |
+| 按本 README 的源码命令启动 | 同客户端，显式指定的 `DB_PATH` |
+| 不设置 `DB_PATH`，直接执行 `./blogbin serve` | 当前工作目录中的 `blog.db` |
+| 个人实例的自建服务器 | `/opt/s_blog/data/blog.db`，以实际服务配置为准 |
+
+客户端数据、本地仓库里的数据库、服务器数据库**不会自动同步**。如果内容突然不同，先核对正在运行的程序使用了哪个 `DB_PATH`。静态站的导出文件也不是一份完整数据库备份。
+
+停止程序后可以备份整个数据目录。程序运行时，建议使用 SQLite 在线备份，不要只复制可能仍有 WAL 写入的 `blog.db`。安装了 `sqlite3` 命令后，例如：
+
+```bash
+BACKUP_FILE="$HOME/blog-backup-$(date +%Y%m%d-%H%M%S).db"
+sqlite3 "file:$HOME/dev-home-blog/blog.db?mode=ro" ".backup '$BACKUP_FILE'"
+```
+
+换电脑时，停止目标程序，把备份数据库放到目标 `DB_PATH`，再启动。图片和视频存储在外部服务中，需要单独维护对应资源。数据库不应提交到 GitHub。
+
+## 常用配置与开发
 
 ### 环境变量
 
-| 变量 | 默认值 | 含义 |
-|------|--------|------|
-| `ADDR` | `:8080` | 监听地址。生产建议 `127.0.0.1:8080`（回环，前置反代） |
-| `DB_PATH` | `blog.db` | SQLite 文件路径 |
-| `SECURE_COOKIES` | *(关)* | 设为 `1` 时 CSRF Cookie 仅走 HTTPS；生产环境开启 |
+| 变量 | 默认值 | 作用 |
+| --- | --- | --- |
+| `ADDR` | `:8080` | 监听地址；本地使用建议显式设为 `127.0.0.1:8080` |
+| `DB_PATH` | `blog.db` | 当前实例的 SQLite 路径 |
+| `REPO_DIR` | `.` | GitHub 向导使用的发布工作目录 |
+| `BASE_URL` | 空 | 仅静态导出时使用的 URL 子路径，如 `/blog` |
+| `SECURE_COOKIES` | 关闭 | 设为 `1` 时，CSRF Cookie 仅通过 HTTPS 发送；本地 HTTP 不要开启 |
 
-### 子命令
+### 开发与打包
 
-```bash
-./blogbin serve          # （默认）启动后台 + 前台服务
-./blogbin export [dir]   # 把当前数据库渲染成静态站（默认输出 ./dist）
-BASE_URL=/blog ./blogbin export dist   # 子路径构建（用于 user.github.io/blog 这类子路径）
-```
-
-「一键发布」本质就是 `export` + 推送到 GitHub Pages（见 `internal/setup/publish.go`）。
-`export` 会把首页、每篇已发布文章渲染成 HTML，把足迹 JSON 写到 `dist/api/footprints`
-（正是地球 fetch 的路径）、搜索索引写到 `dist/api/search`，再拷贝全部静态资源。后台只在
-本地跑，数据库不出本机。
-
-### 数据与备份
-
-你的**全部内容**都在一个文件里：`~/dev-home-blog/blog.db`
-（macOS `/Users/你/dev-home-blog/blog.db`，Windows `C:\Users\你\dev-home-blog\blog.db`）。
-备份就复制它；换电脑就拷到新电脑同样位置。
-
-### 动态部署（可选，付费 VPS，线上后台随处可编辑）
-
-若想让线上 `/admin` 随时可编辑、改完即时生效，可把 Go 服务跑在服务器上。推荐
-**香港（或就近海外）VPS + Cloudflare + 自有域名**。仓库内已含 `Caddyfile`（反代 + 自动
-HTTPS）与 systemd 单元；详见 [`DEPLOY.md`](DEPLOY.md)。
+模板、CSS、JavaScript、字体和地图通过 `go:embed` 编入一个可执行文件。**改内容只需保存；改界面或代码需要重新编译、重启，静态网站还需重新导出发布。**
 
 ```bash
-./scripts/deploy.sh push blog@your-server-ip   # 编译 → 上传 → 重启
-./scripts/deploy.sh build                       # 只编译 Linux 二进制（输出 dist/s_blog）
-```
-
-### 重新生成地球地理数据
-
-`web/static/geo/` 下的地理 JSON 已预生成，通常不用动。要重建（需联网 + Node）：
-
-```bash
-node scripts/gen_geo.mjs            # 重建全部国家
-node scripts/gen_geo.mjs SG TH      # 只重建指定国家
-```
-
-已内置国家：CN（34 省级可下钻）、JP（25）、MY（13）、SG（5）、TH（15），外国地名均为中英双语。
-初始只加载 `world.json`，区域文件在下钻时按需懒加载。
-
-### 打包发布包（维护者）
-
-```bash
-./scripts/package-release.sh   # 生成 dist-release/ 下的两个分平台压缩包
-```
-
-产物是**按系统拆分的两个压缩包**：`Blog-macOS.zip`（含 `Start-Blog.app` / `.command`
-+ macOS 二进制）与 `Blog-Windows.zip`（含 `Start-Blog.exe` / `.bat` + Windows 程序），
-各自都带启动加载页 `loading.html` 与一份说明文件（macOS 为 `使用说明.txt`，Windows 为
-`README.txt`）。用户只需下载对应自己系统的那个。
-
-> **客户端目录**：给最终用户的「客户端」就是打包生成的 **`dist-release/Blog-macOS/`** 与
-> **`dist-release/Blog-Windows/`** 文件夹（压缩后即两个 zip）——里面是双击即用的启动器和
-> 自包含程序，用户无需装任何环境。它由脚本自动生成、**不纳入版本库**（见 `.gitignore`）。
-> 客户端启动器的**源文件**放在仓库的 **`packaging/`** 与 **`cmd/windows-launcher/`** 目录
-> （macOS 的 `.app` 外壳与 `launch`、Windows 的 `.exe` 启动器、以及共用的 `loading.html`），
-> 配合仓库根目录的 `Start-Blog.command` / `Start-Blog-console.bat`。
-
-### 项目结构
-
-```
-main.go                     入口；embed ./web；serve / export 两个子命令
-internal/
-  models/                   内容类型 + 搜索索引、标签、足迹分组、瞬间媒体解析
-  store/                    SQLite 访问（schema.sql + 每类内容一个文件）
-  auth/                     token 助手（CSRF）
-  render/                   html/template + goldmark（Markdown）
-  server/                   路由、中间件（CSRF）、handlers、gzip
-  setup/                    新手向导：环境检测 / GitHub 登录 / 建仓 / 一键发布
-  export/                   把数据库渲染成静态站
-web/
-  templates/public/         home.html, post.html
-  templates/admin/          仪表盘、各版块 list/form、setup 向导页
-  static/css/               site.css（公开站「星夜远行」）、reading.css（文章页阅读模式）、
-                            crt.css + admin.css（后台专用）
-  static/js/                公开站交互（星空、星座、地球 globe.js、moments.js、search.js）、setup.js
-  static/fonts/             自托管字体分片 + fonts.css + OFL.txt（字体许可全文）
-  static/geo/               地球用的 world + 区域 JSON（预生成）
-scripts/
-  package-release.sh        打包小白双击发布包（含跨平台二进制 + 启动器）
-  deploy.sh                 编译 / 推送到 VPS
-  gen_geo.mjs               （重）生成地理数据（需联网）
-  globe_logic_test.mjs      地球纯逻辑测试
-  fonts/                    build-fonts.sh：下载源字体 → 子集化切片 → 生成 fonts.css（开发期用）
-packaging/                  客户端启动器源文件（打包进 dist-release/ 的分平台客户端）
-  mac/                      Start-Blog.app 的 Info.plist 与 launch 控制脚本
-  loading.html              双击后立即显示的启动加载页（探测服务就绪后自动进向导）
-cmd/windows-launcher/       Windows Start-Blog.exe 无窗口启动器
-Start-Blog.command          macOS 备用启动器（可见终端窗口）
-Start-Blog-console.bat      Windows 进阶/排错启动器（双击转交 .exe；log 模式看日志）
-```
-
-### 开发与验证
-
-```bash
-node --check web/static/js/xxx.js   # 改了 JS 时
-go build -o ./blogbin .             # 编译（静态资源已 embed，改前端也要重新编译）
+go build -o ./blogbin .
+go test ./...
 go vet ./...
-go test ./...                       # 全部测试
-node scripts/globe_logic_test.mjs   # 地球纯逻辑测试
+npm ci --prefix scripts       # 仅运行浏览器测试/地图工具时需要 Node.js
+npm test --prefix scripts
+
+# 在 macOS/Linux 构建客户端安装包；会重建 dist-release/。
+./scripts/package-release.sh
 ```
 
-> 前端资源编译进二进制，改完模板/CSS/JS 需**重新 `go build` 并重启服务**才生效。
+安装包输出为 `dist-release/Blog-macOS.zip` 与 `dist-release/Blog-Windows.zip`；它们需要维护者另行上传到 GitHub Releases。启动器源码位于 `packaging/`、`cmd/windows-launcher/` 及仓库根目录的启动脚本中。
 
-### 字体许可
+| 路径 | 用途 |
+| --- | --- |
+| `main.go` | `serve` / `export` 入口 |
+| `internal/store/` | SQLite 表结构与内容读写 |
+| `internal/server/` | 公开页、后台和向导路由 |
+| `internal/export/` | 静态网站导出 |
+| `internal/setup/` | GitHub 授权、建仓与发布 |
+| `web/templates/` | 前台和后台模板 |
+| `web/static/` | 样式、交互、字体和地图 |
+| `scripts/seed_fixture.sh` | 虚构演示数据；会替换目标库内容，只能用于测试库 |
 
-公开站自托管两款字体，子集化后放在 `web/static/fonts/`：
+## 页面与交互
 
-| 字体 | 用途 | 许可 |
-|------|------|------|
-| **Noto Serif SC**（600） | 标题、名字、导航品牌、首字下沉 | SIL Open Font License 1.1 |
-| **Bodoni Moda**（500 / 700） | 数字与罗马数字 | SIL Open Font License 1.1 |
+- 七个内容入口：个人资料、经历、足迹、文章、项目、思考、瞬间。空模块不显示内容区，对应星座导航保留为暗星。
+- 星座导航随滚动停靠，手机使用底部星点栏。
+- 足迹地球支持拖拽、缩放、单击选择、双击下钻，以及出发地航线；内置中国、日本、马来西亚、新加坡、泰国的区域数据。
+- 文章提供夜间 / 纸色阅读面板、目录与进度显示，保留阅读偏好。
+- 字体本地托管，动效支持减少动态效果偏好；后台继续使用终端风格。
 
-两款字体的许可全文与版权声明见 [`web/static/fonts/OFL.txt`](web/static/fonts/OFL.txt)。
-再分发本项目（包括子集化后的字体文件）时请保留该文件；按 OFL 规定，字体文件不得单独售卖。
+Noto Serif SC 与 Bodoni Moda 使用 SIL Open Font License 1.1，许可全文及版权声明见 [OFL.txt](web/static/fonts/OFL.txt)。再分发时请保留该文件。
