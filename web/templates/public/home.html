@@ -1,215 +1,231 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="{{or .Profile.Theme "F"}}">
+<html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{if .Profile.Name}}{{.Profile.Name}}{{else}}dev@home{{end}} — dev@home</title>
+{{template "site_head" .}}
+<script>if(location.hash)document.documentElement.classList.add("no-intro");</script>
+<title>{{template "site_brand" .}}{{with .Profile.Title}} · {{.}}{{end}}</title>
 <meta name="description" content="{{.Profile.Tagline}}">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{{.Base}}{{asset "/static/css/crt.css"}}">
-<link rel="stylesheet" href="{{.Base}}{{asset (printf "/static/css/themes/%s.css" (or .Profile.Theme "F"))}}">
 </head>
-<body>
-<div class="crt-scanlines"></div>
-<div class="crt-vignette"></div>
+<body class="home">
+<canvas id="starfield" aria-hidden="true"></canvas>
+<div class="spotlight" aria-hidden="true"></div>
 
-<nav class="nav">
-  <div class="container">
-    <span class="brand">dev@home</span>
-    <span class="spacer"></span>
-    <div class="search-box">
-      <input type="text" id="site-search" autocomplete="off" spellcheck="false" placeholder="搜索…  /  聚焦" aria-label="搜索站点内容">
-      <div class="search-results" id="search-results"></div>
-    </div>
-    <a class="link" href="#about">whoami</a>
-    <a class="link" href="#experience">经历</a>
-    <a class="link" href="#thoughts">思考</a>
-    <a class="link" href="#projects">项目</a>
-    <a class="link" href="#notes">笔记</a>
-    <a class="link" href="#footprint">足迹</a>
-    <a class="link" href="#moments">瞬间</a>
-  </div>
-</nav>
+{{template "site_nav" .}}
+{{$nav := homeNav .}}
 
-<header class="hero">
-  <div class="container">
-    <div class="cmd">ssh dev@home --connect</div>
-    <h1 class="name">{{if .Profile.Name}}{{.Profile.Name}}{{else}}dev@home{{end}}</h1>
-    <div class="role">{{if .Profile.Title}}{{.Profile.Title}}{{else}}Backend Engineer{{end}}</div>
-    <p class="tagline">{{if .Profile.Tagline}}{{.Profile.Tagline}}{{else}}// 在这里写一句话简介（通过 /admin 编辑）{{end}}<span class="cursor"></span></p>
-    <div class="actions">
-      {{if .Profile.GitHubURL}}<a class="btn" href="{{.Profile.GitHubURL}}" target="_blank" rel="noopener">GitHub</a>{{end}}
-      {{if .Profile.Email}}<a class="btn amber" href="mailto:{{.Profile.Email}}">Email</a>{{end}}
-      <a class="btn" href="#footprint">./modules/footprint</a>
+<!-- region:hero -->
+<header class="hero" id="top">
+  <div class="hero-inner container">
+    <div class="hero-text">
+      {{if or .Profile.Title .Profile.Location}}<p class="hero-eyebrow">{{.Profile.Title}}{{if and .Profile.Title .Profile.Location}} · {{end}}{{with .Profile.Location}}EST. {{.}}{{end}}</p>{{end}}
+      <h1 class="hero-name" aria-label="{{template "site_brand" .}}">
+        {{- range $i, $c := splitChars (or .Profile.Name "dev@home") -}}
+        <span class="ch" style="--i:{{$i}}" aria-hidden="true"><i>{{$c}}</i></span>
+        {{- end -}}
+      </h1>
+      {{with .Profile.Tagline}}<p class="hero-tagline">
+        {{- range $i, $p := splitPhrases . -}}
+        <span style="--i:{{$i}}">{{$p}}</span>
+        {{- end -}}
+      </p>{{end}}
+      {{if or .Profile.GitHubURL .Profile.Email}}<div class="hero-actions">
+        {{with .Profile.GitHubURL}}<a class="btn-gold is-solid" href="{{.}}" target="_blank" rel="noopener" data-magnetic>GitHub <span aria-hidden="true">↗</span></a>{{end}}
+        {{with .Profile.Email}}<a class="btn-gold" href="mailto:{{.}}" data-magnetic>Email <span aria-hidden="true">✉</span></a>{{end}}
+      </div>{{end}}
+      <p class="hero-hint"><span aria-hidden="true">✦</span> 每颗星是一个章节 · 点击跳转</p>
     </div>
   </div>
+  {{template "site_constellation" $nav}}
+  <div class="scroll-cue" aria-hidden="true">SCROLL<s></s></div>
 </header>
+<!-- /region:hero -->
 
-<!-- whoami -->
-<section id="about">
+<main>
+<!-- region:sections -->
+{{$about := navItem $nav "about"}}
+{{if not $about.Off}}
+<section class="sec" id="about">
   <div class="container">
-    <div class="cmd">cat about.md</div>
-    {{if .Profile.AboutMD}}
-      <div class="article">{{markdown .Profile.AboutMD}}</div>
-    {{else}}
-      <p class="empty">// 自我介绍待填写（/admin/profile）</p>
-    {{end}}
-    {{with .Profile.StackTags}}
-    <div class="tags">
-      {{range .}}<span class="tag green">{{.}}</span>{{end}}
+    {{template "site_sec_head" $about}}
+    <div class="about-grid">
+      {{if .Profile.AboutMD}}<div class="prose about-body" data-reveal>{{markdown .Profile.AboutMD}}</div>{{end}}
+      <dl class="about-meta" data-reveal>
+        {{with .Profile.Location}}<div class="about-row"><dt>坐标</dt><dd>{{.}}</dd></div>{{end}}
+        {{with .Profile.StackTags}}<div class="about-row"><dt>技能</dt><dd class="tags">
+          {{- range $i, $t := .}}<span style="--i:{{$i}}">{{$t}}</span>{{end -}}
+        </dd></div>{{end}}
+        {{with .Profile.GitHubURL}}<div class="about-row"><dt>GitHub</dt><dd><a class="ink-link" href="{{.}}" target="_blank" rel="noopener">{{.}}</a></dd></div>{{end}}
+      </dl>
     </div>
-    {{end}}
-    {{if .Profile.Location}}<p class="note-row"><span class="date">location</span><span>{{.Profile.Location}}</span></p>{{end}}
   </div>
 </section>
+{{end}}
 
-<!-- experience -->
-<section id="experience">
+{{$exp := navItem $nav "experience"}}
+{{if not $exp.Off}}
+<section class="sec" id="experience">
   <div class="container">
-    <div class="cmd">tail -f experience.log</div>
-    {{if .Experiences}}
+    {{template "site_sec_head" $exp}}
+    <ol class="timeline">
       {{range .Experiences}}
-      <div class="log-entry">
-        <div class="period">{{.Period}}</div>
-        <div><span class="company">{{.Company}}</span> <span class="role">— {{.Role}}</span></div>
-        <div>{{.Description}}</div>
-      </div>
+      <li class="tl-item" data-reveal>
+        <span class="tl-node" aria-hidden="true"></span>
+        <p class="tl-period">{{.Period}}</p>
+        <div class="tl-main">
+          <h3 class="tl-company">{{.Company}}{{with .Role}} <span class="tl-role">{{.}}</span>{{end}}</h3>
+          {{with .Description}}<p class="tl-desc">{{.}}</p>{{end}}
+        </div>
+      </li>
       {{end}}
-    {{else}}
-      <p class="empty">// 暂无经历（/admin/experiences）</p>
-    {{end}}
+    </ol>
   </div>
 </section>
+{{end}}
+<!-- /region:sections -->
 
-<!-- thoughts -->
-<section id="thoughts">
+<!-- region:footprint -->
+{{$fp := navItem $nav "footprint"}}
+{{if not $fp.Off}}
+<section class="sec" id="footprint" data-home="{{.Profile.Location}}">
   <div class="container">
-    <div class="cmd">less thoughts/</div>
-    {{if .Thoughts}}
+    {{template "site_sec_head" $fp}}
+    <div class="footprint-grid">
+      <div class="globe-stage">
+        <canvas id="globe-canvas" width="440" height="440"></canvas>
+        <div id="globe-load-status" class="globe-load-status" hidden role="status"></div>
+      </div>
+      <div class="globe-panel">
+        <div class="globe-breadcrumb" id="globe-breadcrumb">地球</div>
+        <div class="globe-stats" id="globe-stats"></div>
+        <div class="globe-controls">
+          <button id="globe-cd-up" class="globe-back-btn" type="button" style="display:none" aria-label="返回上一级" data-magnetic>← 返回上一级</button>
+          <span id="globe-drill-hint" class="globe-drill-hint" role="note">双击进入下一级</span>
+        </div>
+        <div id="globe-notes" class="globe-notes" style="display:none"></div>
+        <div id="globe-moment-links" class="globe-moment-links" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+</section>
+{{end}}
+<!-- /region:footprint -->
+
+<!-- region:sections -->
+{{$notes := navItem $nav "notes"}}
+{{if not $notes.Off}}
+<section class="sec" id="notes">
+  <div class="container">
+    {{template "site_sec_head" $notes}}
+    <div class="post-list" data-reveal-group>
+      {{range .Posts}}
+      {{$cover := firstImage .BodyMD}}
+      <a class="post-row" href="{{$.Base}}/posts/{{.Slug}}" data-reveal data-hue="{{titleHue .Title}}" data-glyph="{{firstRune .Title}}"{{with $cover}} data-cover="{{.}}"{{end}}>
+        <span class="post-date">{{.Date}}</span>
+        <span class="post-main">
+          <span class="post-title" style="view-transition-name:{{vtName .Slug}}">{{.Title}}</span>
+          {{with .TagList}}<span class="post-tags">{{range .}}<span class="pill">#{{.}}</span>{{end}}</span>{{end}}
+        </span>
+        {{with $cover}}<img class="post-thumb" src="{{.}}" alt="" loading="lazy">{{end}}
+        <span class="post-arrow" aria-hidden="true" data-magnetic>→</span>
+      </a>
+      {{end}}
+    </div>
+  </div>
+</section>
+{{end}}
+
+{{$proj := navItem $nav "projects"}}
+{{if not $proj.Off}}
+<section class="sec" id="projects">
+  <div class="container">
+    {{template "site_sec_head" $proj}}
+    <div class="project-grid" data-reveal-group>
+      {{range .Projects}}
+      <article class="project-card" data-reveal>
+        <div class="pj-top">
+          {{with .Language}}<span class="pj-lang"><i aria-hidden="true"></i>{{.}}</span>{{end}}
+          {{with .URL}}<a class="pj-open" href="{{.}}" target="_blank" rel="noopener" aria-label="打开项目">↗</a>{{end}}
+        </div>
+        <h3 class="pj-name">{{if .URL}}<a href="{{.URL}}" target="_blank" rel="noopener">{{.Name}}</a>{{else}}{{.Name}}{{end}}</h3>
+        {{with .Description}}<p class="pj-desc">{{.}}</p>{{end}}
+        {{if or .Stars .License}}<div class="pj-meta">
+          {{if .Stars}}<span class="pj-stars"><span aria-hidden="true">★</span> <span class="num" data-to="{{.Stars}}">{{.Stars}}</span></span>{{end}}
+          {{with .License}}<span class="pj-license">{{.}}</span>{{end}}
+        </div>{{end}}
+      </article>
+      {{end}}
+    </div>
+  </div>
+</section>
+{{end}}
+
+{{$th := navItem $nav "thoughts"}}
+{{if not $th.Off}}
+<section class="sec" id="thoughts">
+  <div class="container">
+    {{template "site_sec_head" $th}}
+    <div class="thought-list">
       {{range .Thoughts}}
-      <div class="thought">
+      <div class="thought" data-reveal>
         <div class="thought-body">{{.Body}}</div>
         <button class="thought-toggle" type="button" hidden>展开 ▾</button>
-        <div class="meta">{{if .Topic}}[{{.Topic}}] {{end}}{{.Date}}</div>
+        <div class="meta">{{with .Topic}}<span class="pill">{{.}}</span>{{end}}<span class="thought-date">{{.Date}}</span></div>
       </div>
       {{end}}
-    {{else}}
-      <p class="empty">// 暂无思考（/admin/thoughts）</p>
-    {{end}}
+    </div>
   </div>
 </section>
+{{end}}
 
-<!-- projects -->
-<section id="projects">
+{{$mo := navItem $nav "moments"}}
+{{if not $mo.Off}}
+<section class="sec" id="moments">
   <div class="container">
-    <div class="cmd">ls projects/</div>
-    {{if .Projects}}
-      <div class="grid">
-        {{range .Projects}}
-        <div class="card">
-          <div class="name">{{if .URL}}<a href="{{.URL}}" target="_blank" rel="noopener">{{.Name}}</a>{{else}}{{.Name}}{{end}}</div>
-          <div class="desc">{{.Description}}</div>
-          <div class="meta">
-            {{if .Language}}<span>{{.Language}}</span>{{end}}
-            {{if .Stars}}<span class="star">{{.Stars}}</span>{{end}}
-            {{if .License}}<span>{{.License}}</span>{{end}}
-          </div>
+    {{template "site_sec_head" $mo}}
+    <div class="moments">
+      {{range .Moments}}
+      <article class="moment" id="moment-{{.ID}}" data-reveal>
+        <div class="moment-meta">
+          {{if .Place}}<span class="moment-place">{{.Place}}</span>{{end}}
+          {{if .Date}}<span class="moment-date">{{.Date}}</span>{{end}}
+        </div>
+        {{if .Caption}}<div class="moment-caption">{{.Caption}}</div>{{end}}
+        {{with .MediaList}}
+        <div class="moment-media" data-count="{{len .}}">
+          {{range .}}
+          {{if .IsEmbed}}
+            <div class="moment-item moment-embed">
+              <div class="moment-embed-frame"><iframe src="{{.URL}}" loading="lazy" allow="fullscreen; encrypted-media; picture-in-picture" allowfullscreen scrolling="no" frameborder="0" referrerpolicy="no-referrer"></iframe></div>
+              {{if .WatchURL}}<a class="moment-embed-open" href="{{.WatchURL}}" target="_blank" rel="noopener">{{if eq .Provider "bilibili"}}在 B 站打开{{else if eq .Provider "youtube"}}在 YouTube 打开{{else}}在原站打开{{end}} ↗</a>{{end}}
+            </div>
+          {{else if .IsVideo}}
+            <video class="moment-item" src="{{.URL}}" controls preload="metadata" playsinline></video>
+          {{else}}
+            <img class="moment-item" src="{{.URL}}" alt="" loading="lazy" data-full="{{.URL}}">
+          {{end}}
+          {{end}}
         </div>
         {{end}}
-      </div>
-    {{else}}
-      <p class="empty">// 暂无项目（/admin/projects）</p>
-    {{end}}
-  </div>
-</section>
-
-<!-- notes / blog -->
-<section id="notes">
-  <div class="container">
-    <div class="cmd">ls -lt notes/</div>
-    {{if .Posts}}
-      {{range .Posts}}
-      <div class="note-row">
-        <span class="date">{{.Date}}</span>
-        <a class="title" href="{{$.Base}}/posts/{{.Slug}}">{{.Title}}</a>
-        <span class="tags-inline">{{range .TagList}}<span class="tag-chip">#{{.}}</span>{{end}}</span>
-      </div>
+      </article>
       {{end}}
-    {{else}}
-      <p class="empty">// 暂无文章（/admin/posts）</p>
-    {{end}}
-  </div>
-</section>
-
-<!-- footprint globe -->
-<section id="footprint">
-  <div class="container">
-    <div class="cmd">./modules/footprint --render</div>
-    <div class="globe-breadcrumb" id="globe-breadcrumb">~/globe</div>
-    <div class="globe-stage">
-      <div class="globe-controls">
-        <button id="globe-cd-up" class="globe-back-btn" style="display:none" aria-label="返回上一级">← 返回上一级</button>
-        <span id="globe-drill-hint" class="globe-drill-hint" role="note">双击进入下一级</span>
-      </div>
-      <canvas id="globe-canvas" width="440" height="440"></canvas>
-      <div id="globe-load-status" class="globe-load-status" hidden role="status"></div>
     </div>
-    <div class="globe-stats" id="globe-stats"></div>
-    <div id="globe-notes" class="globe-notes" style="display:none"></div>
-    <div id="globe-moment-links" class="globe-moment-links" style="display:none"></div>
   </div>
 </section>
+{{end}}
+<!-- /region:sections -->
+</main>
 
-<!-- moments -->
-<section id="moments">
-  <div class="container">
-    <div class="cmd">feh moments/*</div>
-    {{if .Moments}}
-      <div class="moments">
-        {{range .Moments}}
-        <article class="moment" id="moment-{{.ID}}">
-          <div class="moment-meta">
-            {{if .Place}}<span class="moment-place">{{.Place}}</span>{{end}}
-            {{if .Date}}<span class="moment-date">{{.Date}}</span>{{end}}
-          </div>
-          {{if .Caption}}<div class="moment-caption">{{.Caption}}</div>{{end}}
-          {{with .MediaList}}
-          <div class="moment-media" data-count="{{len .}}">
-            {{range .}}
-            {{if .IsEmbed}}
-              <div class="moment-item moment-embed">
-                <div class="moment-embed-frame"><iframe src="{{.URL}}" loading="lazy" allow="fullscreen; encrypted-media; picture-in-picture" allowfullscreen scrolling="no" frameborder="0" referrerpolicy="no-referrer"></iframe></div>
-                {{if .WatchURL}}<a class="moment-embed-open" href="{{.WatchURL}}" target="_blank" rel="noopener">{{if eq .Provider "bilibili"}}在 B 站打开{{else if eq .Provider "youtube"}}在 YouTube 打开{{else}}在原站打开{{end}} ↗</a>{{end}}
-              </div>
-            {{else if .IsVideo}}
-              <video class="moment-item" src="{{.URL}}" controls preload="metadata" playsinline></video>
-            {{else}}
-              <img class="moment-item" src="{{.URL}}" alt="" loading="lazy" data-full="{{.URL}}">
-            {{end}}
-            {{end}}
-          </div>
-          {{end}}
-        </article>
-        {{end}}
-      </div>
-    {{else}}
-      <p class="empty">// 暂无瞬间（/admin/moments）</p>
-    {{end}}
-  </div>
-</section>
-
-<footer>
-  <div class="container">
-    <div class="cmd">echo "© {{year}} {{if .Profile.Name}}{{.Profile.Name}}{{else}}dev@home{{end}} — built with Go · self-hosted · no trackers"</div>
-  </div>
-</footer>
+{{template "star_rail" $nav}}
+{{template "site_footer" .}}
 
 <script>
 window.__BASE__ = "{{.Base}}";
 window.__GEO_VERSION__ = "{{assetver "/static/geo"}}";
 </script>
+<script src="{{.Base}}{{asset "/static/js/motion.js"}}" defer></script>
+<script src="{{.Base}}{{asset "/static/js/starfield.js"}}" defer></script>
+<script src="{{.Base}}{{asset "/static/js/constellation.js"}}" defer></script>
+<script src="{{.Base}}{{asset "/static/js/sections.js"}}" defer></script>
 <script src="{{.Base}}{{asset "/static/js/globe-core.js"}}" defer></script>
 <script src="{{.Base}}{{asset "/static/js/globe.js"}}" defer></script>
 <script src="{{.Base}}{{asset "/static/js/thoughts.js"}}" defer></script>

@@ -29,7 +29,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  pages-mode:
+    runs-on: ubuntu-latest
+    outputs:
+      build-type: ${{ steps.pages.outputs.build-type }}
+    steps:
+      - name: Check configured Pages publishing mode
+        id: pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          build_type=$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '.build_type')
+          echo "build-type=$build_type" >> "$GITHUB_OUTPUT"
+          if [ "$build_type" != "workflow" ]; then
+            echo "Pages deploys from its configured branch; skipping the dist deployment."
+          fi
+
   deploy:
+    needs: pages-mode
+    if: needs.pages-mode.outputs.build-type == 'workflow'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

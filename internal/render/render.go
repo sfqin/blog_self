@@ -73,6 +73,18 @@ func funcMap(r *Renderer) template.FuncMap {
 		"now":      func() string { return time.Now().Format("2006-01-02 15:04:05") },
 		"asset":    r.asset,
 		"assetver": r.assetVersion,
+
+		// Public-site redesign helpers (funcs.go).
+		"splitChars":     splitChars,
+		"splitPhrases":   splitPhrases,
+		"footprintStats": footprintStats,
+		"homeNav":        homeNav,
+		"navItem":        navItem,
+		"firstImage":     firstImage,
+		"firstRune":      firstRune,
+		"titleHue":       titleHue,
+		"vtName":         vtName,
+		"add":            func(a, b int) int { return a + b },
 	}
 }
 

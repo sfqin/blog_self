@@ -1,53 +1,60 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="{{or .Profile.Theme "F"}}">
+<html lang="zh-CN" data-reading="night">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{.Post.Title}} — dev@home</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{{.Base}}{{asset "/static/css/crt.css"}}">
-<link rel="stylesheet" href="{{.Base}}{{asset (printf "/static/css/themes/%s.css" (or .Profile.Theme "F"))}}">
+{{template "site_head" .}}
+<link rel="stylesheet" href="{{.Base}}{{asset "/static/css/reading.css"}}">
+<title>{{.Post.Title}} · {{template "site_brand" .}}</title>
+<meta name="description" content="{{.Post.Title}}">
 </head>
-<body>
-<div class="crt-scanlines"></div>
-<div class="crt-vignette"></div>
+<body class="post">
+<div class="read-progress" id="read-progress" aria-hidden="true"></div>
+<canvas id="starfield" aria-hidden="true"></canvas>
+<div class="spotlight" aria-hidden="true"></div>
 
-<nav class="nav">
-  <div class="container">
-    <span class="brand">dev@home</span>
-    <span class="spacer"></span>
-    <div class="search-box">
-      <input type="text" id="site-search" autocomplete="off" spellcheck="false" placeholder="搜索…  /  聚焦" aria-label="搜索站点内容">
-      <div class="search-results" id="search-results"></div>
-    </div>
-    <a class="link" href="{{.Base}}/">$ cd ~</a>
-    <a class="link" href="{{.Base}}/#notes">notes/</a>
+<nav class="site-nav is-post" id="site-nav" aria-label="页面">
+  <div class="nav-inner container">
+    <a class="brand" href="{{.Base}}/">{{template "site_brand" .}}</a>
+    <a class="nav-link nav-back" href="{{.Base}}/">← 返回首页</a>
+    <span class="nav-post-title" aria-hidden="true">{{.Post.Title}}</span>
+    <span class="nav-spacer"></span>
+    {{template "site_search" .}}
+    <button class="reading-toggle" id="reading-toggle" type="button" aria-pressed="false" aria-label="切换到纸页" data-magnetic>
+      <svg class="rt-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+      <svg class="rt-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1z"/></svg>
+    </button>
   </div>
 </nav>
 
-<section>
-  <div class="container">
-    <div class="cmd">cat notes/{{.Post.Slug}}.md</div>
-    <h1 class="name" style="font-size:clamp(24px,5vw,40px)">{{.Post.Title}}</h1>
-    <div class="note-row" style="border:none">
-      <span class="date">{{.Post.Date}}</span>
-      <span class="tags-inline">{{range .Post.TagList}}#{{.}} {{end}}</span>
-    </div>
-    <article class="article">
-      {{markdown .Post.BodyMD}}
-    </article>
-    <p style="margin-top:32px"><a class="btn" href="{{.Base}}/#notes">$ cd ..</a></p>
-  </div>
-</section>
+<main class="post-shell">
+  <header class="post-head container">
+    {{with .Post.TagList}}<div class="post-pills">{{range .}}<span class="pill">#{{.}}</span>{{end}}</div>{{end}}
+    <h1 class="post-title" style="view-transition-name:{{vtName .Post.Slug}}" aria-label="{{.Post.Title}}">
+      {{- range $i, $c := splitChars .Post.Title -}}
+      <span class="ch" style="--i:{{$i}}" aria-hidden="true"><i>{{$c}}</i></span>
+      {{- end -}}
+    </h1>
+    {{with .Post.Date}}<p class="post-date"><time>{{.}}</time></p>{{end}}
+  </header>
 
-<footer>
-  <div class="container">
-    <div class="cmd">echo "© {{year}} {{if .Profile.Name}}{{.Profile.Name}}{{else}}dev@home{{end}}"</div>
-  </div>
-</footer>
+  <article class="reading-panel">
+    <div class="article">
+      {{markdown .Post.BodyMD}}
+    </div>
+  </article>
+
+  <nav class="post-foot" aria-label="文章导航">
+    <a class="post-foot-link" href="{{.Base}}/#notes" data-magnetic>← 返回文章列表</a>
+  </nav>
+</main>
+
+<aside class="reading-toc" id="reading-toc" aria-label="目录" hidden></aside>
+
+{{template "site_footer" .}}
+
 <script>window.__BASE__ = "{{.Base}}";</script>
+<script src="{{.Base}}{{asset "/static/js/motion.js"}}" defer></script>
+<script src="{{.Base}}{{asset "/static/js/starfield.js"}}" defer></script>
+<script src="{{.Base}}{{asset "/static/js/reading.js"}}" defer></script>
 <script src="{{.Base}}{{asset "/static/js/search.js"}}" defer></script>
 {{if .Live}}<script src="{{asset "/static/js/heartbeat.js"}}" defer></script>{{end}}
 </body>

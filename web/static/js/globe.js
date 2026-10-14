@@ -25,38 +25,62 @@
   var BASE = (window.__BASE__ || "").replace(/\/$/, "");
   var GEO_VERSION = window.__GEO_VERSION__ || "";
 
-  // ---- theme colors — read live from crt.css tokens so the globe follows the
-  // admin-selected site theme. Reads once at init (no live switching); falls back
-  // to the F · Retro Terminal palette if a token is unset. Alpha-tinted colors
-  // (rim/visited/drill) are rebuilt from the accent channel tokens. ----
+  // ---- theme colors — read from the site design tokens on :root (site.css,
+  // spec §4.1) so the canvas never hardcodes a palette. Reads once at init (no
+  // live switching); falls back to the 「星夜远行」gold/night palette if a token
+  // is unset. Alpha-tinted colors (rim/visited/drill) are rebuilt from the accent
+  // channel tokens. C.green / C.amber keep their historical names but now hold
+  // the primary / secondary gold accents. ----
   function readTheme() {
     var s = getComputedStyle(document.documentElement);
     function v(name, fallback) {
       var x = s.getPropertyValue(name);
-      return x ? x.trim() : fallback;
+      x = x ? x.trim() : "";
+      return x || fallback;
     }
-    var accent = v("--accent", "#4ade80");
-    var accent2 = v("--accent-2", "#fbbf24");
-    var accentRGB = v("--accent-rgb", "74,222,128");
-    var accent2RGB = v("--accent-2-rgb", "251,191,36");
+    function rgbList(name, fallback) {
+      var parts = v(name, fallback).split(",").map(function (n) { return parseInt(n, 10); });
+      if (parts.length !== 3 || parts.some(function (n) { return isNaN(n); })) {
+        parts = fallback.split(",").map(function (n) { return parseInt(n, 10); });
+      }
+      return parts;
+    }
+    var accent = v("--accent", "#e8c58a");
+    var accent2 = v("--accent-2", "#f3dcae");
+    var accentRGB = v("--accent-rgb", "232,197,138");
+    var accent2RGB = v("--accent-2-rgb", "243,220,174");
     return {
-      ocean1: v("--globe-ocean1", "#0e2a1a"),
-      ocean2: v("--globe-ocean2", "#061309"),
-      land: v("--globe-land", "#123a24"),
-      landLine: v("--globe-land-line", "#1f5c3a"),
-      border: v("--globe-border", "#2a6b45"),
+      ocean1: v("--globe-ocean1", "#0d1426"),
+      ocean2: v("--globe-ocean2", "#05070d"),
+      land: v("--globe-land", "#1a2236"),
+      landLine: v("--globe-land-line", "#2a3450"),
+      border: v("--globe-border", "#2f3a58"),
       rim: "rgba(" + accentRGB + ",0.55)",
       green: accent, amber: accent2,
-      text: v("--text", "#c8f5d3"), muted: v("--muted", "#5a7d63"),
+      text: v("--text", "#e9e7e2"), muted: v("--muted", "#8b8fa0"),
       visited: "rgba(" + accentRGB + ",0.42)", visitedLine: accent,
       drill: "rgba(" + accent2RGB + ",0.16)", drillLine: accent2,
-      region: v("--globe-region", "rgba(30,60,40,0.55)"),
-      regionLine: v("--globe-region-line", "#2a6b45"),
+      region: v("--globe-region", "rgba(26,34,54,0.7)"),
+      regionLine: v("--globe-region-line", "#34405f"),
       halo: "rgba(" + accent2RGB + ",0.18)",              // marker pulse halo
-      overlay: "rgba(" + v("--overlay-rgb", "6,19,9") + ",0.82)", // label backdrop
+      overlay: "rgba(" + v("--overlay-rgb", "10,12,20") + ",0.82)", // label backdrop
+      arc: v("--globe-arc", "rgba(232,197,138,.55)"),     // F1 route lines
+      goldHi: v("--gold-hi", "#f3dcae"),                 // origin label / comet head
+      night: rgbList("--globe-night-rgb", "4,8,22"),      // night-side shade
+      sun: rgbList("--globe-sun-rgb", "243,220,174"),     // sun glow tint
+      fontNum: v("--font-num", '"Bodoni Moda", Didot, Georgia, serif'),
+      fontSans: v("--font-sans", '-apple-system, "PingFang SC", sans-serif'),
     };
   }
   var C = readTheme();
+
+  // Reduced-motion preference. motion.js (window.Motion) is the single source
+  // of truth when present; otherwise fall back to the media query directly.
+  var reduceMQ = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+  function reducedMotion() {
+    if (window.Motion && typeof window.Motion.reduced === "boolean") return window.Motion.reduced;
+    return !!(reduceMQ && reduceMQ.matches);
+  }
 
   // ---- province-name -> drill-file key mapping (admin stores localized names) ----
   // China uses adcode; JP/MY files are keyed by English ADM1 name (spaces -> _).
@@ -89,10 +113,28 @@
   var CX, CY;            // canvas center
 
   // ============================================================
-  // Sizing (PRD §3.4: min(innerWidth-40, 440))
+  // Sizing. Inside a block-level .globe-stage (redesign layout) the canvas
+  // fills the stage up to 600px: min(stage.clientWidth, 600, innerWidth-40).
+  // Without a stage — or with a legacy shrink-to-fit (inline-*) stage whose
+  // width is the canvas itself — keep the PRD §3.4 formula min(innerWidth-40, 440).
   // ============================================================
+  var stage = canvas.closest ? canvas.closest(".globe-stage") : null;
+
+  function targetSize() {
+    var size;
+    var cs = stage ? getComputedStyle(stage) : null;
+    if (cs && cs.display.indexOf("inline") !== 0) {
+      var inner = stage.clientWidth -
+        (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
+      size = Math.min(inner > 0 ? inner : 600, 600, window.innerWidth - 40);
+    } else {
+      size = Math.min(window.innerWidth - 40, 440);
+    }
+    return Math.max(120, Math.floor(size));
+  }
+
   function resize() {
-    var size = Math.min(window.innerWidth - 40, 440);
+    var size = targetSize();
     var dpr = window.devicePixelRatio || 1;
     canvas.width = size * dpr;
     canvas.height = size * dpr;
@@ -185,6 +227,7 @@
     var maxDark = 0.6;              // darkest the night side gets (keep land faintly visible)
     var dayEnd = 0.12, nightEnd = -0.22;   // twilight band in illumination units
     var span = dayEnd - nightEnd;
+    var nr = C.night[0], ng = C.night[1], nb = C.night[2];   // cold-blue night (--globe-night-rgb)
     var idx = 0;
     for (var j = 0; j < N; j++) {
       var y2 = 1 - (j + 0.5) * step;
@@ -197,7 +240,7 @@
         if (illum >= dayEnd) a = 0;
         else if (illum <= nightEnd) a = maxDark;
         else a = maxDark * (dayEnd - illum) / span;
-        data[idx] = 1; data[idx + 1] = 7; data[idx + 2] = 6;   // dark cool-green night
+        data[idx] = nr; data[idx + 1] = ng; data[idx + 2] = nb;
         data[idx + 3] = (a * 255) | 0;
         idx += 4;
       }
@@ -208,15 +251,18 @@
     ctx.drawImage(nightCanvas, CX - R, CY - R, 2 * R, 2 * R);
     ctx.imageSmoothingEnabled = smooth;
 
-    // Warm sun glow centered on the subsolar point (only if it faces us).
+    // Soft sun glow (--globe-sun-rgb) centered on the subsolar point, only if it
+    // faces us. Intensity is 0.6× the original amber glow; static when reduced.
     var sp = project(sun.lon, sun.lat);
     if (sp.visible) {
-      var pulse = 0.9 + 0.1 * Math.sin(Date.now() / 900);   // gentle breathing
+      var pulse = reducedMotion() ? 1 : 0.9 + 0.1 * Math.sin(Date.now() / 900);   // gentle breathing
+      var k = 0.6 * pulse;
+      var sunRGB = C.sun.join(",");
       var g = ctx.createRadialGradient(sp.x, sp.y, 2, sp.x, sp.y, R * 1.05);
-      g.addColorStop(0, "rgba(255,238,180," + (0.60 * pulse).toFixed(3) + ")");
-      g.addColorStop(0.22, "rgba(255,214,110," + (0.34 * pulse).toFixed(3) + ")");
-      g.addColorStop(0.55, "rgba(251,191,36," + (0.16 * pulse).toFixed(3) + ")");
-      g.addColorStop(1, "rgba(251,191,36,0)");
+      g.addColorStop(0, "rgba(" + sunRGB + "," + (0.60 * k).toFixed(3) + ")");
+      g.addColorStop(0.22, "rgba(" + sunRGB + "," + (0.34 * k).toFixed(3) + ")");
+      g.addColorStop(0.55, "rgba(" + sunRGB + "," + (0.16 * k).toFixed(3) + ")");
+      g.addColorStop(1, "rgba(" + sunRGB + ",0)");
       ctx.fillStyle = g;
       ctx.beginPath();
       ctx.arc(CX, CY, R, 0, Math.PI * 2);
@@ -266,7 +312,11 @@
 
     ctx.restore();
 
-    // Amber pulse markers for visited countries.
+    // F1 routes from the origin (lifted above the surface, so outside the clip).
+    var reduced = reducedMotion();
+    drawRoutes(reduced);
+
+    // Gold breathing markers for visited countries (static when reduced).
     var t = Date.now() / 600;
     state.footprints.forEach(function (fp) {
       var meta = world.countries[fp.code];
@@ -274,7 +324,7 @@
       var p = project(meta.c[0], meta.c[1]);
       if (!p.visible) return;
       var isSelected = state.layer === "globe" && state.selected === fp.code;
-      var pulse = isSelected ? 7 : 4 + Math.sin(t) * 1.6;
+      var pulse = isSelected ? 7 : (reduced ? 5 : 4 + Math.sin(t) * 1.6);
       ctx.save();
       ctx.beginPath();
       ctx.arc(p.x, p.y, pulse + 3, 0, Math.PI * 2);
@@ -289,9 +339,202 @@
       ctx.restore();
       // Country code label.
       ctx.fillStyle = isSelected ? C.green : C.amber;
-      ctx.font = "11px 'IBM Plex Mono', monospace";
+      ctx.font = "11px " + C.fontNum;
       ctx.fillText(fp.code, p.x + pulse + 4, p.y + 3);
     });
+
+    drawOrigin(t, reduced);
+  }
+
+  // ============================================================
+  // F1 — great-circle routes from the home origin (globe layer only)
+  // ============================================================
+  var ARC_SEGS = 64;        // points per route (greatCircle n)
+  var ARC_LIFT = 0.12;      // peak lift above the surface, in sphere radii
+  var ARC_MS = 900;         // time to draw one route
+  var ARC_STAGGER = 150;    // delay between consecutive routes
+  var COMET_MS = 3000;      // comet loop period
+  var COMET_TAIL = 6;       // tail segments behind the comet head
+  var routes = null;        // {origin, targets:[{code, pts:[[x,y,z,lift]...]}]}
+  var routeStart = null;    // ms when the routes started drawing (first visible)
+  var globeSeen = !("IntersectionObserver" in window);
+
+  function buildRoutes() {
+    var section = document.getElementById("footprint");
+    var home = section ? section.getAttribute("data-home") || "" : "";
+    var origin = Core.resolveOrigin(home, state.footprints, world);
+    var targets = [];
+    var seen = Object.create(null);
+    state.footprints.forEach(function (fp) {
+      if (!fp || fp.code === origin.code || seen[fp.code]) return;
+      var meta = world.countries[fp.code];
+      if (!meta || !meta.c) return;
+      seen[fp.code] = true;
+      var pts = Core.greatCircle([origin.lon, origin.lat], meta.c, ARC_SEGS).map(function (ll, i) {
+        // World-space unit vector (same axes as project()), pushed outward by
+        // 1 + ARC_LIFT·sin(πt) so the route arcs off the surface.
+        var h = 1 + ARC_LIFT * Math.sin(Math.PI * i / ARC_SEGS);
+        var la = ll[1] * Math.PI / 180, lo = ll[0] * Math.PI / 180;
+        return [Math.cos(la) * Math.sin(lo) * h, Math.sin(la) * h, Math.cos(la) * Math.cos(lo) * h, h];
+      });
+      targets.push({ code: fp.code, pts: pts });
+    });
+    routes = { origin: origin, targets: targets };
+  }
+
+  function routesTotalMs() {
+    var n = routes ? routes.targets.length : 0;
+    return n ? (n - 1) * ARC_STAGGER + ARC_MS : 0;
+  }
+
+  function routesDrawn() {
+    if (!routes) return false;
+    if (!routes.targets.length || reducedMotion()) return true;
+    return routeStart !== null && Date.now() - routeStart >= routesTotalMs();
+  }
+
+  function clamp01(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+  function easeInOut(x) { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
+
+  // Back-facing fade by depth: full alpha on the near side, fading out as the
+  // lifted route curls behind the globe; anything behind the sphere's disk is
+  // occluded (only the part peeking past the limb can show).
+  function arcFade(r, h) {
+    var f = clamp01((r.z / h + 0.3) / 0.4);
+    if (r.z < 0) f *= clamp01((Math.sqrt(r.x * r.x + r.y * r.y) - 1) / 0.03);
+    return f;
+  }
+
+  function projectRoute(pts) {
+    var out = new Array(pts.length);
+    for (var i = 0; i < pts.length; i++) {
+      var r = rotateVec(pts[i][0], pts[i][1], pts[i][2]);
+      out[i] = { x: CX + r.x * R, y: CY - r.y * R, f: arcFade(r, pts[i][3]) };
+    }
+    return out;
+  }
+
+  // Interpolated screen point at fractional index s along a projected route.
+  function routePointAt(sp, s) {
+    var k = Math.max(0, Math.min(sp.length - 2, Math.floor(s)));
+    var u = clamp01(s - k);
+    var a = sp[k], b = sp[k + 1];
+    return { x: a.x + (b.x - a.x) * u, y: a.y + (b.y - a.y) * u, f: a.f + (b.f - a.f) * u };
+  }
+
+  // Stroke the route between fractional indices [from, to]. Consecutive
+  // segments with the same (quantized) depth fade share one path, so the
+  // translucent --globe-arc colour never double-paints at the joints.
+  function strokeRouteSpan(sp, from, to) {
+    var s = Math.max(0, from), e = Math.min(ARC_SEGS, to);
+    if (e <= s) return;
+    var prev = routePointAt(sp, s);
+    var k = Math.floor(s) + 1;
+    var alpha = -1;
+    function flush() {
+      if (alpha > 0) {
+        ctx.globalAlpha = alpha;
+        ctx.stroke();
+      }
+    }
+    while (true) {
+      var at = Math.min(k, e);
+      var next = routePointAt(sp, at);
+      var a = Math.round(Math.min(prev.f, next.f) * 10) / 10;
+      if (a !== alpha) {
+        flush();
+        alpha = a;
+        ctx.beginPath();
+        ctx.moveTo(prev.x, prev.y);
+      }
+      ctx.lineTo(next.x, next.y);
+      if (at >= e) break;
+      prev = next;
+      k++;
+    }
+    flush();
+  }
+
+  function drawComet(sp, index, now) {
+    var doneAt = routeStart + index * ARC_STAGGER + ARC_MS;
+    var u = ((now - doneAt) / COMET_MS + index * 0.37) % 1;
+    if (u < 0) u += 1;
+    var head = u * ARC_SEGS;
+    var seg = ARC_SEGS * 0.03;                       // one tail segment ≈ 3% of the route
+    var edge = Math.min(1, u * 10, (1 - u) * 10,     // ease in/out at the endpoints
+      (now - doneAt) / 400);                         // and fade in once drawn
+    ctx.strokeStyle = C.goldHi;
+    for (var j = 0; j < COMET_TAIL; j++) {
+      var a = head - (j + 1) * seg, b = head - j * seg;
+      if (b <= 0) break;
+      var k = 1 - j / COMET_TAIL;
+      var mid = routePointAt(sp, Math.max(0, (a + b) / 2));
+      ctx.lineWidth = 0.6 + 1.6 * k;
+      ctx.globalAlpha = 0.85 * k * mid.f * edge;
+      if (ctx.globalAlpha <= 0.01) continue;
+      var p0 = routePointAt(sp, Math.max(0, a)), p1 = routePointAt(sp, b);
+      ctx.beginPath();
+      ctx.moveTo(p0.x, p0.y);
+      ctx.lineTo(p1.x, p1.y);
+      ctx.stroke();
+    }
+    var hp = routePointAt(sp, head);
+    if (hp.f * edge <= 0.01) return;
+    ctx.globalAlpha = hp.f * edge;
+    ctx.fillStyle = C.goldHi;
+    ctx.shadowColor = C.goldHi;
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.arc(hp.x, hp.y, 2.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  function drawRoutes(reduced) {
+    if (state.layer !== "globe" || !routes || !routes.targets.length) return;
+    var now = Date.now();
+    if (routeStart === null) {
+      if (!globeSeen && !reduced) return;      // wait until the globe is on screen
+      routeStart = now;
+    }
+    var elapsed = now - routeStart;
+    ctx.save();
+    ctx.lineCap = "butt";
+    ctx.lineJoin = "round";
+    routes.targets.forEach(function (route, i) {
+      var p = reduced ? 1 : easeInOut(clamp01((elapsed - i * ARC_STAGGER) / ARC_MS));
+      if (p <= 0) return;
+      var sp = projectRoute(route.pts);
+      ctx.strokeStyle = C.arc;
+      ctx.lineWidth = 1.2;
+      strokeRouteSpan(sp, 0, p * ARC_SEGS);
+      if (!reduced && p >= 1) drawComet(sp, i, now);
+    });
+    ctx.restore();
+  }
+
+  // Origin marker: 1.6× halo plus a 「出发地」 label.
+  function drawOrigin(t, reduced) {
+    if (state.layer !== "globe" || !routes) return;
+    var o = routes.origin;
+    var p = project(o.lon, o.lat);
+    if (!p.visible) return;
+    var halo = ((reduced ? 5 : 4 + Math.sin(t) * 1.6) + 3) * 1.6;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, halo, 0, Math.PI * 2);
+    ctx.fillStyle = C.halo;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = C.goldHi;
+    ctx.shadowColor = C.goldHi;
+    ctx.shadowBlur = 10;
+    ctx.fill();
+    ctx.restore();
+    ctx.fillStyle = C.goldHi;
+    ctx.font = "11px " + C.fontSans;
+    ctx.fillText("出发地", p.x + halo + 3, p.y + 4);
   }
 
   // Draw an array of rings [[ [lon,lat], ... ], ...] on the sphere with back-face
@@ -376,7 +619,7 @@
     ctx.clearRect(0, 0, size, size);
     if (!data) {
       ctx.fillStyle = C.muted;
-      ctx.font = "13px 'IBM Plex Mono', monospace";
+      ctx.font = "13px " + C.fontSans;
       ctx.fillText("loading…", CX - 30, CY);
       return;
     }
@@ -412,18 +655,20 @@
       });
       ctx.restore();
 
-      // City layer: mark cities linked to a moment with an amber dot, so it's
-      // discoverable that tapping them reveals the 瞬间 links below the globe.
-      if (state.layer === "city" && visited && contentForTarget(reg.name).momentIds.length) {
+      // Visited regions get a 3px gold dot at their centroid (spec 5.4). In the
+      // city layer, cities linked to a moment get a brighter glowing dot, so
+      // it's discoverable that tapping them reveals the 瞬间 links below.
+      if (visited) {
         var c = largestPolyCentroid(reg.polys);
         if (c) {
           var mx = tx(c[0]), my = ty(c[1]);
+          var linked = state.layer === "city" && contentForTarget(reg.name).momentIds.length;
           ctx.save();
           ctx.beginPath();
-          ctx.arc(mx, my, 3.4, 0, Math.PI * 2);
-          ctx.fillStyle = C.amber;
-          ctx.shadowColor = C.amber;
-          ctx.shadowBlur = 8;
+          ctx.arc(mx, my, linked ? 3.4 : 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = linked ? C.amber : C.green;
+          ctx.shadowColor = linked ? C.amber : C.green;
+          ctx.shadowBlur = linked ? 8 : 4;
           ctx.fill();
           ctx.restore();
         }
@@ -435,7 +680,7 @@
     var labelName = state.hover || state.selected;
     if (labelName) {
       var label = dispName(labelName);
-      ctx.font = "12px 'IBM Plex Mono', monospace";
+      ctx.font = "12px " + C.fontSans;
       ctx.fillStyle = C.text;
       ctx.fillText(label, 12, size - 12);
     }
@@ -862,7 +1107,7 @@
     var size = SIZE;
     ctx.clearRect(0, 0, size, size);
     ctx.fillStyle = C.muted;
-    ctx.font = "13px 'IBM Plex Mono', monospace";
+    ctx.font = "13px " + C.fontSans;
     ctx.fillText(msg, CX - ctx.measureText(msg).width / 2, CY);
   }
 
@@ -876,10 +1121,9 @@
     var bc = document.getElementById("globe-breadcrumb");
     var back = document.getElementById("globe-cd-up");
     var hint = document.getElementById("globe-drill-hint");
-    var stats = document.getElementById("globe-stats");
-    var parts = ['<a data-nav="globe">~/globe</a>'];
-    if (state.country) parts.push('<a data-nav="country">' + esc(state.country.code) + "</a>");
-    if (state.province) parts.push('<span>' + esc(dispName(state.province.name)) + "</span>");
+    var parts = ['<a data-nav="globe">地球</a>'];
+    if (state.country) parts.push('<a data-nav="country">' + esc(countryLabel()) + "</a>");
+    if (state.province) parts.push('<span>' + esc(provinceLabel(state.province.name)) + "</span>");
     if (bc) {
       bc.innerHTML = parts.join('<span class="sep">/</span>');
       bc.querySelectorAll("[data-nav]").forEach(function (a) {
@@ -895,7 +1139,7 @@
         back.style.display = "inline-block";
         // Label the destination so it's obvious where "back" goes (P5).
         back.textContent = state.layer === "city"
-          ? "← 返回 " + state.country.code
+          ? "← 返回" + countryLabel()
           : "← 返回地球";
       }
       back.onclick = goBack;
@@ -903,18 +1147,124 @@
     if (hint) {
       hint.style.display = state.layer === "city" ? "none" : "inline-flex";
     }
-    if (stats) {
-      if (state.layer === "globe") {
-        var nCountry = state.footprints.length;
-        var nCity = 0;
-        state.footprints.forEach(function (f) { f.provinces.forEach(function (p) { nCity += p.cities.length; }); });
-        stats.textContent = nCountry ? "去过 " + nCountry + " 国 · " + nCity + " 城" : "";
-      } else stats.textContent = "";
-    }
+    renderStats();
     applyTouchAction();   // keep canvas gesture mode in sync with the layer (P4)
     updateSelectionPanels();
   }
   function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]; }); }
+
+  // Chinese country name from the footprint data (falls back to the code).
+  function countryLabel() {
+    if (!state.country) return "";
+    return state.country.name || state.country.code;
+  }
+
+  // Display name of a province: the zh label carried by foreign ADM1 regions,
+  // else the CN name without its administrative suffix (广东省 → 广东).
+  function provinceLabel(name) {
+    var data = state.country && mapLoader.peek(countryMapURL(state.country.code));
+    var regions = (data && data.regions) || [];
+    for (var i = 0; i < regions.length; i++) {
+      if (regions[i].name === name && regions[i].zh) return regions[i].zh;
+    }
+    return Core.displayRegionName(name);
+  }
+
+  // ============================================================
+  // F3 — per-layer stats in #globe-stats that roll up from 0. Runs the first
+  // time the element scrolls into view, then again on every layer change.
+  // Spaces live inside the unit/sep spans so textContent reads "1 国 · 1 省/州 · 2 处".
+  // ============================================================
+  var STATS_MS = 900;
+  var statsSeen = false;
+  var statsRun = 0;
+
+  function currentStatsSegments() {
+    if (!state.footprints.length) return [];
+    var code = state.country && state.country.code;
+    if (state.layer === "globe") {
+      return Core.statsSegments("globe", Core.footprintStats(state.footprints));
+    }
+    if (state.layer === "country") {
+      return Core.statsSegments("country",
+        Core.footprintStatsFor(state.footprints, "country", code), countryLabel());
+    }
+    if (state.layer === "city" && state.province) {
+      // The city layer shows one province's cities — the spec's "province" row.
+      return Core.statsSegments("province",
+        Core.footprintStatsFor(state.footprints, "province", code, state.province.name));
+    }
+    return [];
+  }
+
+  function renderStats() {
+    var box = document.getElementById("globe-stats");
+    if (!box) return;
+    statsRun++;
+    box.innerHTML = currentStatsSegments().map(function (seg) {
+      if ("num" in seg) return '<span class="num" data-to="' + (seg.num | 0) + '">0</span>';
+      if ("unit" in seg) return '<span class="unit"> ' + esc(seg.unit) + "</span>";
+      if ("sep" in seg) return '<span class="sep"> ' + esc(seg.sep) + " </span>";
+      return esc(seg.text || "");
+    }).join("");
+    if (statsSeen || reducedMotion()) countStats();
+  }
+
+  function countStats() {
+    var box = document.getElementById("globe-stats");
+    if (!box) return;
+    var run = ++statsRun;
+    var reduced = reducedMotion();
+    var M = window.Motion;
+    Array.prototype.forEach.call(box.querySelectorAll(".num"), function (el) {
+      var to = parseInt(el.getAttribute("data-to"), 10) || 0;
+      if (reduced || !to) {
+        el.textContent = String(to);
+      } else if (M && typeof M.countUp === "function") {
+        el.textContent = "0";
+        M.countUp(el, to, STATS_MS);
+      } else {
+        tweenNumber(el, to, run);
+      }
+    });
+  }
+
+  function tweenNumber(el, to, run) {
+    var start = null;
+    el.textContent = "0";
+    function frame(now) {
+      if (run !== statsRun) return;          // superseded by a newer layer
+      if (start === null) start = now;
+      var p = Math.min(1, (now - start) / STATS_MS);
+      el.textContent = String(Math.round(to * (1 - Math.pow(1 - p, 4))));   // ease-out
+      if (p < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function observeStats() {
+    var box = document.getElementById("globe-stats");
+    if (!box) return;
+    function seen(entry) {
+      if (statsSeen || (entry && entry.isIntersecting === false)) return;
+      statsSeen = true;
+      countStats();
+    }
+    if (window.Motion && typeof window.Motion.observe === "function") {
+      window.Motion.observe(box, seen, { once: true });
+    } else if ("IntersectionObserver" in window) {
+      var so = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          so.disconnect();
+          seen(e);
+        });
+      }, { threshold: 0.2 });
+      so.observe(box);
+    } else {
+      seen(null);
+    }
+  }
 
   // ============================================================
   // Animation loop (globe only)
@@ -942,6 +1292,7 @@
   if ("IntersectionObserver" in window) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
+        if (e.isIntersecting) globeSeen = true;  // F1 routes start drawing on first view
         if (state.layer !== "globe") return;
         if (e.isIntersecting) startLoop(); else stopLoop();
       });
@@ -1291,16 +1642,41 @@
           y: transform.oy + center[1] * transform.scale,
         };
       },
+      routes: function () {
+        if (!routes) return null;
+        return {
+          origin: Object.assign({}, routes.origin),
+          targets: routes.targets.map(function (route) { return route.code; }),
+          drawn: routesDrawn(),
+        };
+      },
     };
   }
 
   // ============================================================
   // Boot
   // ============================================================
+  function redraw() {
+    if (state.layer === "globe") {
+      if (world) drawGlobe();
+    } else {
+      drawRegions();
+    }
+  }
+
   window.addEventListener("resize", function () {
     resize();
-    if (state.layer === "globe") drawGlobe(); else drawRegions();
+    redraw();
   });
+
+  // The redesign stage is fluid: follow its width, ignoring sub-8px jitter.
+  if (stage && "ResizeObserver" in window) {
+    new ResizeObserver(function () {
+      if (Math.abs(targetSize() - SIZE) <= 8) return;
+      resize();
+      redraw();
+    }).observe(stage);
+  }
 
   resize();
   Promise.all([
@@ -1309,7 +1685,9 @@
   ]).then(function (res) {
     world = res[0];
     state.footprints = res[1] || [];
+    buildRoutes();
     updateChrome();
+    observeStats();
     drawGlobe();
     requestAnimationFrame(function () {
       startLoop();

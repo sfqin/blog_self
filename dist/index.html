@@ -1,169 +1,370 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="F">
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>旅行者 — dev@home</title>
-<meta name="description" content="试图用有限的时间，给这个混乱的世界打个还算优雅的补丁。">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/css/crt.css?v=65614421fb">
-<link rel="stylesheet" href="/static/css/themes/F.css?v=6a3802d0be">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07080d">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2307080d'/%3E%3Cpath d='M16 5l2.6 8.4L27 16l-8.4 2.6L16 27l-2.6-8.4L5 16l8.4-2.6z' fill='%23d8b56a'/%3E%3C/svg%3E">
+<script>
+(function(d){d.classList.add("js");
+if(d.hasAttribute("data-reading")){var m=null;try{m=localStorage.getItem("reading-mode")}catch(e){}
+if(m!=="night"&&m!=="paper")m=matchMedia("(prefers-color-scheme: light)").matches?"paper":"night";
+d.setAttribute("data-reading",m)}})(document.documentElement);
+</script>
+<link rel="stylesheet" href="/static/fonts/fonts.css?v=4eb1091156">
+<link rel="stylesheet" href="/static/css/site.css?v=43e3b30941">
+<script>if(location.hash)document.documentElement.classList.add("no-intro");</script>
+<title>星野 · 独立开发者 · 夜行写作者</title>
+<meta name="description" content="白天写代码，夜里写字。把走过的路，慢慢点成星图。">
 </head>
-<body>
-<div class="crt-scanlines"></div>
-<div class="crt-vignette"></div>
+<body class="home">
+<canvas id="starfield" aria-hidden="true"></canvas>
+<div class="spotlight" aria-hidden="true"></div>
 
-<nav class="nav">
-  <div class="container">
-    <span class="brand">dev@home</span>
-    <span class="spacer"></span>
-    <div class="search-box">
-      <input type="text" id="site-search" autocomplete="off" spellcheck="false" placeholder="搜索…  /  聚焦" aria-label="搜索站点内容">
+<nav class="site-nav" id="site-nav" aria-label="页面">
+  <div class="nav-inner container">
+    <a class="brand" href="/">星野</a>
+    <span class="nav-spacer"></span>
+    <div class="search-box" id="search-box">
+      <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+      <input type="text" id="site-search" autocomplete="off" spellcheck="false" placeholder="搜索文章、项目、足迹…" aria-label="搜索站点内容">
+      <kbd class="search-kbd" aria-hidden="true">/</kbd>
       <div class="search-results" id="search-results"></div>
     </div>
-    <a class="link" href="#about">whoami</a>
-    <a class="link" href="#experience">经历</a>
-    <a class="link" href="#thoughts">思考</a>
-    <a class="link" href="#projects">项目</a>
-    <a class="link" href="#notes">笔记</a>
-    <a class="link" href="#footprint">足迹</a>
-    <a class="link" href="#moments">瞬间</a>
+    <button class="nav-search-btn" type="button" aria-label="搜索" aria-controls="search-box" aria-expanded="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+    </button>
   </div>
 </nav>
 
-<header class="hero">
-  <div class="container">
-    <div class="cmd">ssh dev@home --connect</div>
-    <h1 class="name">旅行者</h1>
-    <div class="role">专职打螺丝</div>
-    <p class="tagline">试图用有限的时间，给这个混乱的世界打个还算优雅的补丁。<span class="cursor"></span></p>
-    <div class="actions">
-      <a class="btn" href="https://github.com/sfqin" target="_blank" rel="noopener">GitHub</a>
-      <a class="btn amber" href="mailto:sfqincsu@163.com">Email</a>
-      <a class="btn" href="#footprint">./modules/footprint</a>
+
+
+<header class="hero" id="top">
+  <div class="hero-inner container">
+    <div class="hero-text">
+      <p class="hero-eyebrow">独立开发者 · 夜行写作者 · EST. 广东</p>
+      <h1 class="hero-name" aria-label="星野"><span class="ch" style="--i:0" aria-hidden="true"><i>星</i></span><span class="ch" style="--i:1" aria-hidden="true"><i>野</i></span></h1>
+      <p class="hero-tagline"><span style="--i:0">白天写代码，</span><span style="--i:1">夜里写字。</span><span style="--i:2">把走过的路，</span><span style="--i:3">慢慢点成星图。</span></p>
+      <div class="hero-actions">
+        <a class="btn-gold is-solid" href="https://github.com/example" target="_blank" rel="noopener" data-magnetic>GitHub <span aria-hidden="true">↗</span></a>
+        <a class="btn-gold" href="mailto:hello@example.com" data-magnetic>Email <span aria-hidden="true">✉</span></a>
+      </div>
+      <p class="hero-hint"><span aria-hidden="true">✦</span> 每颗星是一个章节 · 点击跳转</p>
     </div>
   </div>
+  <nav class="constellation" id="constellation" aria-label="站点导航">
+  <a class="star" href="#about" data-key="about" data-count="whoami" data-weight="1.00" style="--w:1.00"><i></i><b>关于</b><em>whoami</em></a>
+  <a class="star" href="#experience" data-key="experience" data-count="3 段" data-weight="1.39" style="--w:1.39"><i></i><b>经历</b><em>3 段</em></a>
+  <a class="star" href="#footprint" data-key="footprint" data-count="2 国 · 4 处" data-weight="1.45" style="--w:1.45"><i></i><b>足迹</b><em>2 国 · 4 处</em></a>
+  <a class="star" href="#notes" data-key="notes" data-count="3 篇" data-weight="1.39" style="--w:1.39"><i></i><b>文章</b><em>3 篇</em></a>
+  <a class="star" href="#projects" data-key="projects" data-count="2 个" data-weight="1.31" style="--w:1.31"><i></i><b>项目</b><em>2 个</em></a>
+  <a class="star" href="#thoughts" data-key="thoughts" data-count="2 条" data-weight="1.31" style="--w:1.31"><i></i><b>思考</b><em>2 条</em></a>
+  <a class="star" href="#moments" data-key="moments" data-count="2 刻" data-weight="1.31" style="--w:1.31"><i></i><b>瞬间</b><em>2 刻</em></a>
+</nav>
+  <div class="scroll-cue" aria-hidden="true">SCROLL<s></s></div>
 </header>
 
 
-<section id="about">
+<main>
+
+
+
+<section class="sec" id="about">
   <div class="container">
-    <div class="cmd">cat about.md</div>
-    
-      <div class="article"><h3>$ whoami</h3>
-<ul>
-<li>白天：把复杂的事情拆开、理顺、再拼回去</li>
-<li>跑步 / 健身：给自己刷一点确定的进度条</li>
-<li>游戏 / 捣鼓电脑：换个地方继续解决问题</li>
-<li>阶段性阅读：进度条经常卡在 30%</li>
-<li>轻微下厨：能吃，不保证好吃</li>
-</ul>
-<blockquote>
-<p>世界是个巨大的草台班子，我只是想让手里这块搭得稳一点。</p>
-</blockquote>
+    <div class="sec-head">
+      <span class="sec-line sec-num-line"><span class="sec-num">I</span></span>
+      <h2 class="sec-line"><span class="sec-title">关于</span></h2>
+      <span class="sec-line"><span class="sec-en">ABOUT</span></span>
+      <i class="sec-rule" aria-hidden="true"></i>
+    </div>
+    <div class="about-grid">
+      <div class="prose about-body" data-reveal><p>在南方的海边城市生活，做一些小而完整的软件。</p>
+<p>喜欢清晨的码头、深夜的终端，和一切<strong>慢慢变好</strong>的东西。这里记录写过的代码、去过的地方，以及偶尔冒出来的念头。</p>
 </div>
-    
-    
-    <div class="tags">
-      <span class="tag green">吃喝玩乐样样喜欢</span>
+      <dl class="about-meta" data-reveal>
+        <div class="about-row"><dt>坐标</dt><dd>广东</dd></div>
+        <div class="about-row"><dt>技能</dt><dd class="tags"><span style="--i:0">Go</span><span style="--i:1">TypeScript</span><span style="--i:2">SQLite</span><span style="--i:3">Figma</span></dd></div>
+        <div class="about-row"><dt>GitHub</dt><dd><a class="ink-link" href="https://github.com/example" target="_blank" rel="noopener">https://github.com/example</a></dd></div>
+      </dl>
     </div>
-    
-    <p class="note-row"><span class="date">location</span><span>广东</span></p>
   </div>
 </section>
 
 
-<section id="experience">
+
+
+<section class="sec" id="experience">
   <div class="container">
-    <div class="cmd">tail -f experience.log</div>
-    
-      
-      <div class="log-entry">
-        <div class="period">2080.05 - 至今</div>
-        <div><span class="company">heartbeat</span> <span class="role">— 螺丝钉工</span></div>
-        <div>不一定打螺丝，偶尔帮螺丝分一下类。</div>
-      </div>
-      
-      <div class="log-entry">
-        <div class="period">2078.07-2080.05</div>
-        <div><span class="company">penguin</span> <span class="role">— 螺丝钉少年</span></div>
-        <div>脚踏实地，异想天开。每天精益求精打螺丝。</div>
-      </div>
-      
-      <div class="log-entry">
-        <div class="period">2076.10 - 2077.4</div>
-        <div><span class="company">bear</span> <span class="role">— 外门杂役弟子</span></div>
-        <div>负责帮公司打广告</div>
-      </div>
-      
-    
-  </div>
-</section>
-
-
-<section id="thoughts">
-  <div class="container">
-    <div class="cmd">less thoughts/</div>
-    
-      <p class="empty">// 暂无思考（/admin/thoughts）</p>
-    
-  </div>
-</section>
-
-
-<section id="projects">
-  <div class="container">
-    <div class="cmd">ls projects/</div>
-    
-      <p class="empty">// 暂无项目（/admin/projects）</p>
-    
-  </div>
-</section>
-
-
-<section id="notes">
-  <div class="container">
-    <div class="cmd">ls -lt notes/</div>
-    
-      <p class="empty">// 暂无文章（/admin/posts）</p>
-    
-  </div>
-</section>
-
-
-<section id="footprint">
-  <div class="container">
-    <div class="cmd">./modules/footprint --render</div>
-    <div class="globe-breadcrumb" id="globe-breadcrumb">~/globe</div>
-    <div class="globe-stage">
-      <div class="globe-controls">
-        <button id="globe-cd-up" class="globe-back-btn" style="display:none" aria-label="返回上一级">← 返回上一级</button>
-        <span id="globe-drill-hint" class="globe-drill-hint" role="note">双击进入下一级</span>
-      </div>
-      <canvas id="globe-canvas" width="440" height="440"></canvas>
-      <div id="globe-load-status" class="globe-load-status" hidden role="status"></div>
+    <div class="sec-head">
+      <span class="sec-line sec-num-line"><span class="sec-num">II</span></span>
+      <h2 class="sec-line"><span class="sec-title">经历</span></h2>
+      <span class="sec-line"><span class="sec-en">JOURNEY</span></span>
+      <i class="sec-rule" aria-hidden="true"></i>
     </div>
-    <div class="globe-stats" id="globe-stats"></div>
-    <div id="globe-notes" class="globe-notes" style="display:none"></div>
-    <div id="globe-moment-links" class="globe-moment-links" style="display:none"></div>
+    <ol class="timeline">
+      
+      <li class="tl-item" data-reveal>
+        <span class="tl-node" aria-hidden="true"></span>
+        <p class="tl-period">2024 — 至今</p>
+        <div class="tl-main">
+          <h3 class="tl-company">星港工作室 <span class="tl-role">独立开发者</span></h3>
+          <p class="tl-desc">一个人完成从设计到上线的全部环节，维护三款效率工具。</p>
+        </div>
+      </li>
+      
+      <li class="tl-item" data-reveal>
+        <span class="tl-node" aria-hidden="true"></span>
+        <p class="tl-period">2021 — 2024</p>
+        <div class="tl-main">
+          <h3 class="tl-company">远帆科技 <span class="tl-role">高级前端工程师</span></h3>
+          <p class="tl-desc">负责设计系统与可视化平台，主导首屏性能优化，加载时间减半。</p>
+        </div>
+      </li>
+      
+      <li class="tl-item" data-reveal>
+        <span class="tl-node" aria-hidden="true"></span>
+        <p class="tl-period">2018 — 2021</p>
+        <div class="tl-main">
+          <h3 class="tl-company">灯塔网络 <span class="tl-role">后端工程师</span></h3>
+          <p class="tl-desc">搭建订单与结算服务，第一次体会到「稳定」两个字的分量。</p>
+        </div>
+      </li>
+      
+    </ol>
   </div>
 </section>
 
 
-<section id="moments">
+
+
+
+
+<section class="sec" id="footprint" data-home="广东">
   <div class="container">
-    <div class="cmd">feh moments/*</div>
-    
-      <p class="empty">// 暂无瞬间（/admin/moments）</p>
-    
+    <div class="sec-head">
+      <span class="sec-line sec-num-line"><span class="sec-num">III</span></span>
+      <h2 class="sec-line"><span class="sec-title">足迹</span></h2>
+      <span class="sec-line"><span class="sec-en">FOOTPRINTS</span></span>
+      <i class="sec-rule" aria-hidden="true"></i>
+    </div>
+    <div class="footprint-grid">
+      <div class="globe-stage">
+        <canvas id="globe-canvas" width="440" height="440"></canvas>
+        <div id="globe-load-status" class="globe-load-status" hidden role="status"></div>
+      </div>
+      <div class="globe-panel">
+        <div class="globe-breadcrumb" id="globe-breadcrumb">地球</div>
+        <div class="globe-stats" id="globe-stats"></div>
+        <div class="globe-controls">
+          <button id="globe-cd-up" class="globe-back-btn" type="button" style="display:none" aria-label="返回上一级" data-magnetic>← 返回上一级</button>
+          <span id="globe-drill-hint" class="globe-drill-hint" role="note">双击进入下一级</span>
+        </div>
+        <div id="globe-notes" class="globe-notes" style="display:none"></div>
+        <div id="globe-moment-links" class="globe-moment-links" style="display:none"></div>
+      </div>
+    </div>
   </div>
 </section>
 
-<footer>
+
+
+
+
+
+<section class="sec" id="notes">
   <div class="container">
-    <div class="cmd">echo "© 2026 旅行者 — built with Go · self-hosted · no trackers"</div>
+    <div class="sec-head">
+      <span class="sec-line sec-num-line"><span class="sec-num">IV</span></span>
+      <h2 class="sec-line"><span class="sec-title">文章</span></h2>
+      <span class="sec-line"><span class="sec-en">WRITING</span></span>
+      <i class="sec-rule" aria-hidden="true"></i>
+    </div>
+    <div class="post-list" data-reveal-group>
+      
+      
+      <a class="post-row" href="/posts/night-terminal" data-reveal data-hue="155" data-glyph="在">
+        <span class="post-date">2026-09-18</span>
+        <span class="post-main">
+          <span class="post-title" style="view-transition-name:post-night-terminal">在深夜的终端里写诗</span>
+          <span class="post-tags"><span class="pill">#随笔</span><span class="pill">#工具</span></span>
+        </span>
+        
+        <span class="post-arrow" aria-hidden="true" data-magnetic>→</span>
+      </a>
+      
+      
+      <a class="post-row" href="/posts/harbor-morning" data-reveal data-hue="335" data-glyph="码" data-cover="https://picsum.photos/seed/harbor-morning/1200/800">
+        <span class="post-date">2026-08-02</span>
+        <span class="post-main">
+          <span class="post-title" style="view-transition-name:post-harbor-morning">码头的清晨</span>
+          <span class="post-tags"><span class="pill">#摄影</span><span class="pill">#旅行</span></span>
+        </span>
+        <img class="post-thumb" src="https://picsum.photos/seed/harbor-morning/1200/800" alt="" loading="lazy">
+        <span class="post-arrow" aria-hidden="true" data-magnetic>→</span>
+      </a>
+      
+      
+      <a class="post-row" href="/posts/small-software" data-reveal data-hue="159" data-glyph="小">
+        <span class="post-date">2026-06-21</span>
+        <span class="post-main">
+          <span class="post-title" style="view-transition-name:post-small-software">小而完整的软件</span>
+          <span class="post-tags"><span class="pill">#产品</span><span class="pill">#工程</span></span>
+        </span>
+        
+        <span class="post-arrow" aria-hidden="true" data-magnetic>→</span>
+      </a>
+      
+    </div>
+  </div>
+</section>
+
+
+
+
+<section class="sec" id="projects">
+  <div class="container">
+    <div class="sec-head">
+      <span class="sec-line sec-num-line"><span class="sec-num">V</span></span>
+      <h2 class="sec-line"><span class="sec-title">项目</span></h2>
+      <span class="sec-line"><span class="sec-en">WORKS</span></span>
+      <i class="sec-rule" aria-hidden="true"></i>
+    </div>
+    <div class="project-grid" data-reveal-group>
+      
+      <article class="project-card" data-reveal>
+        <div class="pj-top">
+          <span class="pj-lang"><i aria-hidden="true"></i>Go</span>
+          <a class="pj-open" href="https://github.com/example/lantern" target="_blank" rel="noopener" aria-label="打开项目">↗</a>
+        </div>
+        <h3 class="pj-name"><a href="https://github.com/example/lantern" target="_blank" rel="noopener">lantern</a></h3>
+        <p class="pj-desc">一个把 Markdown 笔记变成静态星图的小工具，支持离线搜索。</p>
+        <div class="pj-meta">
+          <span class="pj-stars"><span aria-hidden="true">★</span> <span class="num" data-to="1280">1280</span></span>
+          <span class="pj-license">MIT</span>
+        </div>
+      </article>
+      
+      <article class="project-card" data-reveal>
+        <div class="pj-top">
+          <span class="pj-lang"><i aria-hidden="true"></i>TypeScript</span>
+          <a class="pj-open" href="https://github.com/example/tidewatch" target="_blank" rel="noopener" aria-label="打开项目">↗</a>
+        </div>
+        <h3 class="pj-name"><a href="https://github.com/example/tidewatch" target="_blank" rel="noopener">tidewatch</a></h3>
+        <p class="pj-desc">潮汐与日出时间的命令行查询器，给早起拍照的人用。</p>
+        <div class="pj-meta">
+          <span class="pj-stars"><span aria-hidden="true">★</span> <span class="num" data-to="342">342</span></span>
+          <span class="pj-license">Apache-2.0</span>
+        </div>
+      </article>
+      
+    </div>
+  </div>
+</section>
+
+
+
+
+<section class="sec" id="thoughts">
+  <div class="container">
+    <div class="sec-head">
+      <span class="sec-line sec-num-line"><span class="sec-num">VI</span></span>
+      <h2 class="sec-line"><span class="sec-title">思考</span></h2>
+      <span class="sec-line"><span class="sec-en">THOUGHTS</span></span>
+      <i class="sec-rule" aria-hidden="true"></i>
+    </div>
+    <div class="thought-list">
+      
+      <div class="thought" data-reveal>
+        <div class="thought-body">慢一点没关系，方向对就好。很多事情不是做得不够快，而是太早放弃了。</div>
+        <button class="thought-toggle" type="button" hidden>展开 ▾</button>
+        <div class="meta"><span class="pill">日常</span><span class="thought-date">2026-09-30</span></div>
+      </div>
+      
+      <div class="thought" data-reveal>
+        <div class="thought-body">关于「完成」：我越来越觉得，一件事真正完成，不是功能都写完的那一刻，而是你可以放心地把它交给别人，自己转身去做下一件事的那一刻。为了到达那一刻，需要写文档、写测试、留好退路，需要把那些没人会夸奖的边角一点点磨圆。这个过程很慢，也很少被看见，但它决定了一件作品能走多远。年轻时总想着做大，现在更想做完整：一个小工具，能安装、能升级、能在出错时说人话；一篇文章，能让读者读到最后一句；一段旅程，回来以后还记得那条街的味道。完整不等于完美，它只是意味着你认真对待了每一个会被别人碰到的地方。我想把这种认真，当作一种长期的习惯来练习。</div>
+        <button class="thought-toggle" type="button" hidden>展开 ▾</button>
+        <div class="meta"><span class="pill">工程</span><span class="thought-date">2026-09-12</span></div>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+
+
+
+<section class="sec" id="moments">
+  <div class="container">
+    <div class="sec-head">
+      <span class="sec-line sec-num-line"><span class="sec-num">VII</span></span>
+      <h2 class="sec-line"><span class="sec-title">瞬间</span></h2>
+      <span class="sec-line"><span class="sec-en">MOMENTS</span></span>
+      <i class="sec-rule" aria-hidden="true"></i>
+    </div>
+    <div class="moments">
+      
+      <article class="moment" id="moment-1" data-reveal>
+        <div class="moment-meta">
+          <span class="moment-place">深圳 · 南山</span>
+          <span class="moment-date">2026-09-20</span>
+        </div>
+        <div class="moment-caption">海边的晚霞，五分钟就褪了色。</div>
+        
+        <div class="moment-media" data-count="3">
+          
+          
+            <img class="moment-item" src="https://picsum.photos/seed/sunset-pier/1200/900" alt="" loading="lazy" data-full="https://picsum.photos/seed/sunset-pier/1200/900">
+          
+          
+          
+            <img class="moment-item" src="https://picsum.photos/seed/sunset-sand/900/1200" alt="" loading="lazy" data-full="https://picsum.photos/seed/sunset-sand/900/1200">
+          
+          
+          
+            <img class="moment-item" src="https://picsum.photos/seed/sunset-gull/1200/800" alt="" loading="lazy" data-full="https://picsum.photos/seed/sunset-gull/1200/800">
+          
+          
+        </div>
+        
+      </article>
+      
+      <article class="moment" id="moment-2" data-reveal>
+        <div class="moment-meta">
+          <span class="moment-place">东京</span>
+          <span class="moment-date">2026-07-08</span>
+        </div>
+        <div class="moment-caption">末班电车上，整节车厢只剩我和一只纸袋。</div>
+        
+        <div class="moment-media" data-count="1">
+          
+          
+            <img class="moment-item" src="https://picsum.photos/seed/last-train/1200/800" alt="" loading="lazy" data-full="https://picsum.photos/seed/last-train/1200/800">
+          
+          
+        </div>
+        
+      </article>
+      
+    </div>
+  </div>
+</section>
+
+
+</main>
+
+<nav class="star-rail" id="star-rail" aria-label="章节">
+  <a class="rail-star" href="#about" data-key="about" data-count="whoami" data-weight="1.00" style="--w:1.00"><i></i><b>关于</b></a>
+  <a class="rail-star" href="#experience" data-key="experience" data-count="3 段" data-weight="1.39" style="--w:1.39"><i></i><b>经历</b></a>
+  <a class="rail-star" href="#footprint" data-key="footprint" data-count="2 国 · 4 处" data-weight="1.45" style="--w:1.45"><i></i><b>足迹</b></a>
+  <a class="rail-star" href="#notes" data-key="notes" data-count="3 篇" data-weight="1.39" style="--w:1.39"><i></i><b>文章</b></a>
+  <a class="rail-star" href="#projects" data-key="projects" data-count="2 个" data-weight="1.31" style="--w:1.31"><i></i><b>项目</b></a>
+  <a class="rail-star" href="#thoughts" data-key="thoughts" data-count="2 条" data-weight="1.31" style="--w:1.31"><i></i><b>思考</b></a>
+  <a class="rail-star" href="#moments" data-key="moments" data-count="2 刻" data-weight="1.31" style="--w:1.31"><i></i><b>瞬间</b></a>
+</nav>
+<footer class="site-footer">
+  <div class="container">
+    <i class="footer-rule" aria-hidden="true"></i>
+    <p class="footer-copy">© 2026 星野 · built with <a href="https://github.com/sfqin/blog_self" target="_blank" rel="noopener noreferrer">blog_self</a></p>
   </div>
 </footer>
 
@@ -171,8 +372,12 @@
 window.__BASE__ = "";
 window.__GEO_VERSION__ = "c878f587da";
 </script>
-<script src="/static/js/globe-core.js?v=98cb1b98b2" defer></script>
-<script src="/static/js/globe.js?v=7a87d87101" defer></script>
+<script src="/static/js/motion.js?v=1fc7d3f7d9" defer></script>
+<script src="/static/js/starfield.js?v=e3612cf9c0" defer></script>
+<script src="/static/js/constellation.js?v=676bac1bd0" defer></script>
+<script src="/static/js/sections.js?v=4a35e37675" defer></script>
+<script src="/static/js/globe-core.js?v=57c8aafeee" defer></script>
+<script src="/static/js/globe.js?v=14c34df26d" defer></script>
 <script src="/static/js/thoughts.js?v=d071577aaf" defer></script>
 <script src="/static/js/moments.js?v=0653dde1d4" defer></script>
 <script src="/static/js/search.js?v=cf153467cb" defer></script>

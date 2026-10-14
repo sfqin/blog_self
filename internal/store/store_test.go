@@ -89,4 +89,3 @@ func TestPostCRUDAndPublishing(t *testing.T) {
 		t.Fatalf("expected 0 posts after delete, got %d", len(all))
 	}
 }
-

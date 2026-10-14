@@ -1,0 +1,70 @@
+{{/*
+  Public-site partials shared by home.html and post.html. Names carry a
+  site_ prefix so they never collide with the admin's admin_head/admin_foot.
+  Every asset path is written as {{.Base}}{{asset "/static/…"}} so exports
+  under a sub-path (BASE_URL=/blog) keep working.
+*/}}
+
+{{define "site_head"}}<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07080d">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2307080d'/%3E%3Cpath d='M16 5l2.6 8.4L27 16l-8.4 2.6L16 27l-2.6-8.4L5 16l8.4-2.6z' fill='%23d8b56a'/%3E%3C/svg%3E">
+<script>
+(function(d){d.classList.add("js");
+if(d.hasAttribute("data-reading")){var m=null;try{m=localStorage.getItem("reading-mode")}catch(e){}
+if(m!=="night"&&m!=="paper")m=matchMedia("(prefers-color-scheme: light)").matches?"paper":"night";
+d.setAttribute("data-reading",m)}})(document.documentElement);
+</script>
+<link rel="stylesheet" href="{{.Base}}{{asset "/static/fonts/fonts.css"}}">
+<link rel="stylesheet" href="{{.Base}}{{asset "/static/css/site.css"}}">{{end}}
+
+{{define "site_brand"}}{{if .Profile.Name}}{{.Profile.Name}}{{else}}dev@home{{end}}{{end}}
+
+{{define "site_search"}}<div class="search-box" id="search-box">
+      <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+      <input type="text" id="site-search" autocomplete="off" spellcheck="false" placeholder="搜索文章、项目、足迹…" aria-label="搜索站点内容">
+      <kbd class="search-kbd" aria-hidden="true">/</kbd>
+      <div class="search-results" id="search-results"></div>
+    </div>
+    <button class="nav-search-btn" type="button" aria-label="搜索" aria-controls="search-box" aria-expanded="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+    </button>{{end}}
+
+{{define "site_nav"}}<nav class="site-nav" id="site-nav" aria-label="页面">
+  <div class="nav-inner container">
+    <a class="brand" href="{{.Base}}/">{{template "site_brand" .}}</a>
+    <span class="nav-spacer"></span>
+    {{template "site_search" .}}
+  </div>
+</nav>{{end}}
+
+{{define "site_footer"}}<footer class="site-footer">
+  <div class="container">
+    <i class="footer-rule" aria-hidden="true"></i>
+    <p class="footer-copy">© {{year}} {{template "site_brand" .}} · built with <a href="https://github.com/sfqin/blog_self" target="_blank" rel="noopener noreferrer">blog_self</a></p>
+  </div>
+</footer>{{end}}
+
+{{/* Section header (G2). Input: one NavItem from homeNav. */}}
+{{define "site_sec_head"}}<div class="sec-head">
+      <span class="sec-line sec-num-line"><span class="sec-num">{{.Numeral}}</span></span>
+      <h2 class="sec-line"><span class="sec-title">{{.Label}}</span></h2>
+      <span class="sec-line"><span class="sec-en">{{.En}}</span></span>
+      <i class="sec-rule" aria-hidden="true"></i>
+    </div>{{end}}
+
+{{/* Constellation nav (5.2). Input: homeNav result. */}}
+{{define "site_constellation"}}<nav class="constellation" id="constellation" aria-label="站点导航">
+  {{- range .}}
+  {{if .Off}}<a class="star" data-key="{{.Key}}" data-count="{{.Count}}" data-weight="{{.Weight}}" data-off aria-disabled="true" tabindex="-1" style="--w:{{.Weight}}"><i></i><b>{{.Label}}</b><em>{{.Count}}</em></a>
+  {{- else}}<a class="star" href="{{.Href}}" data-key="{{.Key}}" data-count="{{.Count}}" data-weight="{{.Weight}}" style="--w:{{.Weight}}"><i></i><b>{{.Label}}</b><em>{{.Count}}</em></a>{{end}}
+  {{- end}}
+</nav>{{end}}
+
+{{/* Mobile bottom star rail (5.6). Input: homeNav result. */}}
+{{define "star_rail"}}<nav class="star-rail" id="star-rail" aria-label="章节">
+  {{- range .}}
+  {{if .Off}}<a class="rail-star" data-key="{{.Key}}" data-count="{{.Count}}" data-weight="{{.Weight}}" data-off aria-disabled="true" tabindex="-1" style="--w:{{.Weight}}"><i></i><b>{{.Label}}</b></a>
+  {{- else}}<a class="rail-star" href="{{.Href}}" data-key="{{.Key}}" data-count="{{.Count}}" data-weight="{{.Weight}}" style="--w:{{.Weight}}"><i></i><b>{{.Label}}</b></a>{{end}}
+  {{- end}}
+</nav>{{end}}

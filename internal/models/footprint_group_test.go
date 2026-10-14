@@ -11,7 +11,7 @@ func TestGroupFootprints(t *testing.T) {
 		{CountryCode: "CN", CountryName: "中国", Province: "北京市", City: "东城区"},
 		{CountryCode: "CN", CountryName: "中国", Province: "湖南省", City: "株洲市"},
 		{CountryCode: "JP", CountryName: "日本", Province: "东京都", City: "新宿区"},
-		{CountryCode: "SG", CountryName: "新加坡"}, // country-only, no province
+		{CountryCode: "SG", CountryName: "新加坡"},   // country-only, no province
 		{CountryCode: "", CountryName: "skip me"}, // dropped: empty code
 	}
 

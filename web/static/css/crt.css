@@ -1,12 +1,12 @@
-/* dev@home — base / structural stylesheet + theme token contract.
-   This file holds ALL layout & component rules and the DEFAULT palette
-   (theme F · Retro Terminal). Alternate themes live in themes/<CODE>.css and
-   only override the :root tokens below via a `:root[data-theme="X"]` block.
-   Every theme MUST define the token contract in this :root; anything a theme
-   omits falls back to the F values here. Admin pages load only this file and
-   therefore always render as F (they carry no data-theme attribute). */
+/* dev@home — 后台专用（admin-only）终端风样式表。
+   Admin-only: loaded by the /admin and /setup pages, together with admin.css.
+   The public site (home + post pages) uses its own single "Starry Night Voyage"
+   design (site.css / reading.css) and must not depend on this file.
+   It holds the admin layout & component rules and the Retro Terminal palette
+   tokens in :root below. Admin pages set <html data-theme="F">, which is what
+   switches on the scanline / vignette overlays further down. */
 :root {
-  /* ===== Core palette (F · Retro Terminal — also the universal fallback) ===== */
+  /* ===== Core palette (F · Retro Terminal) ===== */
   --bg: #0a0e0a;
   --panel: #0d140d;
   --panel-2: #0f1a0f;
@@ -17,7 +17,7 @@
   --line: #1c2a1c;
   --glow: 0 0 8px rgba(74, 222, 128, 0.45);
 
-  /* ===== RGB channels — for rgba() surfaces that must follow the theme ===== */
+  /* ===== RGB channels — for rgba() surfaces that follow the palette ===== */
   --accent-rgb: 74, 222, 128;
   --accent-2-rgb: 251, 191, 36;
   --bg-rgb: 10, 14, 10;
@@ -32,8 +32,8 @@
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace; /* code / chrome  */
 
   /* ===== Decorative toggles (F opts into the terminal flourishes) ===== */
-  --cmd-prefix: "$ ";        /* section-header prefix; "" for non-terminal themes */
-  --brand-suffix: "~";       /* nav brand suffix;      "" for non-terminal themes */
+  --cmd-prefix: "$ ";        /* section-header prefix */
+  --brand-suffix: "~";       /* nav brand suffix      */
   --cmd-color: var(--accent);/* section-header text colour                        */
 
   /* ===== Globe canvas palette (read by globe.js via getComputedStyle) ===== */
@@ -65,8 +65,8 @@ body {
 }
 
 /* --- CRT overlays: scanlines + vignette + flicker (PRD §3.3) ---
-   These terminal flourishes belong to theme F only. They are hidden by default
-   and re-enabled under [data-theme="F"] so alternate themes stay clean. */
+   Hidden by default and switched on under [data-theme="F"], which every admin
+   page sets on <html>. */
 .crt-scanlines,
 .crt-vignette {
   pointer-events: none;

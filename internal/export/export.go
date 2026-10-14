@@ -146,7 +146,7 @@ func Run(st *store.Store, rnd *render.Renderer, staticFS fs.FS, outDir, base str
 		return fmt.Errorf("copy static: %w", err)
 	}
 
-	// 5. Static-host cache rules for versioned Geo JSON.
+	// 5. Static-host cache rules for versioned Geo JSON and self-hosted fonts.
 	if err := writeFile(filepath.Join(outDir, "_headers"), []byte(hostingHeaders(base))); err != nil {
 		return err
 	}
@@ -160,9 +160,13 @@ func Run(st *store.Store, rnd *render.Renderer, staticFS fs.FS, outDir, base str
 	return nil
 }
 
+// hostingHeaders renders a Cloudflare/EdgeOne-style _headers file that marks
+// the content-versioned asset trees (geo JSON, fonts) as one-year immutable.
 func hostingHeaders(base string) string {
 	base = strings.TrimSuffix(base, "/")
-	return fmt.Sprintf(`%s/static/geo/*
+	return fmt.Sprintf(`%[1]s/static/geo/*
+  Cache-Control: public, max-age=31536000, immutable
+%[1]s/static/fonts/*
   Cache-Control: public, max-age=31536000, immutable
 `, base)
 }

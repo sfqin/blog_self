@@ -53,7 +53,6 @@ func (s *Server) handleSetupGHLogin(w http.ResponseWriter, r *http.Request) {
 	s.writeJSON(w, s.actor.GHLoginStart(r.Context(), s.goos))
 }
 
-
 // handleSetupCreateRepo creates (or links) a GitHub repository. The repo is
 // always public — GitHub Pages (free) cannot publish from a private repo.
 func (s *Server) handleSetupCreateRepo(w http.ResponseWriter, r *http.Request) {

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN" data-reading="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07080d">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2307080d'/%3E%3Cpath d='M16 5l2.6 8.4L27 16l-8.4 2.6L16 27l-2.6-8.4L5 16l8.4-2.6z' fill='%23d8b56a'/%3E%3C/svg%3E">
+<script>
+(function(d){d.classList.add("js");
+if(d.hasAttribute("data-reading")){var m=null;try{m=localStorage.getItem("reading-mode")}catch(e){}
+if(m!=="night"&&m!=="paper")m=matchMedia("(prefers-color-scheme: light)").matches?"paper":"night";
+d.setAttribute("data-reading",m)}})(document.documentElement);
+</script>
+<link rel="stylesheet" href="/static/fonts/fonts.css?v=4eb1091156">
+<link rel="stylesheet" href="/static/css/site.css?v=43e3b30941">
+<link rel="stylesheet" href="/static/css/reading.css?v=00085fd294">
+<title>小而完整的软件 · 星野</title>
+<meta name="description" content="小而完整的软件">
+</head>
+<body class="post">
+<div class="read-progress" id="read-progress" aria-hidden="true"></div>
+<canvas id="starfield" aria-hidden="true"></canvas>
+<div class="spotlight" aria-hidden="true"></div>
+
+<nav class="site-nav is-post" id="site-nav" aria-label="页面">
+  <div class="nav-inner container">
+    <a class="brand" href="/">星野</a>
+    <a class="nav-link nav-back" href="/">← 返回首页</a>
+    <span class="nav-post-title" aria-hidden="true">小而完整的软件</span>
+    <span class="nav-spacer"></span>
+    <div class="search-box" id="search-box">
+      <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+      <input type="text" id="site-search" autocomplete="off" spellcheck="false" placeholder="搜索文章、项目、足迹…" aria-label="搜索站点内容">
+      <kbd class="search-kbd" aria-hidden="true">/</kbd>
+      <div class="search-results" id="search-results"></div>
+    </div>
+    <button class="nav-search-btn" type="button" aria-label="搜索" aria-controls="search-box" aria-expanded="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+    </button>
+    <button class="reading-toggle" id="reading-toggle" type="button" aria-pressed="false" aria-label="切换到纸页" data-magnetic>
+      <svg class="rt-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+      <svg class="rt-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1z"/></svg>
+    </button>
+  </div>
+</nav>
+
+<main class="post-shell">
+  <header class="post-head container">
+    <div class="post-pills"><span class="pill">#产品</span><span class="pill">#工程</span></div>
+    <h1 class="post-title" style="view-transition-name:post-small-software" aria-label="小而完整的软件"><span class="ch" style="--i:0" aria-hidden="true"><i>小</i></span><span class="ch" style="--i:1" aria-hidden="true"><i>而</i></span><span class="ch" style="--i:2" aria-hidden="true"><i>完</i></span><span class="ch" style="--i:3" aria-hidden="true"><i>整</i></span><span class="ch" style="--i:4" aria-hidden="true"><i>的</i></span><span class="ch" style="--i:5" aria-hidden="true"><i>软</i></span><span class="ch" style="--i:6" aria-hidden="true"><i>件</i></span></h1>
+    <p class="post-date"><time>2026-06-21</time></p>
+  </header>
+
+  <article class="reading-panel">
+    <div class="article">
+      <p>一个人能做的软件，往往比想象中更多，也比想象中更少。</p>
+<p>关键是让它<strong>完整</strong>：能安装、能升级、能在出错时告诉你发生了什么。</p>
+<ul>
+<li>先做最小的闭环</li>
+<li>再把每个边角磨圆</li>
+<li>最后才考虑增长</li>
+</ul>
+
+    </div>
+  </article>
+
+  <nav class="post-foot" aria-label="文章导航">
+    <a class="post-foot-link" href="/#notes" data-magnetic>← 返回文章列表</a>
+  </nav>
+</main>
+
+<aside class="reading-toc" id="reading-toc" aria-label="目录" hidden></aside>
+
+<footer class="site-footer">
+  <div class="container">
+    <i class="footer-rule" aria-hidden="true"></i>
+    <p class="footer-copy">© 2026 星野 · built with <a href="https://github.com/sfqin/blog_self" target="_blank" rel="noopener noreferrer">blog_self</a></p>
+  </div>
+</footer>
+
+<script>window.__BASE__ = "";</script>
+<script src="/static/js/motion.js?v=1fc7d3f7d9" defer></script>
+<script src="/static/js/starfield.js?v=e3612cf9c0" defer></script>
+<script src="/static/js/reading.js?v=1fcf801a48" defer></script>
+<script src="/static/js/search.js?v=cf153467cb" defer></script>
+
+</body>
+</html>

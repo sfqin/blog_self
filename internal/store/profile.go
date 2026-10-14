@@ -20,8 +20,8 @@ func (s *Store) Profile() (models.Profile, error) {
 }
 
 // SaveProfile updates the single-row profile. It deliberately does NOT touch
-// the theme column — the site theme is edited on its own admin page and
-// persisted via SaveTheme, so saving profile never clobbers the theme.
+// the deprecated theme column: the public site now has a single design, and the
+// column is kept (with its stored value untouched) only for old-database compat.
 func (s *Store) SaveProfile(p models.Profile) error {
 	_, err := s.db.Exec(`
 		UPDATE profile SET
@@ -29,13 +29,5 @@ func (s *Store) SaveProfile(p models.Profile) error {
 			github_url = ?, email = ?, location = ?, updated_at = datetime('now')
 		WHERE id = 1`,
 		p.Name, p.Title, p.Tagline, p.AboutMD, p.Stack, p.GitHubURL, p.Email, p.Location)
-	return err
-}
-
-// SaveTheme updates only the site-wide visual theme code (A–Z; F = default).
-func (s *Store) SaveTheme(theme string) error {
-	_, err := s.db.Exec(
-		`UPDATE profile SET theme = ?, updated_at = datetime('now') WHERE id = 1`,
-		theme)
 	return err
 }

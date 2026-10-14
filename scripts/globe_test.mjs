@@ -35,6 +35,20 @@ async function waitUntil(check, message, timeout = 15000) {
   throw new Error(message);
 }
 
+async function waitForText(page, selector, expected, message) {
+  try {
+    await page.waitForFunction(
+      (selector, expected) => document.querySelector(selector)?.textContent === expected,
+      { timeout: 5000 },
+      selector,
+      expected,
+    );
+  } catch {
+    const actual = await page.$eval(selector, (element) => element.textContent);
+    assert.equal(actual, expected, message);
+  }
+}
+
 async function canvasPoint(page, kind, key) {
   return page.evaluate(({ kind, key }) => {
     const canvas = document.getElementById("globe-canvas");
@@ -131,13 +145,14 @@ try {
     document.getElementById("footprint").scrollIntoView();
   });
   await sleep(100);
+  await waitForText(page, "#globe-stats", "1 国 · 1 省/州 · 2 处", "地球层统计应滚动到最终值");
   await page.evaluate(() => window.__globeDebug.focusCountry("CN"));
   const countryPoint = await canvasPoint(page, "country", "CN");
   assert.ok(countryPoint, "无法定位中国标记");
 
   await page.mouse.click(countryPoint.x, countryPoint.y);
   assert.equal((await page.evaluate(() => window.__globeDebug.state())).selected, "CN");
-  assert.equal(await page.$eval("#globe-breadcrumb", (element) => element.textContent.trim()), "~/globe");
+  assert.equal(await page.$eval("#globe-breadcrumb", (element) => element.textContent.trim()), "地球");
   assert.equal(await page.$eval("#globe-notes", (element) => element.style.display), "none");
   assert.equal(await page.$$eval("#globe-moment-links .gml-item", (items) => items.length), 4);
 
@@ -148,6 +163,7 @@ try {
     await page.$eval("#globe-drill-hint", (element) => getComputedStyle(element).display !== "none"),
     true,
   );
+  assert.equal(await page.$eval("#globe-cd-up", (element) => element.textContent), "← 返回地球");
 
   const provincePoint = await canvasPoint(page, "region", "广东省");
   assert.ok(provincePoint, "无法定位广东省");
@@ -173,6 +189,8 @@ try {
     await page.$eval("#globe-drill-hint", (element) => getComputedStyle(element).display === "none"),
     true,
   );
+  assert.equal(await page.$eval("#globe-cd-up", (element) => element.textContent), "← 返回中国");
+  await waitForText(page, "#globe-stats", "2 处", "下钻到广东后统计应为 2 处");
 
   const cityPoint = await canvasPoint(page, "region", "深圳市");
   assert.ok(cityPoint, "无法定位深圳市");
@@ -241,6 +259,7 @@ try {
   console.log("PASS 首屏仅加载一级，空闲后懒加载省市地图");
   console.log("PASS 单击选中，双击下钻，省市笔记与瞬间聚合正确");
   console.log("PASS 返回按钮、面包屑和横滑均恢复导航快照");
+  console.log("PASS 足迹统计滚动到最终值，返回按钮显示目标层名称");
 } catch (error) {
   console.error(error);
   console.error("browser errors:", JSON.stringify(errors));

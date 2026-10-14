@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS profile (
     github_url TEXT NOT NULL DEFAULT '',
     email      TEXT NOT NULL DEFAULT '',
     location   TEXT NOT NULL DEFAULT '',
-    theme      TEXT NOT NULL DEFAULT 'F',   -- site-wide visual theme (A–Z; F = Retro Terminal)
+    theme      TEXT NOT NULL DEFAULT 'F',   -- deprecated: unused since the single public design; kept for old DBs
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 

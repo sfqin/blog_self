@@ -1,8 +1,8 @@
-# dev@home — retro CRT terminal personal blog
+# dev@home — a "Starry Night Voyage" personal blog
 
 [中文](README.md) · **English**
 
-A retro CRT terminal-styled personal blog with an interactive 3D "footprint" globe. Write posts, add photos, and mark places you've visited in a local admin, then publish with one click to get a free website the whole world can visit.
+A personal blog in the "Starry Night Voyage" style — a deep night sky and gold serif type — with an interactive 3D "footprint" globe. Write posts, add photos, and mark places you've visited in a local admin, then publish with one click to get a free website the whole world can visit.
 
 > 🔗 **Live demo**: <https://sfqin.github.io/blog_test/> (a reference of the published result)
 
@@ -20,7 +20,7 @@ A retro CRT terminal-styled personal blog with an interactive 3D "footprint" glo
 - ✅ An interactive **3D globe** showing the cities you've visited (drill down
   through country → province/state → city).
 
-**End result**: your own retro-terminal personal website with a 3D footprint
+**End result**: your own starry-night personal website with a 3D footprint
 globe, online for free, long term.
 
 ---
@@ -91,7 +91,24 @@ next to it.
 - **Moments feed**: images / short videos / plain-text diary entries
 - **Site-wide fuzzy search**
 
-**Post pages (`/posts/{slug}`)**: Markdown rendered to HTML.
+**Post pages (`/posts/{slug}`)**: Markdown rendered to HTML, with a one-click
+night / paper reading mode.
+
+**Public design: "Starry Night Voyage"**: the home and post pages ship exactly
+one design; there is no theme switcher.
+- Deep night-sky background, gold serif display type and fine gold rules; fonts
+  are self-hosted, with no Google Fonts dependency.
+- **Constellation navigation**: the first screen shows a constellation where each
+  bright star is a section; once you scroll it docks as a star rail on the right
+  (desktop) or a bottom star bar (mobile), doubling as section nav and reading
+  progress. Sections with no content show as dim stars.
+- **Footprint globe** lives in chapter III "Footprints": click to select,
+  double-click to drill down, with flight arcs from your home base and stats.
+- **Reading mode** on posts: an opaque reading panel with a night / paper toggle
+  that is remembered.
+- Every animation degrades gracefully: with reduced motion, on touch devices, or
+  without JS, all content stays fully readable.
+- The admin (`/admin`) keeps its retro terminal look and is unaffected.
 
 **Admin (`/admin`, no login)**: CRUD for every piece of content; saving
 writes to the local database and the public site reflects it on the next load.
@@ -121,8 +138,6 @@ static publishing only.
 
 ## 5. Roadmap & contact
 
-- 🎨 **Multiple themes**: it's retro CRT terminal today; switchable themes
-  (light / minimal / magazine, etc.) are planned so every blog feels personal.
 - More countries' footprint data and more content modules are on the way.
 
 Questions, suggestions, or want to help improve it? Reach out: **sfqincsu@163.com**
@@ -237,13 +252,17 @@ internal/
 web/
   templates/public/         home.html, post.html
   templates/admin/          dashboard, per-section list/form, setup wizard
-  static/css|js/            CRT theme, admin, globe.js, moments.js, search.js, setup.js
+  static/css/               site.css (public "Starry Night Voyage" design), reading.css (post reading mode),
+                            crt.css + admin.css (admin only)
+  static/js/                public-site scripts (starfield, constellation, globe.js, moments.js, search.js), setup.js
+  static/fonts/             self-hosted font slices + fonts.css + OFL.txt (font license text)
   static/geo/               world + region JSON for the globe (pre-built)
 scripts/
   package-release.sh        build the double-click release (cross-platform binaries + launchers)
   deploy.sh                 build / push to a VPS
   gen_geo.mjs               (re)generate geo data (needs network)
   globe_logic_test.mjs      globe pure-logic tests
+  fonts/                    build-fonts.sh: download source fonts → subset into slices → generate fonts.css (dev-time)
 packaging/                  client launcher sources (bundled into the dist-release/ per-OS clients)
   mac/                      Start-Blog.app Info.plist + launch controller script
   loading.html              startup splash opened on double-click (polls the server, then enters the wizard)
@@ -265,3 +284,17 @@ node scripts/globe_logic_test.mjs   # globe pure-logic tests
 > Frontend assets are compiled into the binary, so after editing templates/CSS/JS
 > you must **rebuild with `go build` and restart** the service for changes to take
 > effect.
+
+### Font licenses
+
+The public site self-hosts two fonts, subset and stored under `web/static/fonts/`:
+
+| Font | Used for | License |
+|------|----------|---------|
+| **Noto Serif SC** (600) | headings, names, nav brand, drop caps | SIL Open Font License 1.1 |
+| **Bodoni Moda** (500 / 700) | numerals and Roman numerals | SIL Open Font License 1.1 |
+
+The full license text and copyright notices for both fonts are in
+[`web/static/fonts/OFL.txt`](web/static/fonts/OFL.txt). Keep that file when you
+redistribute this project (including the subset font files); under the OFL the
+fonts may not be sold on their own.
