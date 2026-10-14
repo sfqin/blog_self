@@ -235,7 +235,7 @@ Export and upload again after each content change. **Do not place `blog.db` in t
 
 ## Dynamic hosting: personal instance
 
-A dynamic site reads SQLite on the server. Changes saved through its server admin appear on the public site on the next page load, without a static export. GitHub Pages does not update automatically from those changes.
+A dynamic site reads SQLite on the server. Changes saved through its server admin appear on the public site on the next page load, without a static export. GitHub Pages does not update automatically from those changes. The author's online admin depends on a separate private Ops platform that is not distributed with this project; other deployments can use static publishing or integrate their own authenticated gateway.
 
 The two repositories currently differ:
 
