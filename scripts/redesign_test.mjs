@@ -131,6 +131,9 @@ test("wp1", "390：波浪星座、星点栏出现 / 让位搜索与灯箱、页�
   await sleep(400);
   await scrollToY(page, 1e6);
   const gap = await page.evaluate(() => {
+    // A lazy image can grow the page after scrollToY's wait. Re-anchor and
+    // measure in one browser task so this checks the footer at the real bottom.
+    window.scrollTo(0, document.documentElement.scrollHeight);
     const rail = document.getElementById("star-rail").getBoundingClientRect();
     const copy = document.querySelector(".footer-copy").getBoundingClientRect();
     return rail.top - copy.bottom;
