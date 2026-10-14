@@ -136,7 +136,7 @@ test("wp1", "390：波浪星座、星点栏出现 / 让位搜索与灯箱、页�
     return rail.top - copy.bottom;
   });
   assert.ok(gap >= 0, `footer copy overlaps the rail by ${-gap}px`);
-  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth), 0, "no horizontal overflow");
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), 0, "no horizontal overflow");
   clean(page);
   await page.close();
 });
@@ -329,7 +329,7 @@ test("wp3", "TOC：≥1200 显示并高亮当前项，<1200 隐藏；进度条�
 
 test("wp3", "长文 390：无横向溢出、正文 17px、代码块内滚动", async () => {
   const page = await open("/posts/long-read", MOBILE, { reading: "night" });
-  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth), 0);
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), 0);
   assert.equal(await page.$eval(".reading-panel .article p", (p) => getComputedStyle(p).fontSize), "17px");
   const pre = await page.$eval(".article pre", (el) => ({ sw: el.scrollWidth, cw: el.clientWidth, ox: getComputedStyle(el).overflowX }));
   assert.ok(pre.sw > pre.cw && (pre.ox === "auto" || pre.ox === "scroll"), "wide code scrolls inside its block");
@@ -362,8 +362,11 @@ test("wp4", "地球：两栏、出发地与航线、面包屑与下钻提示", a
   await page.close();
 });
 
-test("wp4", "地球 390：单栏，画布宽 350", async () => {
+test("wp4", "地球 390：单栏，画布宽 350，光晕不撑宽页面", async () => {
   const page = await open("/", MOBILE);
+  // Mobile Chrome can grow innerWidth to include overflow; clientWidth keeps
+  // the configured viewport width and catches halos escaping the page gutter.
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), 0, "globe halo must stay within the mobile viewport");
   await scrollToSection(page, "footprint");
   await page.waitForFunction(() => window.__globeDebug?.ready());
   assert.equal(await page.$eval("#globe-canvas", (c) => Math.round(c.getBoundingClientRect().width)), 350);

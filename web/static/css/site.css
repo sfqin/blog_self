@@ -1242,6 +1242,10 @@ body.lightbox-open { overflow: hidden; }
   background: radial-gradient(closest-side, rgba(var(--gold-rgb), .1) 62%, rgba(var(--gold-rgb), .04) 78%, transparent 100%);
   pointer-events: none;
 }
+@media (max-width: 767px) {
+  /* Keep the decorative halo inside the mobile page gutter. */
+  .globe-stage::before { inset: -16px; }
+}
 #globe-canvas { display: block; margin: 0 auto; cursor: grab; touch-action: none; -webkit-tap-highlight-color: transparent; }
 #globe-canvas:active { cursor: grabbing; }
 
