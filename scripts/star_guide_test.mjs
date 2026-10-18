@@ -10,7 +10,8 @@ async function open({mobile=false,reduced=false,hash=''}={}) {
  p.on('pageerror',e=>errors.push(e.message));
  await p.setViewport(mobile?{width:390,height:844,isMobile:true,hasTouch:true}:{width:1440,height:900});
  if(reduced) await p.emulateMediaFeatures([{name:'prefers-reduced-motion',value:'reduce'}]);
- await p.goto(BASE+'/'+hash,{waitUntil:'networkidle0'});
+ // A finite cue may finish while remote fonts/data are still loading.
+ await p.goto(BASE+'/'+hash,{waitUntil:'domcontentloaded'});
  assert.equal(await p.$('.hero-hint'),null);
  return p;
 }
