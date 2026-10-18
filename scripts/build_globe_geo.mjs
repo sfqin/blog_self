@@ -3,7 +3,7 @@ import { build } from 'esbuild';
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 const here=fileURLToPath(new URL('.',import.meta.url));
-const out=new URL('../web/static/js/vendor/globe-geo.js',import.meta.url);
+const out=new URL('../web/static/js/globe-geo.js',import.meta.url);
 await build({
  stdin:{contents:'export {geoArea, geoOrthographic, geoPath} from "d3-geo";',resolveDir:here},
  bundle:true,format:'iife',globalName:'GlobeGeo',minify:true,target:'es2018',
