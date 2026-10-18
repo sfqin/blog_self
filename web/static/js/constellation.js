@@ -37,6 +37,31 @@
   stars.forEach(function (s) { s.el.style.setProperty("--n", s.i); });
   var railStars = rail ? Array.prototype.slice.call(rail.querySelectorAll("a.rail-star")) : [];
 
+  // A finite, wordless click cue after the entrance; browsing dismisses it.
+  var guide = null, guideTimer = null, guideDone = false;
+  function dismissGuide() {
+    guideDone = true;
+    clearTimeout(guideTimer);
+    if (guide) { guide.remove(); guide = null; }
+    window.removeEventListener("pointerdown", dismissGuide);
+    window.removeEventListener("keydown", dismissGuide);
+  }
+  function showGuide() {
+    if (guideDone || M.reduced || window.scrollY > 8 || location.hash || root.classList.contains("no-intro")) return dismissGuide();
+    var target = stars.find(function (s) { return !s.off && s.sec; });
+    if (!target) return dismissGuide();
+    guide = document.createElement("span");
+    guide.className = "star-guide";
+    guide.setAttribute("aria-hidden", "true");
+    var hand = mk("svg", { viewBox: "0 0 28 32", focusable: "false" }, guide);
+    mk("path", { d: "M7 17V5a2.5 2.5 0 0 1 5 0v7a2.5 2.5 0 0 1 5 0v2a2.5 2.5 0 0 1 5 0v2a2 2 0 0 1 4 0v5c0 6-3 9-8 9h-2c-3 0-5-2-7-4l-6-7a2.5 2.5 0 0 1 3.5-3.5L7 17Z" }, hand);
+    target.el.appendChild(guide);
+    guideTimer = setTimeout(dismissGuide, 8000);
+  }
+  window.addEventListener("pointerdown", dismissGuide, { passive: true });
+  window.addEventListener("keydown", dismissGuide);
+  guideTimer = setTimeout(showGuide, 2400);
+
   // ---- lines ----
   var svg = document.createElementNS(NS, "svg");
   svg.setAttribute("class", "cst-lines");
@@ -94,6 +119,7 @@
 
   function update() {
     var y = window.scrollY;
+    if (!guideDone && (y > 8 || M.reduced)) dismissGuide();
     var p;
     if (mobile) p = 0;
     else if (M.reduced) p = y > 0.4 * vh ? 1 : 0;
@@ -187,6 +213,7 @@
 
   // ---- navigation ----
   function go(key, e) {
+    dismissGuide();
     var sec = key && document.getElementById(key);
     if (e) e.preventDefault();
     if (!sec) return;

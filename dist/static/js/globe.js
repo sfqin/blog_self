@@ -14,8 +14,9 @@
   if (!canvas) return;
   var ctx = canvas.getContext("2d");
   var Core = window.GlobeCore;
-  if (!Core) {
-    console.error("GlobeCore is missing");
+  var Geo = window.GlobeGeo;
+  if (!Core || !Geo) {
+    console.error("Globe rendering dependencies are missing");
     return;
   }
 
@@ -107,6 +108,9 @@
   };
 
   var world = null;      // world.json
+  var landGeometry, borderGeometry;
+  var surfaceProjection = Geo.geoOrthographic().precision(0.3);
+  var surfacePath = Geo.geoPath(surfaceProjection, ctx);
   var R;                 // effective sphere radius (base * globe zoom)
   var RBASE;             // fit radius at zoom=1 (set on resize)
   var SIZE;              // canvas CSS size in px (square)
@@ -274,6 +278,9 @@
   // Layer 1 — the globe
   // ============================================================
   function drawGlobe() {
+    // Visibility and pointer events can arrive before both boot requests finish.
+    // Do not alter the canvas state until the map is ready.
+    if (!world) return;
     var size = SIZE;
     ctx.clearRect(0, 0, size, size);
 
@@ -537,23 +544,32 @@
     ctx.fillText("出发地", p.x + halo + 3, p.y + 4);
   }
 
-  // Draw an array of rings [[ [lon,lat], ... ], ...] on the sphere with back-face
-  // culling: break the path whenever a vertex rotates behind the globe.
+  // A clipped polygon must close along the horizon, never across the disk.
+  // D3 stitches visible fragments and resamples spherical edges before painting.
+  function prepareSurface() {
+    landGeometry = { type: "MultiPolygon", coordinates: world.land.map(function (ring) {
+      var closed = ring.slice();
+      var first = closed[0], last = closed[closed.length - 1];
+      if (first[0] !== last[0] || first[1] !== last[1]) closed.push(first);
+      var area = Geo.geoArea({ type: "Polygon", coordinates: [closed] });
+      // Simplification leaves collapsed two-point islands in world.json.
+      // Such zero-area rings can turn into a full disk when horizon-clipped.
+      if (Math.min(area, 4 * Math.PI - area) < 1e-10) return null;
+      // world.json stores flattened outer rings; D3 uses clockwise exteriors.
+      if (area > 2 * Math.PI) closed.reverse();
+      return [closed];
+    }).filter(Boolean) };
+    borderGeometry = { type: "MultiLineString", coordinates: world.borders };
+  }
+
   function drawRings(rings, fill, stroke, lw, doFill) {
     if (!rings) return;
-    for (var r = 0; r < rings.length; r++) {
-      var ring = rings[r];
-      ctx.beginPath();
-      var penDown = false;
-      for (var i = 0; i < ring.length; i++) {
-        var p = project(ring[i][0], ring[i][1]);
-        if (!p.visible) { penDown = false; continue; }
-        if (!penDown) { ctx.moveTo(p.x, p.y); penDown = true; }
-        else ctx.lineTo(p.x, p.y);
-      }
-      if (doFill && fill) { ctx.fillStyle = fill; ctx.fill(); }
-      if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw; ctx.stroke(); }
-    }
+    surfaceProjection.translate([CX, CY]).scale(R)
+      .rotate([-state.rot.y * 180 / Math.PI, -state.rot.x * 180 / Math.PI]);
+    ctx.beginPath();
+    surfacePath(doFill ? landGeometry : borderGeometry);
+    if (doFill && fill) { ctx.fillStyle = fill; ctx.fill(); }
+    if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw; ctx.stroke(); }
   }
 
   // Hit-test: which visited country marker (if any) is near screen point.
@@ -1270,7 +1286,7 @@
   // Animation loop (globe only)
   // ============================================================
   function startLoop() {
-    if (state.raf) return;
+    if (!world || state.raf) return;
     var step = function () {
       if (state.layer !== "globe") { state.raf = null; return; }
       if (!state.dragging) {
@@ -1589,6 +1605,23 @@
       historySize: function () { return history.size(); },
       goBack: goBack,
       pause: stopLoop,
+      // Sample the real land painter without lighting/markers for clipping regressions.
+      landSamples: function (center, points) {
+        stopLoop();
+        var rot = state.rot;
+        state.rot = { x: center[1] * Math.PI / 180, y: center[0] * Math.PI / 180 };
+        ctx.clearRect(0, 0, SIZE, SIZE);
+        drawRings(world.land, "#fff", null, 0, true);
+        var samples = points.map(function (ll) {
+          var p = project(ll[0], ll[1]);
+          // Avoid classifying subpixel slivers right at the horizon.
+          if (p.z < 0.12) return null;
+          return ctx.getImageData(Math.round(p.x * canvas.width / SIZE), Math.round(p.y * canvas.height / SIZE), 1, 1).data[3] > 127;
+        });
+        state.rot = rot;
+        drawGlobe();
+        return samples;
+      },
       setRegionView: function (view) {
         if (state.layer === "globe") return false;
         cancelTapSequence();
@@ -1679,13 +1712,17 @@
   }
 
   resize();
+  setLoadMessage("正在加载足迹地图…");
   Promise.all([
     loadJSON("/static/geo/world.json"),
-    loadJSON("/api/footprints").catch(function () { return []; }),
+    loadJSON("/api/footprints"),
   ]).then(function (res) {
     world = res[0];
+    prepareSurface();
     state.footprints = res[1] || [];
     buildRoutes();
+    state.rot = { x: routes.origin.lat * Math.PI / 180, y: routes.origin.lon * Math.PI / 180 };
+    clearLoadMessage();
     updateChrome();
     observeStats();
     drawGlobe();
@@ -1694,6 +1731,8 @@
       startBackgroundWarmup();
     });
   }).catch(function (err) {
+    stopLoop();
+    setLoadMessage("地图数据加载失败，请刷新重试", true);
     renderError("地球数据加载失败");
     console.error(err);
   });

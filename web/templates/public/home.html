@@ -32,7 +32,6 @@
         {{with .Profile.GitHubURL}}<a class="btn-gold is-solid" href="{{.}}" target="_blank" rel="noopener" data-magnetic>GitHub <span aria-hidden="true">↗</span></a>{{end}}
         {{with .Profile.Email}}<a class="btn-gold" href="mailto:{{.}}" data-magnetic>Email <span aria-hidden="true">✉</span></a>{{end}}
       </div>{{end}}
-      <p class="hero-hint"><span aria-hidden="true">✦</span> 每颗星是一个章节 · 点击跳转</p>
     </div>
   </div>
   {{template "site_constellation" $nav}}
@@ -54,7 +53,6 @@
         {{with .Profile.StackTags}}<div class="about-row"><dt>技能</dt><dd class="tags">
           {{- range $i, $t := .}}<span style="--i:{{$i}}">{{$t}}</span>{{end -}}
         </dd></div>{{end}}
-        {{with .Profile.GitHubURL}}<div class="about-row"><dt>GitHub</dt><dd><a class="ink-link" href="{{.}}" target="_blank" rel="noopener">{{.}}</a></dd></div>{{end}}
       </dl>
     </div>
   </div>
@@ -227,6 +225,7 @@ window.__GEO_VERSION__ = "{{assetver "/static/geo"}}";
 <script src="{{.Base}}{{asset "/static/js/constellation.js"}}" defer></script>
 <script src="{{.Base}}{{asset "/static/js/sections.js"}}" defer></script>
 <script src="{{.Base}}{{asset "/static/js/globe-core.js"}}" defer></script>
+<script src="{{.Base}}{{asset "/static/js/vendor/globe-geo.js"}}" defer></script>
 <script src="{{.Base}}{{asset "/static/js/globe.js"}}" defer></script>
 <script src="{{.Base}}{{asset "/static/js/thoughts.js"}}" defer></script>
 <script src="{{.Base}}{{asset "/static/js/moments.js"}}" defer></script>

@@ -446,8 +446,6 @@ html.js .sec-head.is-in .sec-rule { transform: scaleX(1); }
 }
 .hero-tagline span { display: inline; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
-.hero-hint { margin-top: 26px; font-size: 12px; letter-spacing: .08em; color: var(--muted); }
-.hero-hint span { color: var(--gold); }
 
 .scroll-cue {
   position: absolute;
@@ -480,7 +478,6 @@ html.js:not(.no-intro) .hero-name .ch { animation: charin 1.3s var(--ease) both;
 html.js:not(.no-intro) .hero-eyebrow { animation: fade-in .9s var(--ease) .1s both; }
 html.js:not(.no-intro) .hero-tagline span { display: inline-block; animation: rise-in .9s var(--ease) both; animation-delay: calc(.7s + var(--i, 0) * .12s); }
 html.js:not(.no-intro) .hero-actions { animation: rise-in .9s var(--ease) 1.25s both; }
-html.js:not(.no-intro) .hero-hint { animation: fade-in .9s var(--ease) 1.5s both; }
 html.js:not(.no-intro) .scroll-cue { animation: fade-in .9s var(--ease) 1.7s both; }
 
 /* ---------- constellation (5.2) ---------- */
@@ -608,6 +605,40 @@ html.js .constellation:not(.is-live) { opacity: 0; }
   50% { transform: scale(2.1); opacity: .6; }
 }
 
+/* Three quiet taps draw attention to a real navigation star, then disappear. */
+.star-guide { position: absolute; left: 50%; top: 50%; pointer-events: none; }
+.star-guide::before {
+  content: "";
+  position: absolute;
+  width: 46px; height: 46px; left: -23px; top: -23px;
+  border: 1px solid var(--gold-hi); border-radius: 50%;
+  box-shadow: 0 0 12px rgba(var(--accent-2-rgb), .16);
+  opacity: 0;
+  animation: star-guide-ring 2.6s ease-out 3;
+}
+.star-guide svg {
+  position: absolute; left: -9px; top: -4px; width: 28px; height: 32px; max-width: none;
+  fill: var(--bg-1); stroke: var(--gold-hi); stroke-width: 1.3;
+  stroke-linecap: round; stroke-linejoin: round;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, .65));
+  opacity: 0; transform-origin: 9px 4px;
+  animation: star-guide-tap 2.6s var(--ease) 3;
+}
+.constellation.is-wave .star-guide svg { rotate: -110deg; }
+@keyframes star-guide-tap {
+  0%, 100% { opacity: 0; transform: translate(16px, 20px); }
+  18% { opacity: .85; transform: translate(8px, 10px); }
+  35%, 54% { opacity: .95; transform: none; }
+  43% { opacity: 1; transform: scale(.88); }
+  74% { opacity: 0; transform: translate(5px, 7px); }
+}
+@keyframes star-guide-ring {
+  0%, 40% { opacity: 0; transform: scale(.25); }
+  46% { opacity: .65; transform: scale(.45); }
+  78%, 100% { opacity: 0; transform: scale(1.25); }
+}
+@media (prefers-reduced-motion: reduce) { .star-guide { display: none; } }
+
 /* Docked: counts only on hover; narrow desktops keep labels on hover too so
    they never sit on top of the content column. */
 @media (max-width: 1279px) {
@@ -631,7 +662,6 @@ html.js:not(.no-intro) .cst-lines .base.dim { animation: fade-in 1s ease both; a
   .hero-text { max-width: none; }
   .hero-name { font-size: clamp(44px, 14vw, 64px); margin: 16px 0 14px; white-space: normal; }
   .hero-actions { margin-top: 24px; }
-  .hero-hint { display: none; }
   .scroll-cue { bottom: 18px; }
   .constellation { bottom: 40px; }
   .constellation.is-live.is-wave {
@@ -722,7 +752,7 @@ html.js:not(.no-intro) .cst-lines .base.dim { animation: fade-in 1s ease both; a
 
 @media (prefers-reduced-motion: reduce) {
   .hero-name .ch, .hero-name .ch i, .post-title .ch, .post-title .ch i,
-  .hero-eyebrow, .hero-tagline span, .hero-actions, .hero-hint, .scroll-cue, .scroll-cue s,
+  .hero-eyebrow, .hero-tagline span, .hero-actions, .scroll-cue, .scroll-cue s,
   .constellation.is-live .star, .constellation.is-live .star i, .constellation.is-live .star i::before,
   .cst-lines .base, .spotlight.is-ripple { animation: none !important; }
   .cst-lines .base:not(.dim) { stroke-dashoffset: 0; }

@@ -5,12 +5,17 @@
   "main": "index.js",
   "scripts": {
     "test": "node globe_core_test.mjs && node globe_logic_test.mjs",
-    "test:browser": "node globe_test.mjs"
+    "test:browser": "node globe_loading_test.mjs && node globe_surface_test.mjs && node globe_test.mjs && node star_guide_test.mjs",
+    "build:geo": "node build_globe_geo.mjs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "puppeteer-core": "^21.11.0"
+  },
+  "devDependencies": {
+    "d3-geo": "^3.1.1",
+    "esbuild": "^0.25.12"
   }
 }
