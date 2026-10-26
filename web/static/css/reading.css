@@ -181,7 +181,13 @@ html[data-reading="paper"] .reading-panel { box-shadow: none; }
 }
 .article h2.is-in::after, html:not(.js) .article h2::after { transform: none; }
 .article h3 { margin: 2em 0 .8em; font: 600 22px/1.6 var(--font-serif); letter-spacing: .03em; }
-.article h4, .article h5, .article h6 { margin: 1.8em 0 .6em; font: 600 18px/1.7 var(--font-sans); }
+.article h4, .article h5, .article h6 { font: 600 18px/1.7 var(--font-sans); }
+.article h4 { margin: 1.8em 0 .6em; }
+.article h5 { margin: 1.2em 0 .6em; }
+.article h6 { margin: 1em 0 .6em; }
+/* Keep nested headings close; the preceding block's margin also participates in collapsing. */
+.article :is(h2, h3, h4, h5, h6) + :is(h5, h6) { margin-top: .6em; }
+.article :is(p, ul, ol):has(+ :is(h5, h6)) { margin-bottom: 1em; }
 
 .article > p:first-of-type::first-letter {
   float: left;
