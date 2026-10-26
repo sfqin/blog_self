@@ -154,14 +154,15 @@ html[data-reading="paper"] .reading-panel { box-shadow: none; }
 .reading-panel .article {
   max-width: var(--read-w);
   margin: 0 auto;
-  font: 400 18px/2 var(--font-sans);
+  font: 400 18px/1.8 var(--font-sans);
   letter-spacing: .02em;
   color: var(--read-text);
   overflow-wrap: break-word;
 }
 .article > :first-child { margin-top: 0; }
-.article p, .article li { text-align: justify; text-wrap: pretty; }
-.article p, .article ul, .article ol, .article pre, .article blockquote, .article .table-wrap, .article .darkroom { margin: 0 0 1.4em; }
+.article p, .article li { text-align: left; text-wrap: pretty; }
+.article p { margin: 0 0 1em; }
+.article ul, .article ol, .article pre, .article blockquote, .article .table-wrap, .article .darkroom { margin: 0 0 1.4em; }
 .article > :last-child { margin-bottom: 0; }
 .article strong { font-weight: 600; color: var(--read-heading); }
 

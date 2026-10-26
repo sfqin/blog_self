@@ -448,7 +448,8 @@ html[data-reading]
 
 **正文排版（`.reading-panel .article`）**
 
-- 正文：`--font-sans`，18px，行高 2，字距 .02em，颜色 `--read-text`；移动端 17px。两端对齐，配 `text-wrap: pretty`。
+- 正文：`--font-sans`，18px，行高 1.8，字距 .02em，颜色 `--read-text`；移动端 17px。正文和列表左对齐，配 `text-wrap: pretty`。
+- 普通段落下边距为 1em；列表、代码块、引用、表格与图片容器保持独立的块间距。
 - 标题：
   - h2：serif 600，28px，下方 1px 金线随 reveal 划出（G2 简化版：无罗马数字）。
   - h3：serif 600，22px。
